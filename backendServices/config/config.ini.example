@@ -1,0 +1,228 @@
+[mysql]
+mysql_account = mysql_account
+mysql_password = mysql_password
+mysql_host = mysql_host
+mysql_port = mysql_port
+mysql_database = mysql_database
+
+jiao_mysql_account = jiao_mysql_account
+jiao_mysql_password = jiao_mysql_password
+jiao_mysql_host = jiao_mysql_host
+jiao_mysql_port = 3306
+jiao_mysql_database = jiao_mysql_database
+
+
+
+[mongodb]
+mgaccount = mgaccount
+mgpassword = mgpassword
+mghost = mghost
+mgport = mgport
+mgdatabase = mgdatabase
+
+[googleExcel]
+google_file = .../ProFileSys/docsFile/google_file
+service_account_file = .../ProFileSys/docsFile/google_file/account_file/xxxx.json
+
+googlebot_keywords = ["Googlebot", 'googlebot(at)googlebot.com']
+sheetTab = "蜘蛛收录"
+sheetGroupName = ["test", "jp-stock-ai"]
+
+google_docs_url = "https://docs.google.com"
+
+;;WordPress配置
+[wordPressServer]
+wp_host = wp_host
+wp_user = root
+wp_pwd = wp_pwd
+wp_port = wp_port
+
+
+wp_auth = 3bvP X0DZ EZeH N2Pl DevT IOiM
+
+domain_convert_symbol = ["-"]
+
+remote_address = /home/scripts/site_mysql
+local_address = .../ProFileSys/backstage/src/wordPress/website/travel/site_mysql
+
+article_file = .../ProFileSys/docsFile/article.txt
+imgage_path = .../ProFileSys/docsFile/images
+
+[wordPressWebsite]
+language = 中文
+dest_lang = ja
+# category = "Fishery, Agriculture and Forestry"
+prompt = 関連株 本命株・出遅れ株 一覧
+domain_url = domain_url
+wp_backstage_user = wp_backstage_user
+wp_backstage_password = wp_backstage_password
+
+image_api = https://ts2.mm.bing.net/th?q=
+ai_key = ai_key
+# 是否发布 0是发布
+isPublish = 0
+# 是否翻译 0是翻译
+istranslate = 1
+
+wp_path = .../ProFileSys/docsFile/wp_some
+default_img_path = .../ProFileSys/docsFile/wp_some/default.png
+font_path = .../ProFileSys/docsFile/wp_some/NotoSansJP-Black.ttf
+stock_path = .../ProFileSys/docsFile/wp_some/stock/
+
+
+[youtube]
+youtube_developer_key = youtube_developer_key
+youtube_local_address = .../ProFileSys/docsFile/youtube_some
+
+
+[note]
+note_path = .../ProFileSys/docsFile/note_some
+
+[ads]
+adsServer = http://local.adspower.net:50332
+
+[server]
+
+;设置SSH连接信息
+serverHost = serverHost
+serverPort = serverPort
+serverUser = root
+serverPwd = serverPwd
+serverImgAdd = /usr/share/nginx/html/images/
+
+
+
+[yescaptcha]
+ye_clientKey = ye_clientKey
+;test
+;ye_clientKey = ye_clientKey
+ye_createTask = https://api.yescaptcha.com/createTask
+ye_getTaskResult = https://api.yescaptcha.com/getTaskResult
+
+
+
+[amazon]
+aws_access_key = aws_access_key
+aws_secret_key = aws_secret_key
+;region_name参数设置为特定的地域名称来指定应该使用哪个地域的 AWS 服务
+;us-east-1：美国东部（弗吉尼亚北部）
+;us-west-2：美国西部（俄勒冈）
+;eu-west-1：欧洲（爱尔兰）
+;ap-southeast-1：亚太地区（新加坡）
+;ap-northeast-1：亚太地区（东京）
+aws_region_name = us-east-1
+aws_policy_document = {
+    "Version": "2012-10-17",
+    "Statement": [
+            {
+                "Sid": "__owner_statement",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "151205356403"
+                },
+                "Action": "SQS:*",
+                "Resource": "arn:aws:sqs:ap-northeast-1:151205356403:SQS-2024.fifo"
+            },
+            {
+                "Sid": "__sender_statement",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": ["730335208738"]
+                },
+                "Action": ["SQS:SendMessage"],
+                "Resource": "arn:aws:sqs:ap-northeast-1:151205356403:SQS-2024.fifo"
+            },
+            {
+                "Sid": "__receiver_statement",
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": ["730335208738"]
+                },
+                "Action": ["SQS:ChangeMessageVisibility", "SQS:DeleteMessage", "SQS:ReceiveMessage"],
+                "Resource": "arn:aws:sqs:ap-northeast-1:151205356403:SQS-2024.fifo"
+            }
+        ]
+    }
+
+[chromedriver]
+
+chromedriverpath = .../unit/driver/chromedriver
+userAgent = Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36
+userDataDir = ~/Library/Application Support/Google/Chrome/Default
+
+ye_plug_in = .../ProFileSys/publicFunctions/thirdParty/plugIN/pro_1.1.21.zip
+
+[flaskrun]
+flaskport = 9091
+
+crossDomain = ["http://localhost:5173"]
+
+[driver]
+pcname = acot
+pclogo = mac
+
+
+
+[process]
+# 进程缓存表名
+processset = process_list
+#记录正在执行的domain的缓存表
+domainset = domainSet
+num_columns = 19
+heart_interval = 10
+heart_wait = 720
+
+
+[logs]
+;DEBUG: 详细信息，通常仅用于诊断问题和调试。
+;INFO: 消息提示，确认应用程序按预期工作。
+;WARNING (或 WARN): 警告信息，表明可能出现问题，但应用程序仍能正常运行。
+;ERROR: 错误信息，表明出现了错误，但不会导致应用程序崩溃。
+;CRITICAL (或 FATAL): 严重错误信息，表示严重问题，可能导致应用程序无法继续运行。
+
+log_folder_path = .../ProFileSys
+log_folder_name = logs
+log_level = INFO
+
+
+
+[avatar]
+min_num = 1
+max_num = 100
+default_avatar = .../ProFileSys/docsFile/avatar/default.png
+avatar_path = .../ProFileSys/docsFile/avatar/
+avatar_path_name = avatarManage
+
+[reptile]
+web_item = ['http://pic.netbian.com', 'https://www.souyoutu.com/touxiang/']
+max_size_width = 1024
+max_size_height = 1024
+max_pic = 100
+pic_suffix = .jpg
+
+[summary]
+days_ago = 1
+
+[case]
+domains_run_temp = .../ProFileSys/backstage/src/domainTemplate/domainStartRumTem.py
+domains_stop_temp = .../ProFileSys/backstage/src/domainTemplate/domainStopRumTem.py
+domains_temp = .../ProFileSys/backstage/src/domainTemplate/domainDemo.py
+domains_other_temp = .../ProFileSys/backstage/src/domainTemplate/domainOtherDemo.py
+domains_path = .../ProFileSys/backstage/src/domainsCase
+
+[other]
+temp_img_path = .../ProFileSys/backstage/src/tempImg
+temp_file_path = .../ProFileSys/src/temp_file
+routine_action = ["locator","values","masL","maxL","mo","websiteKey","websiteURL","taskType"]
+other_img_path = .../ProFileSys/docsFile/otherpic
+
+adsgroup = "12-3"
+
+[tokengo]
+who = ['//form/span/section//ul/li[1]/div']
+continuego = ['//div[3]/div/div[2]//button/span']
+secondaryContinue = ['/html/body/div[1]/div[1]/div[2]/div/div/div[3]/div/div/div[2]/div/div/button/span']
+
+
+
+

@@ -1,0 +1,46 @@
+[uwsgi]
+
+# 支持http+socket两种方式
+http =  0.0.0.0:8080
+# 指向项目目录
+chdir=.../ProFileSys
+# linux
+;chdir=/home/api_auto_testcase/project/apiProject
+
+# python 启动程序文件
+wsgi-file = app.py
+
+# web应用的入口模块名称
+module = app:app
+# python 程序内用以启动的 application 变量名
+;callable = app
+master = true
+enable-threads = true
+
+# 启动的线程
+processes = 4
+threads = 2
+#超时时间（秒）
+vacuum = true
+die-on-term = true
+#防止惊群
+harakiri = 60
+
+# 每一个工作进程都生成以后才加载应用程序
+lazy = true
+disable-logging = true
+# 状态检测地址
+stats = 127.0.0.1:8081
+
+
+# 添加pid文件和status文件的配置
+;stats = %(chdir)/uwsgi/uwsgi.status
+
+pidfile = %(chdir)/uwsgi/uwsgi.pid
+
+buffer-size = 32768
+
+#热加载开启
+;py-autoreload = 1
+# log
+daemonize = %(chdir)/uwsgi/logs/uwsgi.log
