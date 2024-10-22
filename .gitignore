@@ -173,16 +173,16 @@ result/
 
 
 logs/
-DebugLog/*.txt
 
-domainsCase/*.txt
-temp_file/*.txt
-images/*.txt
-wp_some/*.txt
-note_some/*.txt
-google_file/*.txt
-youtube_some/*.txt
-telegra_file/*.txt
+
+domainsCase/
+temp_file/
+images/
+wp_some/
+note_some/
+google_file/
+youtube_some/
+telegra_file/
 node_modules/
 
 ##----------img----------
