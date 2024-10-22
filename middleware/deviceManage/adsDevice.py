@@ -17,11 +17,13 @@ bae_idr = base_dr.replace('\\', '/')
 sys.path.append(bae_idr)
 
 from backendServices.unit.drivers.driversMod import DriversUtil
-
+from middleware.public.commonUse import otherUse
+import json
 
 class adsDevice():
     def __init__(self):
         self.DU = DriversUtil()
+        self.usego = otherUse()
 
 
     def basicEncapsulation(self, who, adsServer):
@@ -29,7 +31,8 @@ class adsDevice():
         time.sleep(5)
 
         whodata = self.chromeStartUp(who, adsServer)
-        print("{}选手信息如下：{}".format(who, whodata))
+        json_string = json.dumps(whodata)
+        print("{}选手信息如下：{}".format(who, json_string))
         if whodata["chromedriver"] != '':
             try:
                 driver = self.DU.drivers(driverpath=whodata['chromedriver'], debugUP=whodata["debugD"])
@@ -46,18 +49,18 @@ class adsDevice():
     def chromeStartUp(self, userid, adsServer):
         asdchrome = {}
         response = self.adsAPI(adsServer, "start", userid)
-        dict_response = dict(response)
+        dict_response = self.usego.changeDict(response)
         print(f"本次请求结果:{dict_response}")
         try:
-           res = response.json()
+            asdchrome["chromedriver"] = dict_response['data'].get('webdriver')
+            ws = dict_response['data']['ws']
+            asdchrome["debugD"] = ws.get('selenium')
+            return asdchrome
         except Exception as e:
             print(f"出现了异常{e}")
             return False
-        else:
-            asdchrome["chromedriver"] = res['data'].get('webdriver')
-            ws = res['data']['ws']
-            asdchrome["debugD"] = ws.get('selenium')
-            return asdchrome
+
+
 
 
     def adsAPI(self, adsServer, mo, userid):
