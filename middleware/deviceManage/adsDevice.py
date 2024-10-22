@@ -29,8 +29,8 @@ class adsDevice():
         time.sleep(5)
 
         whodata = self.chromeStartUp(who, adsServer)
+        print("{}选手信息如下：{}".format(who, whodata))
         if whodata["chromedriver"] != '':
-            print("{}选手信息如下：{}".format(who, whodata))
             try:
                 driver = self.DU.drivers(driverpath=whodata['chromedriver'], debugUP=whodata["debugD"])
 
@@ -50,8 +50,8 @@ class adsDevice():
         print(f"本次请求结果:{dict_response}")
         try:
            res = response.json()
-        except:
-            print(f"本次请求结果:{dict_response}")
+        except Exception as e:
+            print(f"出现了异常{e}")
             return False
         else:
             asdchrome["chromedriver"] = res['data'].get('webdriver')

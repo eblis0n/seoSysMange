@@ -55,7 +55,8 @@ class telegraSelenium():
 
             threads = []  # 清空上一轮线程
             # 每次最多取 10 个用户和对应的 10 个链接组
-            for i in range(min(minadsUser, num_links)):  # 最多取 10 个任务，防止越界
+            this_go = min(minadsUser, num_links)
+            for i in range(this_go):  # 最多取 10 个任务，防止越界
                 # 使用 user_index 确保轮询 adsUser
                 user = adsUser[user_index % num_users]
                 link = alll_links_list[i]
@@ -66,8 +67,7 @@ class telegraSelenium():
                 threads.append(t)
                 t.start()
                 time.sleep(3)  # 每个线程启动时延迟 3 秒
-
-
+            print("这波线程准备就绪！")
             # 等待所有线程完成
             for thread in threads:
                 thread.join()
