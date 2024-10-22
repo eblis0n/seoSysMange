@@ -31,8 +31,8 @@ class adsDevice():
         time.sleep(5)
 
         whodata = self.chromeStartUp(who, adsServer)
-        json_string = json.dumps(whodata)
-        print("{}选手信息如下：{}".format(who, json_string))
+
+        print("{}选手信息如下：{}".format(who, whodata))
         if whodata["chromedriver"] != '':
             try:
                 driver = self.DU.drivers(driverpath=whodata['chromedriver'], debugUP=whodata["debugD"])
@@ -41,7 +41,6 @@ class adsDevice():
             except:
                 print("ads接口 返回异常")
                 return False
-
         else:
             print("这个用户{},通过{} 启动chromeStartUp失败".format(who, adsServer))
             return False
