@@ -23,7 +23,7 @@ from backendServices.src.socialPlatforms.telegraGO.telegraSelenium import telegr
 
 
 
-class telegraGO():
+class telegraManage():
     def __init__(self):
         self.bp = Blueprint("telegra", __name__, url_prefix="/telegra")
         self.mossql = mongo_sqlGO()
@@ -42,22 +42,27 @@ class telegraGO():
             @Motto：简单描述用途
         """
         sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post")
-        print("sql_data", sql_data)
+        resdatas = []
+        # print("sql_data", sql_data)
         if "sql 语句异常" not in str(sql_data):
-            print("sql_data",sql_data)
-            # try:
-            #     resdatas = [{'id': item[0], 'salesperson': item[1], 'name': item[2],
-            #                  'create_at': self.usego.turn_isoformat(item[3]),
-            #                  'update_at': self.usego.turn_isoformat(item[4])} for item in sql_data]
-            #
-            # except:
-            #     self.usego.sendlog(f'list没数据：{sql_data}')
-            #     res = ResMsg(code='B0001', msg=f'list没数据：{sql_data}')
-            #     responseData = res.to_json()
-            # else:
-            #     self.usego.sendlog(f'list结果：{resdatas}')
-            #     res = ResMsg(data=resdatas)
-            #     responseData = res.to_dict()
+            try:
+                for i, data in sql_data:
+                    thisdata = {
+                        "id": i,
+                        "url": data["url"],
+                        "created_at": self.usego.turn_isoformat(data["created_at"])
+                    }
+                    resdatas.append(thisdata)
+
+            except Exception as e:
+                print(f"{e}")
+                self.usego.sendlog(f'list没数据：{sql_data}')
+                res = ResMsg(code='B0001', msg=f'list没数据：{sql_data}')
+                responseData = res.to_json()
+            else:
+                self.usego.sendlog(f'list结果：{resdatas}')
+                res = ResMsg(data=resdatas)
+                responseData = res.to_json()
 
         else:
             self.usego.sendlog(f'list查询失败：{sql_data}')
@@ -79,18 +84,18 @@ class telegraGO():
         stacking_min = data_request['stacking_min']
         stacking_max = data_request['stacking_max']
         alt_tex = data_request['alt_tex']
+        print("进来了")
 
         sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post")
-        print("sql_data", sql_data)
 
+        all_links = []
+        for data in sql_data:
 
+            all_links.append(data["url"])
+        print(f"{len(all_links)}")
 
-        # self.tele.run(stacking_min, stacking_max, alt_tex)
+        self.tele.run(all_links, stacking_min, stacking_max, alt_tex)
         res = ResMsg(data=sql_data)
         responseData = res.to_json()
         return responseData
 
-
-
-
-    

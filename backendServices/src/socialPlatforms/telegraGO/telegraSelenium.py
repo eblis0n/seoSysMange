@@ -38,6 +38,7 @@ class telegraSelenium():
             @Author ：eblis
             @Motto：简单描述用途
         """
+        print(f"开始")
         res_list = []
         alll_links_list = self.siphon_links(all_links, stacking_min, stacking_max)
 

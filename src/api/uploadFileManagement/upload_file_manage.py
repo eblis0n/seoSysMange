@@ -57,8 +57,9 @@ class uploadFileManage():
         for file in files:
             # 检查文件后缀是否合法
             if file.filename.endswith(valid_extensions):
+                print(f"当前文件名称{file.filename}")
                 # 保存文件
-                file.save(os.path.join(configCall.temp_file_path, file.filename))
+                file.save(f"{configCall.temp_file_path}/{file.filename}")
                 file_name.append(file.filename)
                 print(f"接收到文件：{file.filename}，属于 {who} 类型")
 

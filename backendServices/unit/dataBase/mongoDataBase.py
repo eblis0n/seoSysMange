@@ -15,17 +15,26 @@ sys.path.append(bae_idr)
 import middleware.public.configurationCall as configCall
 from pymongo import MongoClient
 
+
 class mongodb():
     def __init__(self):
         # 只在类实例化时创建一次 MongoClient，连接池会自动管理连接复用
-        host = configCall.mg_65_host
-        port = eval(configCall.mg_65_port)
-        username = configCall.mg_65_account
-        password = configCall.mg_65_password
-        self.mongodb_url = f'mongodb://{username}:{password}@{host}:{port}'
-        self.client = MongoClient(self.mongodb_url, maxPoolSize=50, minPoolSize=5)
+        self.host = configCall.mg_65_host
+        self.port = eval(configCall.mg_65_port)
+        self.username = configCall.mg_65_account
+        self.password = configCall.mg_65_password
+        self.base_url = f'mongodb://{self.username}:{self.password}@{self.host}:{self.port}'
+        
+        # 创建一个没有指定数据库的客户端
+        self.client = MongoClient(self.base_url, maxPoolSize=50, minPoolSize=5)
 
-    def mongo_65_connect(self, databaseName):
+    def get_database(self, database_name):
+        """
+        获取指定数据库的连接
+        """
+        return self.client[database_name]
+
+    def mongo_65_connect(self, database_name):
         '''
         连接到 MongoDB 并返回数据库对象
         '''
@@ -34,30 +43,29 @@ class mongodb():
             db_list = self.client.list_database_names()
 
             # 检查数据库是否存在
-            if databaseName in db_list:
-                db = self.client[databaseName]
+            if database_name in db_list:
+                db = self.get_database(database_name)
                 return db
             else:
-                print(f"连接成功！但数据库 '{databaseName}' 不存在。")
-                return False
+                print(f"连接成功！但数据库 '{database_name}' 不存在。")
+                return None
         except Exception as e:
             print(f"连接失败: {e}")
-            return False
+            return None
 
     def mongocol(self, dbname, setname):
         '''
         返回数据库集合对象（根据集合名称）
         '''
         db = self.mongo_65_connect(dbname)
-        if db:
+        if db is not None:
             try:
                 setgo = db[setname]
                 return setgo
             except Exception as e:
                 print(f"获取集合失败: {e}")
-                return False
-        return False
-
+                return None
+        return None
 
     def close(self):
         '''
@@ -81,7 +89,7 @@ class mongodb():
         :return: 查询结果，单条记录返回字典，多条记录返回列表
         '''
         mycol = self.mongocol(dbname, setname)
-        if mycol:
+        if mycol is not None:
             try:
                 # 如果没有提供查询条件，则默认查询所有记录
                 if query is None:
@@ -110,7 +118,7 @@ class mongodb():
         :return: 插入后的文档ID或ID列表
         '''
         mycol = self.mongocol(dbname, setname)
-        if mycol:
+        if mycol is not None:
             try:
                 if isinstance(data, list):  # 判断是否为批量插入
                     result = mycol.insert_many(data)
@@ -120,8 +128,8 @@ class mongodb():
                     return result.inserted_id
             except Exception as e:
                 print(f"MongoDB insert error: {e}")
-                return False
-        return False
+                return None
+        return None
 
 
     def updat_data(self, dbname, setname, query, update, update_operator='$set', multi=False):
@@ -136,7 +144,7 @@ class mongodb():
         :return: 返回更新操作的结果，包括是否成功、匹配的文档数和修改的文档数
         '''
         mycol = self.mongocol(dbname, setname)
-        if mycol:
+        if mycol is not None:
             try:
                 # 使用动态更新操作符
                 update_dick = {update_operator: update}
@@ -154,8 +162,8 @@ class mongodb():
                 }
             except Exception as e:
                 print(f"MongoDB query error: {e}")
-                return False
-        return False
+                return None
+        return None
 
     def delet_data(self, dbname, setname, query, multiple=False):
         '''
@@ -167,7 +175,7 @@ class mongodb():
         :return: 返回删除操作的结果，包括是否成功、删除的文档数
         '''
         mycol = self.mongocol(dbname, setname)
-        if mycol:
+        if mycol is not None:
             try:
                 if multiple:  # 如果是批量删除
                     result = mycol.delete_many(query)
@@ -181,10 +189,9 @@ class mongodb():
                 }
             except Exception as e:
                 print(f"MongoDB delete error: {e}")
-                return False
-        return False
+                return None
+        return None
 
 
 
 
-    

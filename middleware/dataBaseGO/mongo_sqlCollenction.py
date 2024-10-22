@@ -1,3 +1,9 @@
+'''
+version: 1.0.0
+Author: Eblis
+Date: 2024-10-19 13:30:51
+LastEditTime: 2024-10-22 19:59:40
+'''
 # -*- coding: utf-8 -*-
 """
 @Datetime ： 2024/10/19 13:30
@@ -27,7 +33,7 @@ class mongo_sqlGO():
 
 
     # 批量插入
-    def telegra_interim_insert_batch(self,setname, dataList):
+    def telegra_interim_insert_batch(self, setname, dataList):
         """
             @Datetime ： 2024/10/19 16:18
             @Author ：eblis

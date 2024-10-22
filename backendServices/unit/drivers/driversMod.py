@@ -9,7 +9,8 @@
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-import publicFunctions.configuration as configuration
+
+import middleware.public.configurationCall as configCall
 
 
 class DriversUtil:
@@ -49,7 +50,7 @@ class DriversUtil:
         options.add_argument("--disable-blink-features=AutomationControlled")
 
         # 验证码插件
-        options.add_extension(f"{configuration.ye_plug_in}")
+        options.add_extension(f"{configCall.ye_plug_in}")
         # 设置浏览器窗口大小为宽1200像素，高800像素
         # options.add_argument('--start-maximized')
 
@@ -60,7 +61,7 @@ class DriversUtil:
             options.add_experimental_option("debuggerAddress", debugUP)
 
         if userAgent is not None:
-            # configuration.userAgent
+            # configCall.userAgent
             options.add_argument(f"user-agent={userAgent}")
 
         if userDataDir is not None:
