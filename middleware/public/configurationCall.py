@@ -82,6 +82,13 @@ log_folder_path = conf.get("logs", "log_folder_path")
 log_folder_name = conf.get("logs", "log_folder_name")
 log_level = conf.get("logs", "log_level")
 
+
+###################################### chromedriver 信息 ######################################
+driverpath = conf.get("chromedriver", "chromedriverpath")
+ye_plug_in = conf.get("chromedriver", "ye_plug_in")
+userAgent = conf.get("chromedriver", "userAgent")
+userDataDir = conf.get("chromedriver", "userDataDir")
+
 ###################################### ads ######################################
 
 adsServer = conf.get("ads", "adsServer")
@@ -106,5 +113,8 @@ proxy_add = conf.get("proxy", "proxy_add")
 ###################################### other ######################################
 
 temp_file_path = conf.get("other", "temp_file_path")
+
+
+
 
 
