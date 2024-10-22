@@ -33,13 +33,13 @@ class adsDevice():
         whodata = self.chromeStartUp(who, adsServer)
 
         print("{}选手信息如下：{}".format(who, whodata))
-        if whodata["chromedriver"] != '':
+        whodata_dict = self.usego.changeDict(whodata)
+        if whodata_dict["chromedriver"] != '':
             try:
-                driver = self.DU.drivers(driverpath=whodata['chromedriver'], debugUP=whodata["debugD"])
-
+                driver = self.DU.drivers(driverpath=whodata_dict['chromedriver'], debugUP=whodata_dict["debugD"])
                 return driver
-            except:
-                print("ads接口 返回异常")
+            except Exception as e:
+                print(f"ads接口 返回异常:{e}")
                 return False
         else:
             print("这个用户{},通过{} 启动chromeStartUp失败".format(who, adsServer))
