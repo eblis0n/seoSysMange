@@ -201,7 +201,7 @@ flask_session/
 
 ##----------除外----------
 #  除外
-!*/*.md
+!*.md
 !docsFile/wp_some/article_custom.css
 !docsFile/wp_some/wp_default.png
 !docsFile/avatar/default.png
