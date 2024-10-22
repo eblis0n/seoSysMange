@@ -168,13 +168,9 @@ Examples/
 
 report/
 
-
 result/
 
-
-logs/
-
-
+lgs/
 
 docsFile/temp_file/
 docsFile/images/
@@ -184,6 +180,7 @@ docsFile/google_file/
 docsFile/youtube_some/
 docsFile/telegra_file/
 node_modules/
+flask_session/
 
 ##----------img----------
 *.png
