@@ -16,7 +16,7 @@ from middleware.public.returnMsg import ResMsg
 
 from flask import Blueprint, request
 from src.api.urlSet import MyEnum
-import middleware.public.configurationCall as configCall
+
 from middleware.dataBaseGO.mongo_sqlCollenction import mongo_sqlGO
 from middleware.public.commonUse import otherUse
 from backendServices.src.socialPlatforms.telegraGO.telegraSelenium import telegraSelenium

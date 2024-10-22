@@ -18,7 +18,7 @@ sys.path.append(bae_idr)
 from middleware.deviceManage.adsDevice import adsDevice
 import middleware.public.configurationCall as configCall
 from middleware.public.commonUse import otherUse
-
+from middleware.dataBaseGO.mongo_sqlCollenction import mongo_sqlGO
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -237,13 +237,18 @@ class telegraSelenium():
 
 
 if __name__ == '__main__':
-    tele = telegraSelenium()
-
-
     # 记录开始时间
     start_time = datetime.now()
+    tele = telegraSelenium()
+    mossql = mongo_sqlGO()
+    sql_data = mossql.telegra_interim_findAll("seo_external_links_post")
 
-    tele.run_bak()
+    all_links = []
+    for data in sql_data:
+        all_links.append(data["url"])
+    print(f"{len(all_links)}")
+
+    tele.run(all_links, configCall.stacking_min, configCall.stacking_max, configCall.stacking_text)
     end_time = datetime.now()
     # 计算耗时
     execution_time = (end_time - start_time).total_seconds()
