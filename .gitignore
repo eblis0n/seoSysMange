@@ -175,14 +175,14 @@ result/
 logs/
 
 
-domainsCase/
-temp_file/
-images/
-wp_some/
-note_some/
-google_file/
-youtube_some/
-telegra_file/
+
+docsFile/temp_file/
+docsFile/images/
+docsFile/wp_some/
+docsFile/note_some/
+docsFile/google_file/
+docsFile/youtube_some/
+docsFile/telegra_file/
 node_modules/
 
 ##----------img----------
@@ -206,6 +206,5 @@ node_modules/
 #  除外
 !*/*.md
 !docsFile/wp_some/article_custom.css
-!publicFunctions/thirdParty/NotoSansJP-Black.ttf
 !docsFile/wp_some/wp_default.png
 !docsFile/avatar/default.png
