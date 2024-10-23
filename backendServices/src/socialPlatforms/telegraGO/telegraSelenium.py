@@ -183,13 +183,17 @@ class telegraSelenium():
                 for link in this_links:
                     link = link.strip('\n\n')
                     driver.execute_script("""
-                        var a = document.createElement('a');
-                        a.href = arguments[0];
-                        a.textContent = arguments[1];
-                        arguments[2].appendChild(a);
-                        var space = document.createTextNode('\u00A0');
-                        arguments[2].appendChild(space);
-                    """, link, alt_tex, content_input)
+                            var a = document.createElement('a');
+                            a.href = arguments[0];  // 链接地址
+                            a.textContent = arguments[1];  // 链接文字
+                            a.target = '_blank';  // 打开新标签页
+                            arguments[2].appendChild(a);
+
+                            // 添加空格
+                            var space = document.createTextNode('\u00A0');
+                            arguments[2].appendChild(space);
+                        """, link, alt_tex, content_input)
+
                 time.sleep(3)
 
                 # 发布
