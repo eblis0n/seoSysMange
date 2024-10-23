@@ -243,22 +243,26 @@ if __name__ == '__main__':
     mossql = mongo_sqlGO()
     sql_data = mossql.telegra_interim_findAll("seo_external_links_post")
 
+
     all_links = []
-    for data in sql_data:
-        all_links.append(data["url"])
-    print(f"{len(all_links)}")
+    if sql_data != []:
+        for data in sql_data:
+            all_links.append(data["url"])
+        print(f"{len(all_links)}")
 
-    tele.run(all_links, configCall.stacking_min, configCall.stacking_max, configCall.stacking_text)
-    for url in all_links:
-        query = {"url": url}
-        sql_data = mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
-        print(f"删除结果：{sql_data}")
+        tele.run(all_links, configCall.stacking_min, configCall.stacking_max, configCall.stacking_text)
+        for url in all_links:
+            query = {"url": url}
+            sql_data = mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
+            print(f"删除结果：{sql_data}")
 
 
-    end_time = datetime.now()
-    # 计算耗时
-    execution_time = (end_time - start_time).total_seconds()
-    print(f"代码执行耗时: {execution_time:.5f} 秒")
+        end_time = datetime.now()
+        # 计算耗时
+        execution_time = (end_time - start_time).total_seconds()
+        print(f"代码执行耗时: {execution_time:.5f} 秒")
+    else:
+        print("没有可执行的数据")
 
 
 
