@@ -182,22 +182,27 @@ class telegraSelenium():
                 # 插入链接
                 for link in this_links:
                     link = link.strip('\n')
-                    a_tab = f"""<a href={link} target="_blank">{alt_tex}</a>&nbsp;"""
-                    all_atab += a_tab  # 正确的拼接字符串方式
-                p_tab = f"""<p dir="auto" data-placeholder="Your story...">{all_atab}"""
-                driver.execute_script("arguments[0].innerHTML = arguments[1];", content_input, p_tab)
-
-                # driver.execute_script("""
-                    #         var a = document.createElement('a');
-                    #         a.href = arguments[0];  // 链接地址
-                    #         a.textContent = arguments[1];  // 链接文字
-                    #         a.target = '_blank';  // 打开新标签页
-                    #         arguments[2].appendChild(a);
+                    driver.execute_script("""
+                                        arguments[2].innerHTML += '<a href="' + arguments[0] + '" target="_blank">' + arguments[1] + '</a>&nbsp;';
+                                    """, link, alt_tex, content_input)
+                    # a_tab = f"""<a href={link} target="_blank">{alt_tex}</a>&nbsp;"""
+                    # all_atab += a_tab  # 正确的拼接字符串方式
                     #
-                    #         // 添加空格
-                    #         var space = document.createTextNode('\u00A0');
-                    #         arguments[2].appendChild(space);
-                    #     """, link, alt_tex, content_input)
+                    #
+                    # driver.execute_script("""
+                    #             var a = document.createElement('a');
+                    #             a.href = arguments[0];  // 链接地址
+                    #             a.textContent = arguments[1];  // 链接文字
+                    #             a.target = '_blank';  // 打开新标签页
+                    #             arguments[2].appendChild(a);
+                    #
+                    #             // 添加空格
+                    #             var space = document.createTextNode('\u00A0');
+                    #             arguments[2].appendChild(space);
+                    #         """, link, alt_tex, content_input)
+
+                # p_tab = f"""<p>{all_atab}</p>"""
+                # driver.execute_script("arguments[0].innerHTML = arguments[1];", content_input, p_tab)
 
                 time.sleep(3)
 
