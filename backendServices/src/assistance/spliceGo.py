@@ -52,6 +52,6 @@ class spliceGo():
 
 if __name__ == '__main__':
     spl = spliceGo()
-    file_name = ["url301.txt", "zy301.txt"]
+    file_name = ["zy301.txt","url301.txt"]
     result = spl.splice_301(file_name)
     print(result)

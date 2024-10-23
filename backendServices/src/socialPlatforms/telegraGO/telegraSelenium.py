@@ -188,17 +188,17 @@ class telegraSelenium():
                     #     var space = document.createTextNode('\u00A0');
                     #     arguments[2].appendChild(space);
                     # """, link, alt_tex, content_input)
-
                     driver.execute_script("""
-                        var p = document.createElement('p');
                         var a = document.createElement('a');
-                        a.href = arguments[0];
-                        a.textContent = arguments[1];
-                        p.appendChild(a);
-                        var space = document.createTextNode('\u00A0');
-                        arguments[2].appendChild(p);
-                    """, link, alt_tex, content_input)
+                        a.href = arguments[0];  // 链接地址
+                        a.textContent = arguments[1];  // 链接文字
+                        a.target = '_blank';  // 打开新标签页
+                        arguments[2].appendChild(a);
 
+                        // 添加空格
+                        var space = document.createTextNode('\u00A0');
+                        arguments[2].appendChild(space);
+                    """, link, alt_tex, content_input)
 
                 time.sleep(3)
 
@@ -268,14 +268,5 @@ if __name__ == '__main__':
         print(f"代码执行耗时: {execution_time:.5f} 秒")
     else:
         print("没有可执行的数据")
-
-
-
-
-
-
-
-
-
 
 
