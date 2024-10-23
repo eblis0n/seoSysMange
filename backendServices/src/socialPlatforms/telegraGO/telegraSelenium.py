@@ -168,7 +168,6 @@ class telegraSelenium():
             # 填充内容部分
             try:
                 content_input = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_tl_editor"]/div[1]/p')))
-                # print("Content input is clickable")
 
                 # 清除内容输入框的现有内容
                 driver.execute_script("arguments[0].textContent = '';", content_input)
@@ -178,17 +177,28 @@ class telegraSelenium():
                 return None
             else:
                 print("this_links:", len(this_links), this_links)
-                all_atab = ''
                 # 插入链接
-                # for link in this_links:
-                #     link = link.strip('\n')
-                all_links_html = ''.join(
-                    [f'<a href="{link}" target="_blank">{alt_tex}</a>&nbsp;' for link in this_links])
+                for link in this_links:
+                    link = link.strip('\n')
+                    # driver.execute_script("""
+                    #     var a = document.createElement('a');
+                    #     a.href = arguments[0];
+                    #     a.textContent = arguments[1];
+                    #     arguments[2].appendChild(a);
+                    #     var space = document.createTextNode('\u00A0');
+                    #     arguments[2].appendChild(space);
+                    # """, link, alt_tex, content_input)
 
-                # 使用 innerHTML 一次性插入所有 <a> 标签
-                driver.execute_script("""
-                    arguments[0].innerHTML = arguments[1];
-                """, content_input, all_links_html)
+                    driver.execute_script("""
+                        var p = document.createElement('p');
+                        var a = document.createElement('a');
+                        a.href = arguments[0];
+                        a.textContent = arguments[1];
+                        p.appendChild(a);
+                        var space = document.createTextNode('\u00A0');
+                        arguments[2].appendChild(p);
+                    """, link, alt_tex, content_input)
+
 
                 time.sleep(3)
 
