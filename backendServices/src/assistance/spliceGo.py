@@ -1,9 +1,3 @@
-'''
-version: 1.0.0
-Author: Eblis
-Date: 2024-10-19 21:36:56
-LastEditTime: 2024-10-22 16:23:31
-'''
 # -*- coding: utf-8 -*-
 """
 @Datetime ： 2024/10/19 21:36

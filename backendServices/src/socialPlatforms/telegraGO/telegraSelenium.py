@@ -23,13 +23,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import threading
-import json
+
 
 class telegraSelenium():
 
     def __init__(self):
         self.usego = otherUse()
         self.ads = adsDevice()
+        self.mossql = mongo_sqlGO()
 
 
 
@@ -42,7 +43,7 @@ class telegraSelenium():
         print(f"开始")
         res_list = []
         alll_links_list = self.siphon_links(all_links, stacking_min, stacking_max)
-
+        bad_run_list = []
         adsUser = eval(configCall.telegra_ads)
         minadsUser = eval(configCall.min_concurrent_user)
         num_users = len(adsUser)
@@ -63,7 +64,7 @@ class telegraSelenium():
                 link = alll_links_list[i]
 
                 t = threading.Thread(target=self.post_to_telegraph_wrapper,
-                                     args=(user, res_list, link, alll_links_list, alt_tex,))
+                                     args=(user, res_list, link, alll_links_list, bad_run_list, alt_tex,))
                 user_index += 1  # 移动到下一个用户
                 threads.append(t)
                 t.start()
@@ -73,20 +74,25 @@ class telegraSelenium():
             for thread in threads:
                 thread.join()
 
-
-            # 移除已处理的链接
             alll_links_list = alll_links_list[10:]  # 每次移除前 10 个处理过的链接
+            if bad_run_list !=[]:
+
+                for bad in bad_run_list:
+                    alll_links_list.append(bad)
+
 
             num_links = len(alll_links_list)  # 更新剩余的链接数量
 
         print(f"全部跑完了，这是成功的：{res_list}")
+        self.save_res(res_list)
+        
+        
         return res_list
+    
 
-
-        # self.save_res(res_list)
 
     # 线程函数，执行 post 并将结果写入 res_list，同时从 this_go_list 删除已处理的 link
-    def post_to_telegraph_wrapper(self, user, result_list, link, all_list, alt_tex):
+    def post_to_telegraph_wrapper(self, user, result_list, link, all_list, bad_run_list, alt_tex):
         # 使用线程锁确保线程安全
         lock = threading.Lock()
         result = tele.post_to_telegraph(user, link, alt_tex)  # 执行发布操作
@@ -96,6 +102,8 @@ class telegraSelenium():
             with lock:  # 确保线程安全
                 result_list.append(result)  # 将结果写入 res_list
                 all_list.remove(link)  # 从 this_go_list 删除已处理的 link
+        else:
+            bad_run_list.append(link)
 
 
 
@@ -173,7 +181,7 @@ class telegraSelenium():
 
                 # 插入链接
                 for link in this_links:
-                    link = link.strip('\n')
+                    link = link.strip('\n\n')
                     driver.execute_script("""
                         var a = document.createElement('a');
                         a.href = arguments[0];
@@ -182,7 +190,7 @@ class telegraSelenium():
                         var space = document.createTextNode('\u00A0');
                         arguments[2].appendChild(space);
                     """, link, alt_tex, content_input)
-                time.sleep(5)
+                time.sleep(3)
 
                 # 发布
                 print("发布中...")
@@ -206,34 +214,21 @@ class telegraSelenium():
 
 
 
-    # def save_res(self, urls):
-    #     """
-    #         @Datetime ： 2024/10/17 19:45
-    #         @Author ：eblis
-    #         @Motto：简单描述用途
-    #     """
-    #     # 获取当前日期和时间
-    #     now = datetime.now()
-    #     # 格式化日期和时间
-    #     formatted_now = now.strftime("%Y%m%d")
-    #     file_name = f"telegra_result_{formatted_now}.txt"
-    #     today_file = self.usego.make_file(config.telegra_result, file_name)
-    #     with open(today_file, 'a+') as f:
-    #         for url in urls:
-    #             f.write(f"{url}\n")
-    #
-    #     with open(config.telegra_301_file, 'w+') as f:
-    #         f.write('')
-
-    # def save_res(self, urls):
-    #     """
-    #         @Datetime ： 2024/10/17 19:45
-    #         @Author ：eblis
-    #         @Motto：简单描述用途
-    #     """
-    #     telegra_interim_insert_batch(self, setname, dataList)
-
-
+    def save_res(self, urls):
+        """
+            @Datetime ： 2024/10/17 19:45
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        # 获取当前日期和时间
+        now = datetime.now()
+        # 格式化日期和时间
+        formatted_now = now.strftime("%Y%m%d")
+        file_name = f"telegra_result_{formatted_now}.txt"
+        today_file = self.usego.make_file(configCall.telegra_result, file_name)
+        with open(today_file, 'a+') as f:
+            for url in urls:
+                f.write(f"{url}\n")
 
 
 
@@ -250,6 +245,12 @@ if __name__ == '__main__':
     print(f"{len(all_links)}")
 
     tele.run(all_links, configCall.stacking_min, configCall.stacking_max, configCall.stacking_text)
+    for url in all_links:
+        query = {"url": url}
+        sql_data = mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
+        print(f"删除结果：{sql_data}")
+
+
     end_time = datetime.now()
     # 计算耗时
     execution_time = (end_time - start_time).total_seconds()

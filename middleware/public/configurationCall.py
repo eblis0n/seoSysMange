@@ -100,7 +100,7 @@ min_concurrent_user = conf.get("ads", "min_concurrent_user")
 stacking_text = conf.get("telegra", "stacking_text")
 stacking_min = conf.get("telegra", "stacking_min")
 stacking_max = conf.get("telegra", "stacking_max")
-
+telegra_result = conf.get("telegra", "telegra_result")
 ###################################### ahrefs ######################################
 
 ahrefs_api_token = conf.get("ahrefs", "ahrefs_api_token")

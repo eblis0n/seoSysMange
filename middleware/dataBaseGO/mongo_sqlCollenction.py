@@ -54,6 +54,31 @@ class mongo_sqlGO():
 
         return sql_data
 
+    def telegra_interim_findAll(self, setname):
+        """
+            @Datetime ： 2024/10/20 16:06
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        sql_data = self.mosql.find_data(self.seo_interim, setname)
+
+
+        return sql_data
+
+
+    def telegra_interim_multiple_delet(self, setname, query):
+        """
+            @Datetime ： 2024/10/20 16:06
+            @Author ：eblis
+            @Motto：query 传字典
+        """
+        sql_data = self.mosql.delet_data(self.seo_interim, setname, query, multiple=True)
+
+
+        return sql_data
+
+
+
 
 
 
