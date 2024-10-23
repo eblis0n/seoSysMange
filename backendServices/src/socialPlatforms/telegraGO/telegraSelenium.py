@@ -180,29 +180,15 @@ class telegraSelenium():
                 print("this_links:", len(this_links), this_links)
                 all_atab = ''
                 # 插入链接
-                for link in this_links:
-                    link = link.strip('\n')
-                    driver.execute_script("""
-                                        arguments[2].innerHTML += '<a href="' + arguments[0] + '" target="_blank">' + arguments[1] + '</a>&nbsp;';
-                                    """, link, alt_tex, content_input)
-                    # a_tab = f"""<a href={link} target="_blank">{alt_tex}</a>&nbsp;"""
-                    # all_atab += a_tab  # 正确的拼接字符串方式
-                    #
-                    #
-                    # driver.execute_script("""
-                    #             var a = document.createElement('a');
-                    #             a.href = arguments[0];  // 链接地址
-                    #             a.textContent = arguments[1];  // 链接文字
-                    #             a.target = '_blank';  // 打开新标签页
-                    #             arguments[2].appendChild(a);
-                    #
-                    #             // 添加空格
-                    #             var space = document.createTextNode('\u00A0');
-                    #             arguments[2].appendChild(space);
-                    #         """, link, alt_tex, content_input)
+                # for link in this_links:
+                #     link = link.strip('\n')
+                all_links_html = ''.join(
+                    [f'<a href="{link}" target="_blank">{alt_tex}</a>&nbsp;' for link in this_links])
 
-                # p_tab = f"""<p>{all_atab}</p>"""
-                # driver.execute_script("arguments[0].innerHTML = arguments[1];", content_input, p_tab)
+                # 使用 innerHTML 一次性插入所有 <a> 标签
+                driver.execute_script("""
+                    arguments[0].innerHTML = arguments[1];
+                """, content_input, all_links_html)
 
                 time.sleep(3)
 
