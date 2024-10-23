@@ -251,10 +251,9 @@ if __name__ == '__main__':
         print(f"{len(all_links)}")
 
         tele.run(all_links, configCall.stacking_min, configCall.stacking_max, configCall.stacking_text)
-        for url in all_links:
-            query = {"url": url}
-            sql_data = mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
-            print(f"删除结果：{sql_data}")
+        query = {"url": {"$in": all_links}}
+        sql_data = mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
+        print(f"删除结果：{sql_data}")
 
 
         end_time = datetime.now()
