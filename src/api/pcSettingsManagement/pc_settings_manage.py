@@ -40,9 +40,10 @@ class pcManage():
         data_request = request.json
         name = data_request['name']
         address = data_request['address']
+        application = data_request['application']
 
 
-        sql_data = self.ssql.pcSettings_insert_sql(name, address, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        sql_data = self.ssql.pcSettings_insert_sql(name, address, application, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'添加成功：{sql_data}')

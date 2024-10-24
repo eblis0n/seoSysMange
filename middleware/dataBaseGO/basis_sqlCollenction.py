@@ -147,6 +147,19 @@ class basis_sqlGO():
 
     # ############################################# 菜单 #####################################################
 
+    def menu_list(self):
+        """
+            @Datetime ： 2024/10/23 22:51
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        sqlgo = f""" SELECT * FROM sys_menu; """
+
+        sql_data = self.ssql.mysql_select('basis', sqlgo)
+        return sql_data
+
+
+
     def menu_router_list(self, roles, button_value):
         """
             @Datetime ： 2024/9/30 15:43
@@ -188,9 +201,9 @@ class basis_sqlGO():
         sql_data = self.ssql.mysql_select('basis', sqlgo)
         return sql_data
 
-    def pcSettings_insert_sql(self, name, address, create_at):
+    def pcSettings_insert_sql(self, name, address, application, create_at):
         # noinspection SqlNoDataSourceInspection
-        sqlgo = f"""INSERT INTO pro_pc_settings (name, address, create_at) VALUES ('{name}', '{address}','{create_at}');"""
+        sqlgo = f"""INSERT INTO pro_pc_settings (name, address, application,create_at) VALUES ('{name}', '{address}', '{application}', '{create_at}');"""
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_commit('basis', sqlgo)
         return sql_data
@@ -202,7 +215,7 @@ class basis_sqlGO():
         sql_data = self.ssql.mysql_commit('basis', sqlgo)
         return sql_data
 
-    def pcSettings_update_sql(self, name=None, address=None, state=None, id=None):
+    def pcSettings_update_sql(self, name=None, address=None, application=None, state=None):
         """
             更新 PC 设置的状态、名称和地址
         """
@@ -214,36 +227,11 @@ class basis_sqlGO():
             'id': id
         }
 
-        # 检查所有必需参数是否提供
-        if all(param is not None for param in [params['name'], params['state'], params['address'], params['id']]):
-            sqlgo = f"""
-                UPDATE pro_pc_settings 
-                SET name = %s, address = %s, state = %s 
-                WHERE id = %s;
-            """
-            values = (params['name'], params['address'], params['state'], params['id'])
-        else:
-            # 如果 address 为列表，使用 IN 查询
-            if isinstance(address, list) and len(address) > 1:
-                sqlgo = f"""
-                    UPDATE pro_pc_settings 
-                    SET state = %s 
-                    WHERE address IN ({','.join(['%s'] * len(address))});
-                """
-                values = (params['state'], *address)
-            elif address is not None:
-                sqlgo = f"""
-                    UPDATE pro_pc_settings 
-                    SET state = %s 
-                    WHERE address = %s;
-                """
-                values = (params['state'], address)
-            else:
-                print("没有有效的更新参数")
-                return None
-
-        print(f"pcSettings_update_sql 所执行的 SQL: {sqlgo % values}")
-
+        sqlgo = f"""
+                        UPDATE pro_pc_settings 
+                        SET name = %s, address = %s, state = %s 
+                        WHERE id = %s;
+                    """
         # 执行 SQL 更新查询
         sql_data = self.ssql.mysql_commit_tuple('basis', sqlgo, values)
         return sql_data

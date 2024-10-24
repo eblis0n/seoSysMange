@@ -18,13 +18,13 @@ import sys
 base_dr = str(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 bae_idr = base_dr.replace('\\', '/')
 sys.path.append(bae_idr)
-from backendServices.unit.dataBase.mongoDataBase import mongodb
+from backendServices.unit.dataBase.mongoDataBase import MongoDB
 import middleware.public.configurationCall as configCall
 
 # 执行后不主动关闭数据库连接，通过 外部调用 关闭
 class mongo_sqlGO():
     def __init__(self):
-        self.mosql = mongodb()
+        self.mosql = MongoDB()
         self.seo_interim = configCall.mg_65_interim_databas
 
     ############################################# 公共 #####################################################
@@ -72,7 +72,7 @@ class mongo_sqlGO():
             @Author ：eblis
             @Motto：query 传字典
         """
-        sql_data = self.mosql.delet_data(self.seo_interim, setname, query, multiple=True)
+        sql_data = self.mosql.delete_data(self.seo_interim, setname, query, multiple=True)
 
 
         return sql_data

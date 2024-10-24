@@ -19,7 +19,7 @@ from src.api.sysUserManagement.sys_user_manage import userService
 from src.api.sysMenuManagement.sys_menu_manage import menuDeploy
 from src.api.pcSettingsManagement.pc_settings_manage import pcManage
 from src.api.uploadFileManagement.upload_file_manage import uploadFileManage
-from src.api.telegraManagement.telegra_manage import telegraManage
+from src.api.splicingManagement.splicing_manage import splicingManage
 
 
 
@@ -64,7 +64,7 @@ userService_bp = userService().bp
 menuDeploy_bp = menuDeploy().bp
 pcManage_bp = pcManage().bp
 uploadFile_bp = uploadFileManage().bp
-telegra_bp = telegraManage().bp
+splicing_bp = splicingManage().bp
 
 #################################################### 引用 ###########################################################
 
@@ -74,7 +74,7 @@ app.register_blueprint(userService_bp)
 app.register_blueprint(menuDeploy_bp)
 app.register_blueprint(pcManage_bp)
 app.register_blueprint(uploadFile_bp)
-app.register_blueprint(telegra_bp)
+app.register_blueprint(splicing_bp)
 
 
 

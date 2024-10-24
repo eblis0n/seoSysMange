@@ -15,43 +15,48 @@ sys.path.append(bae_idr)
 from middleware.public.commonUse import otherUse
 from middleware.dataBaseGO.mongo_sqlCollenction import mongo_sqlGO
 import middleware.public.configurationCall as configCall
+from datetime import datetime
 
 class spliceGo():
     def __init__(self):
         self.usego = otherUse()
         self.mossql = mongo_sqlGO()
 
-    def splice_301(self, files):
-        if len(files) < 2:
-            print("至少需要两个文件")
-            return False
+    def splice_301(self, zyurllist, urllist, platform, genre):
 
-        file_1_path = f"{configCall.temp_file_path}/{files[0]}"
-        file_2_path = f"{configCall.temp_file_path}/{files[1]}"
+        # 获取当前时间
+        now = datetime.now()
 
-        try:
-            with open(file_1_path, 'r', encoding='utf-8') as f1, open(file_2_path, 'r', encoding='utf-8') as f2:
-                one_file_links = [line.strip() for line in f1 if line.strip()]
-                two_file_links = [line.strip() for line in f2 if line.strip()]
+        # 格式化为年月日时分秒
+        formatted_now = now.strftime("%Y-%m-%d %H:%M:%S")
+        new_links_list = [
+            {
+                "url": f"{zy_link}{url}",
+                "platform": platform,
+                "genre": genre,
+                "created_at": formatted_now
+            }
+            for zy_link in zyurllist
+            for url in urllist
+        ]
+        # print("new_links_list", new_links_list)
 
-            # 修改这里，将链接转换为字典
-            new_links_list = [{"url": f"{zy_link}{url}"} for zy_link in one_file_links for url in two_file_links]
-            print("new_links_list", new_links_list)
+        # 批量插入生成的链接
+        result = self.mossql.telegra_interim_insert_batch("seo_external_links_post", new_links_list)
 
-            # 批量插入生成的链接
-            result = self.mossql.telegra_interim_insert_batch("seo_external_links_post", new_links_list)
+        if result is not None:  # 修改这里，检查 result 是否为 None
+            return f"生成 {len(new_links_list)} 个新链接，已入库"
+        else:
+            return None
 
-            if result is not None:  # 修改这里，检查 result 是否为 None
-                return f"生成 {len(new_links_list)} 个新链接，已入库"
-            else:
-                return "数据库插入操作失败"
-
-        except Exception as e:
-            print(f"处理文件时出错: {e}")
-            return False
 
 if __name__ == '__main__':
     spl = spliceGo()
-    file_name = ["zy301.txt","url301.txt"]
-    result = spl.splice_301(file_name)
+
+    file_zy301 = f"{configCall.temp_file_path}/zy301.txt"
+    file_url301 = f"{configCall.temp_file_path}/url301.txt"
+    with open(file_zy301, 'r', encoding='utf-8') as f1, open(file_url301, 'r', encoding='utf-8') as f2:
+        zy301_file_links = [line.strip() for line in f1 if line.strip()]
+        url301_file_links = [line.strip() for line in f2 if line.strip()]
+    result = spl.splice_301(zy301_file_links,url301_file_links, "telegra", "0")
     print(result)

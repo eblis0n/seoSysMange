@@ -28,6 +28,12 @@ class MyEnum():
 
     # 菜单
     SYS_MENU_ROUTES = "/routes/"
+    SYS_MENU_LIST = "/list/"
+    # SYS_MENU_OPTIONS = "/options/"
+    # SYS_MENU_FORM = "/form/"
+    # SYS_MENU_ADD = "/add/"
+    # SYS_MENU_UPDATE = "/update/"
+    # SYS_MENU_DELETE = "/del/"
 
 
 
@@ -38,6 +44,8 @@ class MyEnum():
     PC_LIST = "/list/"
 
 
-    #telegra
+    #splicing
     SUBMIT_301 = "/301/"
     SPLICING_LIST = "/list/"
+    SPLICING_INSERT = "/add/"
+    SPLICING_SUPPORTED_PLATFORMS = "/platforms/"
