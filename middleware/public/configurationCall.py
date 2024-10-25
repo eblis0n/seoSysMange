@@ -36,6 +36,10 @@ conf_file_path = bae_idr + "/backendServices/config/config.ini"
 conf = cparser.ConfigParser()
 conf.read(conf_file_path, encoding="utf-8-sig")
 
+###################################### switch ######################################
+
+isClient = conf.get("switch", "isClient")
+
 ###################################### mysql 信息 ######################################
 
 mysql_65_account = conf.get("mysql", "mysql_65_account")
@@ -83,11 +87,23 @@ log_folder_name = conf.get("logs", "log_folder_name")
 log_level = conf.get("logs", "log_level")
 
 
+###################################### Client ######################################
+
+client_id = conf.get("Client", "client_id")
+
 ###################################### chromedriver 信息 ######################################
 driverpath = conf.get("chromedriver", "chromedriverpath")
 ye_plug_in = conf.get("chromedriver", "ye_plug_in")
 userAgent = conf.get("chromedriver", "userAgent")
 userDataDir = conf.get("chromedriver", "userDataDir")
+
+###################################### amazon 信息 ######################################
+aws_access_key = conf.get("amazon", "aws_access_key")
+aws_secret_key = conf.get("amazon", "aws_secret_key")
+aws_region_name = conf.get("amazon", "aws_region_name")
+aws_policy_document = conf.get("amazon", "aws_policy_document")
+task_address = conf.get("amazon", "task_address")
+
 
 ###################################### ads ######################################
 
@@ -113,6 +129,7 @@ proxy_add = conf.get("proxy", "proxy_add")
 ###################################### other ######################################
 
 temp_file_path = conf.get("other", "temp_file_path")
+
 
 
 

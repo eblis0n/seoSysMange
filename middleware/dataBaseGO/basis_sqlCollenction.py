@@ -201,9 +201,9 @@ class basis_sqlGO():
         sql_data = self.ssql.mysql_select('basis', sqlgo)
         return sql_data
 
-    def pcSettings_insert_sql(self, group, name, address,account, password, application, remark, create_at):
+    def pcSettings_insert_sql(self, group, name, address, account, password, platform, remark, create_at):
         # noinspection SqlNoDataSourceInspection
-        sqlgo = f"""INSERT INTO pro_pc_settings (`group`, `name`, `address`,`account`, `password`,`application`, `remark`,`create_at`) VALUES ('{group}','{name}', '{address}', '{account}', '{password}',  '{application}', '{remark}','{create_at}');"""
+        sqlgo = f"""INSERT INTO pro_pc_settings (`group`, `name`, `address`,`account`, `password`,`platform`, `remark`,`create_at`) VALUES ('{group}','{name}', '{address}', '{account}', '{password}',  '{platform}', '{remark}','{create_at}');"""
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_commit('basis', sqlgo)
         return sql_data
@@ -215,30 +215,30 @@ class basis_sqlGO():
         sql_data = self.ssql.mysql_commit('basis', sqlgo)
         return sql_data
 
-    def pcSettings_update_sql(self, group, name, address, account, password, application, remark, state, id):
+    def pcSettings_update_sql(self, group, name, address, account, password, platform, remark, state, id):
         """
             更新 PC 设置的状态、名称和地址
         """
 
         sqlgo = f"""
                         UPDATE pro_pc_settings 
-                        SET `name` = '{name}', `address` = '{address}', `application` = '{application}', `state` = {state}, `group` = '{group}', `account` = '{account}', `password` = '{password}', `remark` = {remark}
+                        SET `name` = '{name}', `address` = '{address}', `platform` = '{platform}', `state` = {state}, `group` = '{group}', `account` = '{account}', `password` = '{password}', `remark` = {remark}
                         WHERE `id` = {id};
                     """
         # 执行 SQL 更新查询
         sql_data = self.ssql.mysql_commit('basis', sqlgo)
         return sql_data
 
-    def pcSettings_select_sql(self, address=None, state=None):
+    def pcSettings_select_sql(self, platform=None, state=None):
         """
             @Datetime ： 2024/5/7 10:59
             @Author ：eblis
             @Motto：查询 PC 设置
         """
-        print("pcSettings_select, locals():", locals())
+        # print("pcSettings_select, locals():", locals())
 
         # 构建参数字典，过滤掉 None 和空字符串
-        params = {k: v for k, v in locals().items() if k in ['address', 'state'] and v not in [None, ""]}
+        params = {k: v for k, v in locals().items() if k in ['platform', 'state'] and v not in [None, ""]}
         print("非 None 的参数名：", list(params.keys()))
 
         # 根据参数构建 SQL 查询
@@ -248,7 +248,7 @@ class basis_sqlGO():
         else:
             sqlgo = "SELECT /*+ NOCACHE */ * FROM pro_pc_settings ORDER BY create_at DESC;"
 
-        print("生成的 SQL 查询:", sqlgo)
+        # print("生成的 SQL 查询:", sqlgo)
 
         # 执行查询
         sql_data = self.ssql.mysql_select('basis', sqlgo)

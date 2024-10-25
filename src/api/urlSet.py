@@ -48,4 +48,6 @@ class MyEnum():
     SUBMIT_301 = "/301/"
     SPLICING_LIST = "/list/"
     SPLICING_INSERT = "/add/"
-    SPLICING_SUPPORTED_PLATFORMS = "/platforms/"
+
+    # public
+    PLATFORMS = "/platforms/"

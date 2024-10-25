@@ -54,14 +54,20 @@ class mongo_sqlGO():
 
         return sql_data
 
-    def telegra_interim_findAll(self, setname):
+    def telegra_interim_findAll(self, setname, genre=None, platform=None):
         """
             @Datetime ： 2024/10/20 16:06
             @Author ：eblis
             @Motto：简单描述用途
         """
-        sql_data = self.mosql.find_data(self.seo_interim, setname)
+        query = {}
+        if genre is not None:
+            query['genre'] = genre
+        if platform is not None:
+            query['platform'] = platform
 
+            # 调用 find_data 方法执行查询
+        sql_data = self.mosql.find_data(self.seo_interim, setname, query=query)
 
         return sql_data
 

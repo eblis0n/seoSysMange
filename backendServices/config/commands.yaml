@@ -1,0 +1,25 @@
+# 命令配置列表
+commands:
+  - name: run_telegra_selenium  # 命令名称
+    module: backendServices.src.socialPlatforms.telegraGO.telegraSelenium  # 模块路径
+    class: telegraSelenium  # 类名
+    method: run  # 方法名
+    params:  # 参数列表
+      - all_links  # 所有链接
+      - stacking_min  # 最小堆叠数
+      - stacking_max  # 最大堆叠数
+      - alt_tex  # 替代文本
+
+  - name: another_command  # 另一个命令的名称
+    function: another_module.another_function  # 函数路径
+    params:  # 参数列表
+      - param1  # 参数1
+      - param2  # 参数2
+
+# 可以继续添加更多命令
+# 每个命令都应包含以下字段:
+# name: 命令的唯一标识符
+# module: 包含要执行的代码的Python模块路径
+# class: (可选) 如果要执行的是类方法,这里指定类名
+# method 或 function: 要执行的方法或函数名
+# params: 执行方法或函数所需的参数列表
