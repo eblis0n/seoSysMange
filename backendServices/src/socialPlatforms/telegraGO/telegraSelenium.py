@@ -41,7 +41,7 @@ class telegraSelenium():
             @Motto：简单描述用途
         """
         print(f"开始")
-        res_list = []
+        all_res_list = []
         alll_links_list = self.siphon_links(all_links, stacking_min, stacking_max)
         bad_run_list = []
         adsUser = eval(configCall.telegra_ads)
@@ -53,6 +53,7 @@ class telegraSelenium():
 
         # 每次从 adsUser 拿 10 个出来跑
         while len(alll_links_list) > 0:
+            res_list = []
             print(f"剩余 {len(alll_links_list)} 需要执行！！")
 
             threads = []  # 清空上一轮线程
@@ -75,19 +76,22 @@ class telegraSelenium():
                 thread.join()
 
             alll_links_list = alll_links_list[10:]  # 每次移除前 10 个处理过的链接
-            if bad_run_list !=[]:
 
+            print(f"这波跑完了，这是成功的：{res_list},bad_run_list 记录结果{bad_run_list}")
+            self.save_res(res_list)
+            if bad_run_list !=[]:
                 for bad in bad_run_list:
                     alll_links_list.append(bad)
 
 
             num_links = len(alll_links_list)  # 更新剩余的链接数量
 
-        print(f"全部跑完了，这是成功的：{res_list}")
-        self.save_res(res_list)
+
+
+            all_res_list.extend([item for item in res_list if item not in all_res_list])  # 第一次添加
+
         
-        
-        return res_list
+        return all_res_list
     
 
 
