@@ -67,7 +67,7 @@ class MongoDB:
             self.client.close()
             print("MongoDB 连接已关闭。")
 
-    def find_data(self, dbname, setname, query=None, projection=None, find_one=False):
+    def find_data(self, dbname, setname, query=None, projection=None, find_one=False, limit=None):
         """通用查询方法"""
         mycol = self.get_collection(dbname, setname)
         if mycol is not None:
@@ -78,6 +78,8 @@ class MongoDB:
                     return mycol.find_one(query, projection)  # 单条查询
                 else:
                     result = mycol.find(query, projection)
+                    if limit:
+                        result = result.limit(limit)  # 设置返回结果的限制数量
                     return list(result)  # 查询全部
             except Exception as e:
                 print(f"MongoDB 查询错误: {e}")

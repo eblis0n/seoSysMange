@@ -201,9 +201,9 @@ class basis_sqlGO():
         sql_data = self.ssql.mysql_select('basis', sqlgo)
         return sql_data
 
-    def pcSettings_insert_sql(self, name, address, application, create_at):
+    def pcSettings_insert_sql(self, group, name, address,account, password, application, remark, create_at):
         # noinspection SqlNoDataSourceInspection
-        sqlgo = f"""INSERT INTO pro_pc_settings (name, address, application,create_at) VALUES ('{name}', '{address}', '{application}', '{create_at}');"""
+        sqlgo = f"""INSERT INTO pro_pc_settings (`group`, `name`, `address`,`account`, `password`,`application`, `remark`,`create_at`) VALUES ('{group}','{name}', '{address}', '{account}', '{password}',  '{application}', '{remark}','{create_at}');"""
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_commit('basis', sqlgo)
         return sql_data
@@ -215,25 +215,18 @@ class basis_sqlGO():
         sql_data = self.ssql.mysql_commit('basis', sqlgo)
         return sql_data
 
-    def pcSettings_update_sql(self, name=None, address=None, application=None, state=None):
+    def pcSettings_update_sql(self, group, name, address, account, password, application, remark, state, id):
         """
             更新 PC 设置的状态、名称和地址
         """
-        # 用于构建 SQL 语句的参数字典
-        params = {
-            'name': name,
-            'address': address,
-            'state': state,
-            'id': id
-        }
 
         sqlgo = f"""
                         UPDATE pro_pc_settings 
-                        SET name = %s, address = %s, state = %s 
-                        WHERE id = %s;
+                        SET `name` = '{name}', `address` = '{address}', `application` = '{application}', `state` = {state}, `group` = '{group}', `account` = '{account}', `password` = '{password}', `remark` = {remark}
+                        WHERE `id` = {id};
                     """
         # 执行 SQL 更新查询
-        sql_data = self.ssql.mysql_commit_tuple('basis', sqlgo, values)
+        sql_data = self.ssql.mysql_commit('basis', sqlgo)
         return sql_data
 
     def pcSettings_select_sql(self, address=None, state=None):

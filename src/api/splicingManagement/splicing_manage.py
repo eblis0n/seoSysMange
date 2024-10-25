@@ -124,7 +124,7 @@ class splicingManage():
         stacking_min = data_request['stacking_min']
         stacking_max = data_request['stacking_max']
         alt_tex = data_request['alt_tex']
-        print("进来了")
+        # print("进来了")
 
         sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post")
 

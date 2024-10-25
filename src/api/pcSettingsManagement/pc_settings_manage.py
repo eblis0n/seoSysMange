@@ -38,12 +38,17 @@ class pcManage():
     def pc_insert(self):
 
         data_request = request.json
+        group = data_request['group']
         name = data_request['name']
         address = data_request['address']
+        account = data_request['account']
+        password = data_request['password']
         application = data_request['application']
+        remark = data_request['remark']
 
 
-        sql_data = self.ssql.pcSettings_insert_sql(name, address, application, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+        sql_data = self.ssql.pcSettings_insert_sql(group, name, address,account, password,application, remark, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'添加成功：{sql_data}')
@@ -52,7 +57,7 @@ class pcManage():
 
         else:
             self.usego.sendlog(f'添加失败：{sql_data}')
-            res = ResMsg(code=10001, msg=f'添加失败：{sql_data}')
+            res = ResMsg(code='B0001', msg=f'添加失败：{sql_data}')
             responseData = res.to_json()
         return responseData
 
@@ -71,7 +76,7 @@ class pcManage():
 
         else:
             self.usego.sendlog(f'删除失败：{sql_data}')
-            res = ResMsg(code=10001, msg=f'删除失败：{sql_data}')
+            res = ResMsg(code='B0001', msg=f'删除失败：{sql_data}')
             responseData = res.to_json()
         return responseData
 
@@ -79,13 +84,18 @@ class pcManage():
     def pc_update(self):
 
         data_request = request.json
-        name = data_request['name']
-        address = data_request['address']
         state = data_request['state']
         id = data_request['id']
+        group = data_request['group']
+        name = data_request['name']
+        address = data_request['address']
+        account = data_request['account']
+        password = data_request['password']
+        application = data_request['application']
+        remark = data_request['remark']
 
 
-        sql_data = self.ssql.pcSettings_update_sql(name, address, state, id)
+        sql_data = self.ssql.pcSettings_update_sql(group, name, address,account, password,application, remark,  state, id)
 
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'更新成功：{sql_data}')
@@ -94,22 +104,32 @@ class pcManage():
 
         else:
             self.usego.sendlog(f'更新失败：{sql_data}')
-            res = ResMsg(code=10001, msg=f'更新失败：{sql_data}')
+            res = ResMsg(code='B0001', msg=f'更新失败：{sql_data}')
             responseData = res.to_json()
         return responseData
 
     def pc_list(self):
         sql_data = self.ssql.pcSettings_list_sql()
+        # print("sql_data", sql_data)
 
         if "sql 语句异常" not in str(sql_data):
             try:
-                resdatas = [{'id': item[0], 'name': item[1], 'address': item[2], 'state': item[3],
-                             'create_at': self.usego.turn_isoformat(item[4]),
-                             'update_at': self.usego.turn_isoformat(item[5])} for item in sql_data]
+                resdatas = [{'id': item[0],
+                             'group': item[1],
+                             'name': item[2],
+                             'address': item[3],
+                             'account': item[4],
+                             'password': item[5],
+                             'application': item[6],
+                             'state': item[7],
+                              'remark': item[8],
+                             'create_at': self.usego.turn_isoformat(item[9]),
+                             'update_at': self.usego.turn_isoformat(item[10])
+                             } for item in sql_data]
 
             except:
                 self.usego.sendlog(f'list没数据：{sql_data}')
-                res = ResMsg(code=10001, msg=f'list没数据：{sql_data}')
+                res = ResMsg(code='B0001', msg=f'list没数据：{sql_data}')
                 responseData = res.to_json()
             else:
                 self.usego.sendlog(f'list结果：{resdatas}')
@@ -118,7 +138,7 @@ class pcManage():
 
         else:
             self.usego.sendlog(f'list查询失败：{sql_data}')
-            res = ResMsg(code=10001, msg=f'list查询失败：{sql_data}')
+            res = ResMsg(code='B0001', msg=f'list查询失败：{sql_data}')
             responseData = res.to_json()
 
         return responseData

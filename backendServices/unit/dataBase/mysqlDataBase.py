@@ -132,8 +132,8 @@ class mysqlGO():
         # time.sleep(1)
         conn = self._connect(mo)
         if conn is None:
-            print("Failed to get a connection.")
-            return f"SQL语句异常"
+            print(f"conn 失败 ")
+            return f"sql 语句异常"
         cursor = None
         try:
             cursor = conn.cursor()
@@ -155,8 +155,8 @@ class mysqlGO():
     def mysql_select_special(self, mo, query, params):
         conn = self._connect(mo)
         if conn is None:
-            print("Failed to get a connection.")
-            return None
+            print(f"conn 失败 ")
+            return f"sql 语句异常"
         cursor = None
         try:
             cursor = conn.cursor()
@@ -175,8 +175,9 @@ class mysqlGO():
     def mysql_commit(self, mo, commitSQL):
         conn = self._connect(mo)
         if conn is None:
-            print("Failed to get a connection.")
-            return None
+            print(f"conn 失败 ")
+            return f"sql 语句异常"
+
         cursor = None
         try:
             cursor = conn.cursor()
@@ -196,8 +197,9 @@ class mysqlGO():
     def mysql_commit_tuple(self, mo, commitSQL, data):
         conn = self._connect(mo)
         if conn is None:
-            print("Failed to get a connection.")
-            return None
+            print(f"conn 失败 ")
+            result = f"sql 语句异常"
+            return result
         cursor = None
         try:
             cursor = conn.cursor()
@@ -206,7 +208,6 @@ class mysqlGO():
             conn.commit()
         except Exception as e:
             print(f"sql 语句异常:{e}")
-
             result = f"sql 语句异常:{e}"
         finally:
 
@@ -218,8 +219,8 @@ class mysqlGO():
         errdd = []
         conn = self._connect(mo)
         if conn is None:
-            print("Failed to get a connection.")
-            return None
+            print(f"conn 失败 ")
+            return f"sql 语句异常"
         cursor = None
         try:
             cursor = conn.cursor()
@@ -241,7 +242,6 @@ class mysqlGO():
         except Exception as e:
 
             print(f"sql 语句异常:{e}")
-
             result = f"sql 语句异常:{e}"
 
         finally:
@@ -253,8 +253,8 @@ class mysqlGO():
     def mysql_union_all(self, mo, commitSQL):
         conn = self._connect(mo)
         if conn is None:
-            print("Failed to get a connection.")
-            return None
+            print(f"conn 失败 ")
+            return f"sql 语句异常"
         cursor = None
         try:
             cursor = conn.cursor()
@@ -280,8 +280,6 @@ class mysqlGO():
         except Exception as e:
             print(f"sql 语句异常:{e}")
             result = f"sql 语句异常:{e}"
-
-
         finally:
 
             self._close(conn, cursor)

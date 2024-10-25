@@ -247,7 +247,7 @@ if __name__ == '__main__':
     start_time = datetime.now()
     tele = telegraSelenium()
     mossql = mongo_sqlGO()
-    sql_data = mossql.telegra_interim_findAll("seo_external_links_post")
+    sql_data = mossql.telegra_interim_find_max("seo_external_links_post", max=100000)
 
 
     all_links = []
