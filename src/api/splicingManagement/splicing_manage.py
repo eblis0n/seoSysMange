@@ -155,7 +155,7 @@ class splicingManage():
 
             self.usego.sendlog(f'有 {len(all_links)} 连接需要发送')
             if all_links != []:
-                if len(all_links) > 100000 and:
+                if len(all_links) > 100000:
                     # 平分 all_links
                     split_links = self.usego.split_evenly(all_links, len(resdatas))
                 else:
