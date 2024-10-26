@@ -8,13 +8,9 @@
 """
 import os
 import sys
-from datetime import datetime
 import time
-import logging
-import middleware.public.configurationCall as configCall
 
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+
 
 base_dr = str(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 bae_idr = base_dr.replace('\\', '/')
@@ -25,6 +21,7 @@ from botocore.exceptions import ClientError, SSLError
 from botocore.config import Config
 import json
 from middleware.public.commonUse import otherUse
+import middleware.public.configurationCall as configCall
 
 class amazonSQS():
     def __init__(self):

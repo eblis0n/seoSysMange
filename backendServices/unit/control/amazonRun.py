@@ -12,11 +12,11 @@ import sys
 base_dr = str(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 bae_idr = base_dr.replace('\\', '/')
 sys.path.append(bae_idr)
-from backendServices.src.awsMQ.amazonSQS import amazonSQS
+
 import yaml
 import importlib
 import time
-
+from backendServices.src.awsMQ.amazonSQS import amazonSQS
 import middleware.public.configurationCall as configCall
 
 class amazonRun():
