@@ -61,11 +61,11 @@ class splicingManage():
                         }
                         resdatas.append(thisdata)
 
-                    self.usego.sendlog(f'list结果：{len(resdatas)}')
+                    self.usego.sendlog(f'list结果：{resdatas}')
                     res = ResMsg(data=resdatas)
                     responseData = res.to_json()
                 else:
-                    self.usego.sendlog(f'list结果：{len(resdatas)}')
+                    self.usego.sendlog(f'list结果：{resdatas}')
                     res = ResMsg(data=resdatas)
                     responseData = res.to_json()
             except Exception as e:
@@ -158,10 +158,8 @@ class splicingManage():
         self.usego.sendlog(f'开始干活啦')
         results = []
         for idx, client in enumerate(resdatas):
-            # 创建队列
             queue_response = self.aws_sqs.initialization(f'client_{client["name"]}')
             queue_url = queue_response['QueueUrl']
-
             task_data = {
                 'command': 'run_telegra_selenium',
                 'all_links': split_links[idx],
@@ -170,10 +168,13 @@ class splicingManage():
                 'stacking_max': stacking_max,
             }
 
-            # 向队列发送消息
-            self.aws_sqs.send_task(queue_url, task_data)
-            self.usego.sendlog(f'任务 地址：{queue_url}')
-
+            try:
+                self.aws_sqs.send_task(queue_url, task_data)
+                result = self.aws_sqs.receive_result(queue_url)
+                if result:
+                    results.append(result)
+            finally:
+                self.aws_sqs.delete_message(queue_url)
 
         res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
         return res.to_json()
