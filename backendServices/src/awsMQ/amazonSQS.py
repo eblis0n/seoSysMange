@@ -10,8 +10,11 @@ import os
 import sys
 from datetime import datetime
 import time
+import logging
 import middleware.public.configurationCall as configCall
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 base_dr = str(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 bae_idr = base_dr.replace('\\', '/')
@@ -48,31 +51,48 @@ class amazonSQS():
 
     def initialization(self, taskid):
         queue_name = f'SQS-{taskid}.fifo'
-
-        self.usego.sendlog(f"Creating SQS FIFO queue: {queue_name}")
+        logger.debug(f"Initializing SQS FIFO queue: {queue_name}")
         policy_document = eval(configCall.aws_policy_document)
         policy_string = json.dumps(policy_document)
 
+        queue_attributes = {
+            'FifoQueue': 'true',
+            "DelaySeconds": "0",
+            "VisibilityTimeout": "60",
+            'ContentBasedDeduplication': 'true',
+            'Policy': policy_string
+        }
+
         for attempt in range(self.max_retries):
             try:
-                response = self.sqs.create_queue(
-                    QueueName=queue_name,
-                    Attributes={
-                        'FifoQueue': 'true',
-                        "DelaySeconds": "0",
-                        "VisibilityTimeout": "60",
-                        'ContentBasedDeduplication': 'true',
-                        'Policy': policy_string
-                    }
-                )
+                # 首先尝试获取现有队列
+                existing_queues = self.sqs.list_queues(QueueNamePrefix=queue_name)
+                if 'QueueUrls' in existing_queues and existing_queues['QueueUrls']:
+                    queue_url = existing_queues['QueueUrls'][0]
+                    logger.debug(f"Queue already exists: {queue_url}")
+                    
+                    # 更新现有队列的属性
+                    self.sqs.set_queue_attributes(
+                        QueueUrl=queue_url,
+                        Attributes=queue_attributes
+                    )
+                    logger.debug("Queue attributes updated successfully")
+                else:
+                    # 如果队列不存在，创建新队列
+                    response = self.sqs.create_queue(
+                        QueueName=queue_name,
+                        Attributes=queue_attributes
+                    )
+                    queue_url = response['QueueUrl']
+                    logger.debug(f"New queue created: {queue_url}")
 
-                self.usego.sendlog(f"Queue created successfully: {response['QueueUrl']}")
-                return response
+                return {'QueueUrl': queue_url}
+
             except (ClientError, SSLError) as e:
                 if attempt == self.max_retries - 1:
-                    self.usego.sendlog(f"Failed to create queue after {self.max_retries} attempts: {str(e)}")
+                    logger.error(f"Failed to initialize queue after {self.max_retries} attempts: {str(e)}")
                     raise
-                self.usego.sendlog(f"Attempt {attempt + 1} failed. Retrying in {self.retry_delay} seconds...")
+                logger.warning(f"Attempt {attempt + 1} failed. Retrying in {self.retry_delay} seconds...")
                 time.sleep(self.retry_delay)
 
     def send_task(self, queue_url, task_data):
