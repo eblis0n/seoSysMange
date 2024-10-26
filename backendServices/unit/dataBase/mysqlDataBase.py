@@ -31,16 +31,16 @@ class mysqlGO():
         # 创建连接池
         pool = PooledDB(
             creator=pymysql,  # 使用链接数据库的模块
-            maxconnections=20,  # 连接池允许的最大连接数，0和None表示不限制连接数
-            mincached=2,  # 初始化时，链接池中至少创建的空闲的链接，0表示不创建
-            maxcached=5,  # 链接池中最多闲置的链接，0和None不限制
-            maxshared=5,
+            maxconnections=50,  # 连接池允许的最大连接数，0和None表示不限制连接数
+            mincached=5,  # 初始化时，链接池中至少创建的空闲的链接，0表示不创建
+            maxcached=15,  # 链接池中最多闲置的链接，0和None不限制
+
             # 链接池中最多共享的链接数量，0和None表示全部共享。PS: 无用，因为pymysql和MySQLdb等模块的
             # connections和 cursors都不支持共享连接。
             blocking=True,  # 连接池中如果没有可用连接后，是否阻塞等待。True，等待；False，不等待然后报错
-            maxusage=None,  # 一个链接最多被重复使用的次数，None表示无限制
-            setsession=[],  # 开始会话前执行的命令列表。如：["set datestyle to ...", "set time zone ..."]
-            ping=1,
+            maxusage=1000,  # 一个链接最多被重复使用的次数，None表示无限制
+            setsession=["SET NAMES 'utf8mb4'", "SET time_zone='+00:00'"],  # 开始会话前执行的命令列表。如：["set datestyle to ...", "set time zone ..."]
+            ping=7,
             # ping MySQL服务端，检查是否服务可用。如：0 = None = never, 1 = default = whenever it is requested,
             # 2 = when a cursor is created, 4 = when a query is executed, 7 = always
             host=configCall.mysql_111_host,  # 主机名
@@ -50,21 +50,11 @@ class mysqlGO():
             database=configCall.mysql_article_database,  # 数据库名称
             charset='utf8',
             # 添加超时参数
-            connect_timeout=10,  # 连接超时时间，单位为秒
+            connect_timeout=20,  # 连接超时时间，单位为秒
             read_timeout=30,  # 读取超时时间，单位为秒
             write_timeout=30  # 写入超时时间，单位为秒
         )
-        # 连接 MySQL 数据库
-        # conn = pymysql.connect(
-        #     host=configCall.mysql_111_host,  # 主机名
-        #     port=eval(configCall.mysql_111_port),  # 端口号，MySQL默认为3306
-        #     user=configCall.mysql_111_account,  # 用户名
-        #     password=configCall.mysql_111_password,  # 密码
-        #     database=configCall.mysql_article_database,  # 数据库名称
-        #
-        # )
-        # # 创建游标对象
-        # cursor = conn.cursor()
+
         return pool
 
 
@@ -76,22 +66,26 @@ class mysqlGO():
         """
         # 创建连接池
         pool = PooledDB(
-            creator=pymysql,
-            maxconnections=50,  # 根据实际情况增加
-            mincached=10,
-            maxcached=10,
-            maxshared=10,
-            blocking=True,
-            maxusage=None,
-            setsession=[],
-            ping=1,
+            creator=pymysql,  # 使用链接数据库的模块
+            maxconnections=50,  # 连接池允许的最大连接数，0和None表示不限制连接数
+            mincached=5,  # 初始化时，链接池中至少创建的空闲的链接，0表示不创建
+            maxcached=15,  # 链接池中最多闲置的链接，0和None不限制
+
+            # 链接池中最多共享的链接数量，0和None表示全部共享。PS: 无用，因为pymysql和MySQLdb等模块的
+            # connections和 cursors都不支持共享连接。
+            blocking=True,  # 连接池中如果没有可用连接后，是否阻塞等待。True，等待；False，不等待然后报错
+            maxusage=1000,  # 一个链接最多被重复使用的次数，None表示无限制
+            setsession=["SET NAMES 'utf8mb4'", "SET time_zone='+00:00'"],
+            # 开始会话前执行的命令列表。如：["set datestyle to ...", "set time zone ..."]
+            ping=7,
+
             host=configCall.mysql_65_host,
             port=eval(configCall.mysql_65_port),
             user=configCall.mysql_65_account,
             password=configCall.mysql_65_password,
             database=configCall.mysql_base_database,
             charset='utf8',
-            connect_timeout=10,  # 加入超时配置
+            connect_timeout=20,  # 加入超时配置
             read_timeout=30,
             write_timeout=30
         )
@@ -115,7 +109,8 @@ class mysqlGO():
             except Exception as e:
                 print(f"Attempt {attempt + 1} - Failed to connect: {e}")
                 if attempt < max_retries - 1:
-                    time.sleep(1)  # Optional: Wait before retrying
+                    time.sleep(3)  # Optional: Wait before retrying
+
         return None  # Or raise an error
 
         # 归还连接到连接池

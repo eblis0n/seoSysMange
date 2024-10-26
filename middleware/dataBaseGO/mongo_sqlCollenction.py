@@ -54,7 +54,7 @@ class mongo_sqlGO():
 
         return sql_data
 
-    def telegra_interim_findAll(self, setname, genre=None, platform=None):
+    def telegra_interim_findAll(self, setname, genre=None, platform=None, projection=None, limit=None):
         """
             @Datetime ： 2024/10/20 16:06
             @Author ：eblis
@@ -66,10 +66,11 @@ class mongo_sqlGO():
         if platform is not None:
             query['platform'] = platform
 
-            # 调用 find_data 方法执行查询
-        sql_data = self.mosql.find_data(self.seo_interim, setname, query=query)
 
-        return sql_data
+            # 调用 find_data 方法执行查询
+        sql_datas = self.mosql.find_data(self.seo_interim, setname, query=query, projection=projection, limit=limit)
+
+        return sql_datas
 
 
     def telegra_interim_multiple_delet(self, setname, query):

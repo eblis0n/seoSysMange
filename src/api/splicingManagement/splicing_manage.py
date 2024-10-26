@@ -26,7 +26,7 @@ from backendServices.src.awsMQ.amazonSQS import amazonSQS
 
 class splicingManage():
     def __init__(self):
-        self.bp = Blueprint("splicing", __name__, url_prefix="/api/splicing")
+        self.bp = Blueprint("splicing", __name__, url_prefix="/splicing")
         self.mossql = mongo_sqlGO()
         self.ssql = basis_sqlGO()
         self.Myenum = MyEnum()
@@ -45,7 +45,7 @@ class splicingManage():
             @Author ：eblis
             @Motto：简单描述用途
         """
-        sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post")
+        sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", limit=10000)
         resdatas = []
         # print("sql_data", sql_data)
         if "sql 语句异常" not in str(sql_data):
