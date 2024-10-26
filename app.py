@@ -13,7 +13,7 @@ from datetime import timedelta
 from flask_socketio import SocketIO
 import threading
 
-from backendServices.unit.control.amazonRun import amazonRun
+from middleware.control.amazonRun import amazonRun
 
 
 # 接口蓝图配置

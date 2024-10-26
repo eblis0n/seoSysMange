@@ -21,7 +21,7 @@ from middleware.dataBaseGO.mongo_sqlCollenction import mongo_sqlGO
 from middleware.public.commonUse import otherUse
 from backendServices.src.socialPlatforms.telegraGO.telegraSelenium import telegraSelenium
 from backendServices.src.assistance.spliceGo import spliceGo
-from backendServices.src.awsMQ.amazonSQS import amazonSQS
+from backendServices.src.awsMQ.amazonSQS import AmazonSQS
 
 
 class splicingManage():
@@ -32,7 +32,7 @@ class splicingManage():
         self.Myenum = MyEnum()
         self.usego = otherUse()
         self.tele = telegraSelenium()
-        self.aws_sqs = amazonSQS()
+        self.aws_sqs = AmazonSQS()
         
         self.bp.route(self.Myenum.SPLICING_SUBMIT_PUSH, methods=['POST'])(self.splicing_submit_push)
         self.bp.route(self.Myenum.SPLICING_INSERT, methods=['POST'])(self.splicing_insert)
@@ -148,7 +148,7 @@ class splicingManage():
             return res.to_json()
 
         sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=genre,
-                                                       platform=platform, limit=100000)
+                                                       platform=platform, limit=200000)
         all_links = [data["url"] for data in sql_data] if sql_data else []
         self.usego.sendlog(f'有 {len(all_links)} 连接需要发送')
 
@@ -168,13 +168,8 @@ class splicingManage():
                 'stacking_max': stacking_max,
             }
 
-            try:
-                self.aws_sqs.send_task(queue_url, task_data)
-                result = self.aws_sqs.receive_result(queue_url)
-                if result:
-                    results.append(result)
-            finally:
-                self.aws_sqs.delFIFO(queue_url)
+            response = self.aws_sqs.sendMSG(queue_url, "run_telegra_group", "run_telegra_selenium", task_data)
+            self.usego.sendlog(f' run_telegra_selenium，任务发送结果:{response}')
 
         res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
         return res.to_json()

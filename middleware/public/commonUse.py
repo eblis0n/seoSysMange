@@ -27,7 +27,7 @@ from cachetools import TTLCache
 import bcrypt
 import jwt
 import middleware.public.configurationCall as configCall
-from collections import defaultdict
+
 
 class verifyGO():
 

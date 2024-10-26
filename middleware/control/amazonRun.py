@@ -16,18 +16,16 @@ sys.path.append(bae_idr)
 import yaml
 import importlib
 import time
-from backendServices.src.awsMQ.amazonSQS import amazonSQS
+from backendServices.src.awsMQ.amazonSQS import AmazonSQS
 import middleware.public.configurationCall as configCall
 
-class amazonRun():
+class amazonRun:
     def __init__(self):
-        self.aws_sqs = amazonSQS()
-
+        self.aws_sqs = AmazonSQS()
 
     def load_commands(self):
         with open(f'{configCall.task_address}/commands.yaml', 'r+', encoding='utf-8') as file:
             return yaml.safe_load(file)['commands']
-
 
     def execute_command(self, command, message):
         module = importlib.import_module(command['module'])
@@ -37,41 +35,37 @@ class amazonRun():
         params = [message.get(param) for param in command['params']]
         return method(*params)
 
-
-    def run_sqs_client(self, ):
-        """
-        运行SQS客户端模式,接收任务并执行
-        """
-
+    def run_sqs_client(self):
         commands = self.load_commands()
-
-        # 获取当前客户端的ID
+        print("commands", commands)
         client_id = configCall.client_id
+        is_running = True  # 运行状态标志
 
-        while True:
-            # 获取或创建队列URL
+        while is_running:
             queue_url = self.aws_sqs.initialization(f'client_{client_id}')['QueueUrl']
+            message = self.aws_sqs.takeMSG(queue_url)
+            print("message.get('command')")
 
-            # 接收消息
-            message = self.aws_sqs.receive_result(queue_url)
-            print(f"接收到 执行命令：{message}")
             if message:
                 try:
-                    # 查找匹配的命令
                     command = next((cmd for cmd in commands if cmd['name'] == message.get('command')), None)
+                    # print(f"找到了匹配的{command}")
                     if command:
-                        # 执行命令
                         result = self.execute_command(command, message)
-                        # 发送结果
-                        self.aws_sqs.send_task(queue_url, {'result': result})
+                        print("执行命令result", result)
                     else:
                         raise ValueError(f"Unknown command: {message.get('command')}")
                 except Exception as e:
-                    # 发送错误信息
-                    self.aws_sqs.send_task(queue_url, {'error': str(e)})
+                    print(f"出现异常: {e}")
+                    is_running = False  # 设置为 False，停止运行
                 finally:
-                    # 删除队列
                     self.aws_sqs.delFIFO(queue_url)
+                    time.sleep(60)
+
             else:
-                # 如果没有消息，等待一段时间再次检查
                 time.sleep(10)
+
+
+if __name__ == '__main__':
+    ama = amazonRun()
+    ama.run_sqs_client()

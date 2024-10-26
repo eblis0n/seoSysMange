@@ -10,11 +10,11 @@ commands:
       - stacking_max  # 最大堆叠数
       - alt_text  # 替代文本
 
-  - name: another_command  # 另一个命令的名称
-    function: another_module.another_function  # 函数路径
-    params:  # 参数列表
-      - param1  # 参数1
-      - param2  # 参数2
+  - name: test1  # 另一个命令的名称
+    module: backendServices.examples.test1  # 模块路径
+    class: test  # 类名
+    method: run  # 方法名
+    params: []  # 无参数
 
 # 可以继续添加更多命令
 # 每个命令都应包含以下字段:
