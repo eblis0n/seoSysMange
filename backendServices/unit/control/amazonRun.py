@@ -25,7 +25,7 @@ class amazonRun():
 
 
     def load_commands(self):
-        with open(f'{configCall.task_address}/commands.yaml', 'r') as file:
+        with open(f'{configCall.task_address}/commands.yaml', 'r+', encoding='utf-8') as file:
             return yaml.safe_load(file)['commands']
 
 
