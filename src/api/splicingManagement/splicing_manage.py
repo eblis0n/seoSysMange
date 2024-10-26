@@ -174,7 +174,7 @@ class splicingManage():
                 if result:
                     results.append(result)
             finally:
-                self.aws_sqs.delete_message(queue_url)
+                self.aws_sqs.delFIFO(queue_url)
 
         res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
         return res.to_json()

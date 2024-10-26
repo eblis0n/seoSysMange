@@ -71,7 +71,7 @@ class amazonRun():
                     self.aws_sqs.send_task(queue_url, {'error': str(e)})
                 finally:
                     # 删除队列
-                    self.aws_sqs.delete_message(queue_url)
+                    self.aws_sqs.delFIFO(queue_url)
             else:
                 # 如果没有消息，等待一段时间再次检查
                 time.sleep(10)

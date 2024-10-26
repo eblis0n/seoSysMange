@@ -51,52 +51,29 @@ class amazonSQS():
 
     def initialization(self, taskid):
         queue_name = f'SQS-{taskid}.fifo'
-        logger.debug(f"Initializing SQS FIFO queue: {queue_name}")
-        policy_document = eval(configCall.aws_policy_document)
-        policy_string = json.dumps(policy_document)
-
         queue_attributes = {
             'FifoQueue': 'true',
-            "DelaySeconds": "0",
-            "VisibilityTimeout": "60",
+            'DelaySeconds': '0',
+            'VisibilityTimeout': '60',
             'ContentBasedDeduplication': 'true',
-            'Policy': policy_string
         }
+
 
         for attempt in range(self.max_retries):
             try:
-                # 首先尝试获取现有队列
-                existing_queues = self.sqs.list_queues(QueueNamePrefix=queue_name)
-                if 'QueueUrls' in existing_queues and existing_queues['QueueUrls']:
-                    queue_url = existing_queues['QueueUrls'][0]
-                    logger.debug(f"Queue already exists: {queue_url}")
-                    
-                    # 更新现有队列的属性
-                    self.sqs.set_queue_attributes(
-                        QueueUrl=queue_url,
-                        Attributes=queue_attributes
-                    )
-                    logger.debug("Queue attributes updated successfully")
-                else:
-                    # 如果队列不存在，创建新队列
-                    response = self.sqs.create_queue(
-                        QueueName=queue_name,
-                        Attributes=queue_attributes
-                    )
-                    queue_url = response['QueueUrl']
-                    logger.debug(f"New queue created: {queue_url}")
+                response = self.sqs.create_queue(
+                    QueueName=queue_name,
+                    Attributes=queue_attributes
+                )
 
-                return {'QueueUrl': queue_url}
-
+                return response
             except (ClientError, SSLError) as e:
                 if attempt == self.max_retries - 1:
-                    logger.error(f"Failed to initialize queue after {self.max_retries} attempts: {str(e)}")
+                    self.usego.sendlog(f"Failed to send message after {self.max_retries} attempts: {str(e)}")
                     raise
-                logger.warning(f"Attempt {attempt + 1} failed. Retrying in {self.retry_delay} seconds...")
                 time.sleep(self.retry_delay)
 
     def send_task(self, queue_url, task_data):
-        self.usego.sendlog(f"Attempting to send message to queue: {queue_url}")
         for attempt in range(self.max_retries):
             try:
                 response = self.sqs.send_message(
@@ -104,17 +81,15 @@ class amazonSQS():
                     MessageBody=json.dumps(task_data),
                     MessageGroupId='task_group'
                 )
-                self.usego.sendlog("Message sent successfully")
                 return response
             except (ClientError, SSLError) as e:
                 if attempt == self.max_retries - 1:
                     self.usego.sendlog(f"Failed to send message after {self.max_retries} attempts: {str(e)}")
                     raise
-                self.usego.sendlog(f"Attempt {attempt + 1} failed. Retrying in {self.retry_delay} seconds...")
                 time.sleep(self.retry_delay)
 
     def receive_result(self, queue_url, wait_time=20):
-        self.usego.sendlog(f"Attempting to receive message from queue: {queue_url}")
+
         for attempt in range(self.max_retries):
             try:
                 response = self.sqs.receive_message(
@@ -132,29 +107,29 @@ class amazonSQS():
                         QueueUrl=queue_url,
                         ReceiptHandle=receipt_handle
                     )
-                    self.usego.sendlog("Message received and deleted successfully")
+
                     return result
-                self.usego.sendlog("No messages in queue")
+
                 return None
             except (ClientError, SSLError) as e:
                 if attempt == self.max_retries - 1:
-                    self.usego.sendlog(f"Failed to receive message after {self.max_retries} attempts: {str(e)}")
+                    self.usego.sendlog(f"Failed to send message after {self.max_retries} attempts: {str(e)}")
                     raise
-                self.usego.sendlog(f"Attempt {attempt + 1} failed. Retrying in {self.retry_delay} seconds...")
+
                 time.sleep(self.retry_delay)
 
     def delFIFO(self, queue_url):
-        self.usego.sendlog(f"Attempting to delete queue: {queue_url}")
+
         for attempt in range(self.max_retries):
             try:
                 self.sqs.delete_queue(QueueUrl=queue_url)
-                self.usego.sendlog("Queue deleted successfully")
+
                 return
             except (ClientError, SSLError) as e:
                 if attempt == self.max_retries - 1:
-                    self.usego.sendlog(f"Failed to delete queue after {self.max_retries} attempts: {str(e)}")
+                    self.usego.sendlog(f"Failed to send message after {self.max_retries} attempts: {str(e)}")
                     raise
-                self.usego.sendlog(f"Attempt {attempt + 1} failed. Retrying in {self.retry_delay} seconds...")
+
                 time.sleep(self.retry_delay)
 
 if __name__ == '__main__':
