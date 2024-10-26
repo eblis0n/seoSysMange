@@ -69,6 +69,7 @@ class mongo_sqlGO():
 
             # 调用 find_data 方法执行查询
         sql_datas = self.mosql.find_data(self.seo_interim, setname, query=query, projection=projection, limit=limit)
+        print("sql_datas",sql_datas)
 
         return sql_datas
 

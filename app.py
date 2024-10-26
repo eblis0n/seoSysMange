@@ -145,7 +145,8 @@ def run_sqs_client():
             time.sleep(10)
 
 if __name__ == '__main__':
-    if configCall.isClient == '0':
+    print(f"configCall.isClient,{type(configCall.isClient)},{configCall.isClient}")
+    if configCall.isClient == '0' or configCall.isClient == 0:
         print("启动SQS客户端模式")
         # 启动SQS客户端模式
         threading.Thread(target=run_sqs_client, daemon=True).start()
