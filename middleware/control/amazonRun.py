@@ -44,7 +44,7 @@ class amazonRun:
         while is_running:
             queue_url = self.aws_sqs.initialization(f'client_{client_id}')['QueueUrl']
             message = self.aws_sqs.takeMSG(queue_url)
-            print(f"{queue_url},{message}")
+            print(f"{queue_url}, {message}")
 
             if message:
                 try:
@@ -57,13 +57,14 @@ class amazonRun:
                         raise ValueError(f"Unknown command: {message.get('command')}")
                 except Exception as e:
                     print(f"出现异常: {e}")
-                    is_running = False  # 设置为 False，停止运行
+                    # is_running = False  # 设置为 False，停止运行
                 finally:
                     self.aws_sqs.delFIFO(queue_url)
                     time.sleep(60)
 
             else:
-                time.sleep(10)
+                print("没有接收到消息，继续等待...")
+                time.sleep(60)
 
 
 if __name__ == '__main__':

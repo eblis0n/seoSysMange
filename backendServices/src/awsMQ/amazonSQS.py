@@ -44,30 +44,46 @@ class AmazonSQS:
                     print(f"Unexpected error: {e}")
                     raise
 
-    def sendMSG(self, queue_url, msg_group, scriptname, task_data):
+    def sendMSG(self, queue_url, msg_group, scriptname, task_data, retries=3, delay=5):
         message_body = {"command": f"{scriptname}", "script": task_data}
-        response = self.sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message_body),
-                                         MessageGroupId=msg_group)
-        return response
 
-    def takeMSG(self, queue_url, wait_time=20):
-        response = self.sqs.receive_message(
-            QueueUrl=queue_url,
-            MaxNumberOfMessages=1,
-            VisibilityTimeout=30,
-            WaitTimeSeconds=wait_time
-        )
+        for attempt in range(retries):
+            try:
+                response = self.sqs.send_message(
+                    QueueUrl=queue_url,
+                    MessageBody=json.dumps(message_body),
+                    MessageGroupId=msg_group
+                )
+                return response
+            except ClientError as e:
+                print(f"Attempt {attempt + 1} to send message failed: {e}")
+                time.sleep(delay)  # 等待一段时间后重试
+                if attempt == retries - 1:
+                    raise  # 如果重试次数用尽，则抛出异常
 
-        if 'Messages' in response:
-            message = response['Messages'][0]
-            message_body = json.loads(message['Body'])
-            receipt_handle = message['ReceiptHandle']
+    def takeMSG(self, queue_url, wait_time=20, retries=3, delay=5):
+        for attempt in range(retries):
+            try:
+                response = self.sqs.receive_message(
+                    QueueUrl=queue_url,
+                    MaxNumberOfMessages=1,
+                    VisibilityTimeout=30,
+                    WaitTimeSeconds=wait_time
+                )
 
-            # self.delFIFO(queue_url, receipt_handle)
+                if 'Messages' in response:
+                    message = response['Messages'][0]
+                    message_body = json.loads(message['Body'])
+                    return message_body
+                else:
+                    print("No messages received.")
+                    return None
 
-            return message_body
-        return None
-
+            except ClientError as e:
+                print(f"Attempt {attempt + 1} to receive message failed: {e}")
+                time.sleep(delay)  # 等待一段时间后重试
+                if attempt == retries - 1:
+                    raise  # 如果重试次数用尽，则抛出异常
 
     def delFIFO(self, queue_url, receipt_handle=None):
         if receipt_handle is None:
