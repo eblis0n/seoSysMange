@@ -61,11 +61,11 @@ class splicingManage():
                         }
                         resdatas.append(thisdata)
 
-                    self.usego.sendlog(f'list结果：{resdatas}')
+                    self.usego.sendlog(f'list结果：{len(resdatas)}')
                     res = ResMsg(data=resdatas)
                     responseData = res.to_json()
                 else:
-                    self.usego.sendlog(f'list结果：{resdatas}')
+                    self.usego.sendlog(f'list结果：{len(resdatas)}')
                     res = ResMsg(data=resdatas)
                     responseData = res.to_json()
             except Exception as e:
@@ -148,7 +148,7 @@ class splicingManage():
             return res.to_json()
 
         sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=genre,
-                                                       platform=platform, limit=200000)
+                                                       platform=platform, limit=100000)
         all_links = [data["url"] for data in sql_data] if sql_data else []
         self.usego.sendlog(f'有 {len(all_links)} 连接需要发送')
 
@@ -158,6 +158,7 @@ class splicingManage():
         self.usego.sendlog(f'开始干活啦')
         results = []
         for idx, client in enumerate(resdatas):
+            # 创建队列
             queue_response = self.aws_sqs.initialization(f'client_{client["name"]}')
             queue_url = queue_response['QueueUrl']
 
@@ -169,7 +170,7 @@ class splicingManage():
                 'stacking_max': stacking_max,
             }
 
-
+            # 向队列发送消息
             self.aws_sqs.send_task(queue_url, task_data)
             self.usego.sendlog(f'任务 地址：{queue_url}')
 

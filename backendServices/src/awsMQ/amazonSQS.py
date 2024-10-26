@@ -35,10 +35,8 @@ class amazonSQS():
             @Author ：eblis
             @Motto：简单描述用途
         """
-
-        nowdate = datetime.now().strftime("%Y%m%d%H%M%S")
         # 创建或获取 SQS FIFO 队列的 URL
-        queue_name = f'SQS-{taskid}-{nowdate}.fifo'
+        queue_name = f'SQS-{taskid}.fifo'
         print(f"SQS FIFO 队列的 名称:{queue_name}")
         policy_document = eval(configCall.aws_policy_document)
         policy_string = json.dumps(policy_document)
