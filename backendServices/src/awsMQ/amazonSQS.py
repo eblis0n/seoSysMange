@@ -27,7 +27,7 @@ class amazonSQS():
                                 aws_access_key_id=configCall.aws_access_key,
                                 aws_secret_access_key=configCall.aws_secret_key)
 
-    def initialization(self,taskid):
+    def initialization(self, taskid):
         """
             @Datetime ： 2024/5/10 10:06
             @Author ：eblis
@@ -52,6 +52,7 @@ class amazonSQS():
             }
         )
         return response
+    
     def send(self, queue_url, datas):
         """
             @Datetime ： 2024/5/10 10:32

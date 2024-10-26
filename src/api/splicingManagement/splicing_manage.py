@@ -155,7 +155,7 @@ class splicingManage():
                         # 给每个客户端分配对应的链接子列表
                         results = []
                         for idx, client in enumerate(resdatas):
-                            queue_response = self.aws_sqs.initialization(f'client_{client["id"]}')
+                            queue_response = self.aws_sqs.initialization(f'client_{client["name"]}')
                             queue_url = queue_response['QueueUrl']
                             task_data = {
                                 'command': 'run_telegra_selenium',
