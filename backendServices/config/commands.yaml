@@ -3,7 +3,7 @@ commands:
   - name: run_telegra_selenium  # 命令名称
     module: backendServices.src.socialPlatforms.telegraGO.telegraSelenium  # 模块路径
     class: telegraSelenium  # 类名
-    method: run  # 方法名
+    method: main  # 方法名
     params:  # 参数列表
       - genre
       - platform

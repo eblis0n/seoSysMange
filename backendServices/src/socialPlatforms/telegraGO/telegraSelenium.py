@@ -31,7 +31,7 @@ class telegraSelenium:
         self.mossql = mongo_sqlGO()
 
 
-    def main(self,  genre, platform, stacking_min, stacking_max, alt_text):
+    def main(self, genre, platform, stacking_min, stacking_max, alt_text):
         """
             @Datetime ： 2024/10/26 00:09
             @Author ：eblis

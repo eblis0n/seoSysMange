@@ -1,6 +1,19 @@
+# -*- coding: utf-8 -*-
+"""
+@Datetime ： 2024/10/19 13:37
+@Author ： eblis
+@File ：mongoDataBase.py
+@IDE ：PyCharm
+@Motto：ABC(Always Be Coding)
+"""
 import os
 import sys
 import time
+
+# 设置项目根目录
+base_dr = str(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+bae_idr = base_dr.replace('\\', '/')
+sys.path.append(bae_idr)
 
 import boto3
 import json
@@ -13,10 +26,6 @@ class AmazonSQS:
         self.sqs = boto3.client('sqs', region_name=configCall.aws_region_name,
                                 aws_access_key_id=configCall.aws_access_key,
                                 aws_secret_access_key=configCall.aws_secret_key)
-
-    import json
-    import time
-    from botocore.exceptions import ClientError
 
     def initialization(self, taskid):
         queue_name = f'SQS-{taskid}.fifo'
