@@ -49,9 +49,9 @@ class amazonRun:
             if message:
                 try:
                     command = next((cmd for cmd in commands if cmd['name'] == message.get('command')), None)
-                    # print(f"找到了匹配的{command}")
+                    print(f"找到了匹配的{command}")
                     if command:
-                        result = self.execute_command(command, message)
+                        result = self.execute_command(command, message.get('script'))
                         print("执行命令result", result)
                     else:
                         raise ValueError(f"Unknown command: {message.get('command')}")

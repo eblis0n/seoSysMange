@@ -150,7 +150,6 @@ class splicingManage():
             print("queue_url", queue_url)
 
             task_data = {
-                'command': 'run_telegra_selenium',
                 'genre': genre,
                 'platform': platform,
                 'alt_text': alt_text,
