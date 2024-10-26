@@ -45,7 +45,7 @@ class MyEnum():
 
 
     #splicing
-    SUBMIT_301 = "/301/"
+    SPLICING_SUBMIT_PUSH = "/push/"
     SPLICING_LIST = "/list/"
     SPLICING_INSERT = "/add/"
 

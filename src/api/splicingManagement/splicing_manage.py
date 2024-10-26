@@ -34,7 +34,7 @@ class splicingManage():
         self.tele = telegraSelenium()
         self.aws_sqs = amazonSQS()
         
-        self.bp.route(self.Myenum.SUBMIT_301, methods=['POST'])(self.submit_301)
+        self.bp.route(self.Myenum.SPLICING_SUBMIT_PUSH, methods=['POST'])(self.splicing_submit_push)
         self.bp.route(self.Myenum.SPLICING_INSERT, methods=['POST'])(self.splicing_insert)
         self.bp.route(self.Myenum.SPLICING_LIST, methods=['GET'])(self.splicing_list)
 
@@ -104,9 +104,9 @@ class splicingManage():
 
 
         
-    def submit_301(self):
+    def splicing_submit_push(self):
         data_request = request.json
-        alt_tex = data_request['alt_tex']
+        alt_text = data_request['alt_text']
         stacking_min = data_request['stacking_min']
         stacking_max = data_request['stacking_max']
         genre = data_request['genre']
@@ -130,15 +130,16 @@ class splicingManage():
             except Exception as e:
                 self.usego.sendlog(f'没有可用的客户端：{e}')
                 res = ResMsg(code='B0001', msg=f'没有可用的客户端')
-                responseData = res.to_json()
+                return res.to_json()
             else:
+                self.usego.sendlog(f'有 {len(resdatas)} 设备符合')
                 if resdatas != []:
-                    results = []
 
                     if platform == "telegra":
                         sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=genre,
                                                                        platform=platform)
                         all_links = [data["url"] for data in sql_data] if sql_data else []
+                        self.usego.sendlog(f'有 {len(all_links)} 连接需要发送')
                         # 平分 all_links
                         if len(resdatas) > 1:
                             # 计算每份的大小，使用列表切片将 all_links 平均分割
@@ -153,6 +154,7 @@ class splicingManage():
                             split_links = all_links  # 只有一个 resdatas，则不分割
 
                         # 给每个客户端分配对应的链接子列表
+                        self.usego.sendlog(f'开始干活啦')
                         results = []
                         for idx, client in enumerate(resdatas):
                             queue_response = self.aws_sqs.initialization(f'client_{client["name"]}')
@@ -160,7 +162,7 @@ class splicingManage():
                             task_data = {
                                 'command': 'run_telegra_selenium',
                                 'all_links': split_links if len(resdatas) == 1 else split_links[idx],  # 直接分配链接列表
-                                'alt_tex': alt_tex,
+                                'alt_text': alt_text,
                                 'stacking_min': stacking_min,
                                 'stacking_max': stacking_max,
                             }
@@ -198,26 +200,4 @@ class splicingManage():
 
             return res.to_json()
 
-
-
-
-
-
-        # suitable_clients = self.get_suitable_clients(data_request['platform'])
-        # results = []
-        #
-
-        #
-        # res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
-        # return res.to_json()
-
-    # def get_suitable_clients(self, platform):
-    #     # 实现根据platform筛选适合的PC客户端的逻辑
-    #     # 返回格式: [{'id': '1', 'ip': '192.168.1.100'}, ...]
-    #     pass
-    #
-    # def store_client_queue_mapping(self, client_id, queue_url):
-    #     # 实现存储客户端ID和队列URL映射的逻辑
-    #     # 可以存储在数据库或配置文件中
-    #     pass
 

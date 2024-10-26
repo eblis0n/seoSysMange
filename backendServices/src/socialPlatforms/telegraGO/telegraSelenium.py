@@ -31,7 +31,7 @@ class telegraSelenium:
         self.mossql = mongo_sqlGO()
 
 
-    def main(self, all_links, stacking_min, stacking_max, alt_tex):
+    def main(self, all_links, stacking_min, stacking_max, alt_text):
         """
             @Datetime ： 2024/10/26 00:09
             @Author ：eblis
@@ -46,7 +46,7 @@ class telegraSelenium:
 
         for i in range(num_iterations):
             batch_links = all_links[i * batch_size: (i + 1) * batch_size]
-            res_list = self.run(batch_links, stacking_min, stacking_max, alt_tex)
+            res_list = self.run(batch_links, stacking_min, stacking_max, alt_text)
 
             # 添加每个 res_list 元素到 all_res 中，确保不重复
             for item in res_list:
@@ -63,7 +63,7 @@ class telegraSelenium:
 
 
 
-    def run(self, all_links, stacking_min, stacking_max, alt_tex):
+    def run(self, all_links, stacking_min, stacking_max, alt_text):
         this_res = []
 
         alll_links_list = self.siphon_links(all_links, stacking_min, stacking_max)
@@ -82,7 +82,7 @@ class telegraSelenium:
                 user = adsUser[user_index % num_users]
                 link = alll_links_list[i]
                 t = threading.Thread(target=self.post_to_telegraph_wrapper,
-                                     args=(user, res_list, link, alll_links_list, bad_run_list, alt_tex))
+                                     args=(user, res_list, link, alll_links_list, bad_run_list, alt_text))
                 user_index += 1
                 threads.append(t)
                 t.start()
@@ -100,9 +100,9 @@ class telegraSelenium:
 
         return this_res
 
-    def post_to_telegraph_wrapper(self, user, result_list, link, all_list, bad_run_list, alt_tex):
+    def post_to_telegraph_wrapper(self, user, result_list, link, all_list, bad_run_list, alt_text):
         with threading.Lock():
-            result = self.post_to_telegraph(user, link, alt_tex)
+            result = self.post_to_telegraph(user, link, alt_text)
             if result:
                 result_list.append(result)
                 all_list.remove(link)
@@ -122,7 +122,7 @@ class telegraSelenium:
 
         return this_run_list
 
-    def post_to_telegraph(self, adsUser, this_links, alt_tex):
+    def post_to_telegraph(self, adsUser, this_links, alt_text):
         this_title = self.usego.redome_string("小写字母", 10, 20)
         driver = None
         try:
@@ -145,7 +145,7 @@ class telegraSelenium:
                     a.target = '_blank';
                     arguments[2].appendChild(a);
                     arguments[2].appendChild(document.createTextNode('\u00A0'));
-                """, link, alt_tex, content_input)
+                """, link, alt_text, content_input)
 
             publish_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_publish_button"]')))
             driver.execute_script("arguments[0].click();", publish_button)

@@ -122,6 +122,7 @@ def run_sqs_client():
         
         # 接收消息
         message = aws_sqs.receive_result(queue_url)
+        print(f"接收到 执行命令：{message}")
         if message:
             try:
                 # 查找匹配的命令
@@ -145,6 +146,7 @@ def run_sqs_client():
 
 if __name__ == '__main__':
     if configCall.isClient == '0':
+        print("启动SQS客户端模式")
         # 启动SQS客户端模式
         threading.Thread(target=run_sqs_client, daemon=True).start()
         print("SQS client mode started.")

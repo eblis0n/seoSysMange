@@ -8,7 +8,7 @@ commands:
       - all_links  # 所有链接
       - stacking_min  # 最小堆叠数
       - stacking_max  # 最大堆叠数
-      - alt_tex  # 替代文本
+      - alt_text  # 替代文本
 
   - name: another_command  # 另一个命令的名称
     function: another_module.another_function  # 函数路径
