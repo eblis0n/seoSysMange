@@ -14,12 +14,17 @@ class AmazonSQS:
                                 aws_access_key_id=configCall.aws_access_key,
                                 aws_secret_access_key=configCall.aws_secret_key)
 
+    import json
+    import time
+    from botocore.exceptions import ClientError
+
     def initialization(self, taskid):
         queue_name = f'SQS-{taskid}.fifo'
-        policy_document = eval(configCall.aws_policy_document)
+        policy_document = json.loads(configCall.aws_policy_document)  # 使用 json.loads
         policy_string = json.dumps(policy_document)
 
-        while True:
+        retries = 3  # 设置重试次数
+        for attempt in range(retries):
             try:
                 response = self.sqs.create_queue(
                     QueueName=queue_name,
@@ -38,8 +43,12 @@ class AmazonSQS:
                     print(f"Queue {queue_name} already exists. Retrieving its URL...")
                     return self.sqs.get_queue_url(QueueName=queue_name)
                 elif e.response['Error']['Code'] == 'QueueDeletedRecently':
-                    print(f"Queue '{queue_name}' was recently deleted. Waiting 60 seconds before retrying...")
-                    time.sleep(60)  # 等待 60 秒后重试
+                    if attempt < retries - 1:
+                        print(f"Queue '{queue_name}' was recently deleted. Waiting 60 seconds before retrying...")
+                        time.sleep(60)  # 等待 60 秒后重试
+                    else:
+                        print(f"Exceeded maximum retries for '{queue_name}'.")
+                        raise
                 else:
                     print(f"Unexpected error: {e}")
                     raise
