@@ -36,12 +36,15 @@ class MongoDB:
                 try:
                     self.client = MongoClient(base_url, maxPoolSize=50, minPoolSize=5, connectTimeoutMS=60000)
                     print("MongoDB 连接成功。")
+                    return
                 except Exception as e:
                     print(f"Attempt {attempt + 1} - Failed to connect: {e}")
 
                     if attempt < max_retries - 1:
                         time.sleep(3)  # Optional: Wait before retrying
             self.client = None  # 确保在失败时将 client 设置为 None
+
+
 
 
     def get_database(self, database_name):
