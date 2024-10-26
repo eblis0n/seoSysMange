@@ -37,7 +37,7 @@ class telegraSelenium:
             @Author ：eblis
             @Motto：简单描述用途
         """
-        sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=genre,
+        sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=int(genre),
                                                        platform=platform, limit=200000)
         if sql_data is not None and sql_data != []:
 
