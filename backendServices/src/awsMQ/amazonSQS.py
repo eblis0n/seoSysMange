@@ -63,7 +63,7 @@ class AmazonSQS:
             message_body = json.loads(message['Body'])
             receipt_handle = message['ReceiptHandle']
 
-            self.delFIFO(queue_url, receipt_handle)
+            # self.delFIFO(queue_url, receipt_handle)
 
             return message_body
         return None

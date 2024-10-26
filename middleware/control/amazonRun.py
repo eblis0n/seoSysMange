@@ -37,14 +37,14 @@ class amazonRun:
 
     def run_sqs_client(self):
         commands = self.load_commands()
-        print("commands", commands)
+        # print("commands", commands)
         client_id = configCall.client_id
         is_running = True  # 运行状态标志
 
         while is_running:
             queue_url = self.aws_sqs.initialization(f'client_{client_id}')['QueueUrl']
             message = self.aws_sqs.takeMSG(queue_url)
-            print("message.get('command')")
+            print(f"{queue_url},{message}")
 
             if message:
                 try:

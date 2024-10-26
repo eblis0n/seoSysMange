@@ -61,11 +61,11 @@ class splicingManage():
                         }
                         resdatas.append(thisdata)
 
-                    self.usego.sendlog(f'list结果：{resdatas}')
+                    self.usego.sendlog(f'list结果：{len(resdatas)}')
                     res = ResMsg(data=resdatas)
                     responseData = res.to_json()
                 else:
-                    self.usego.sendlog(f'list结果：{resdatas}')
+                    self.usego.sendlog(f'list结果：{len(resdatas)}')
                     res = ResMsg(data=resdatas)
                     responseData = res.to_json()
             except Exception as e:
