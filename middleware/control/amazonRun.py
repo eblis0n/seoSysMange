@@ -42,6 +42,7 @@ class amazonRun:
         is_running = True  # 运行状态标志
 
         while is_running:
+            time.sleep(60)
             queue_url = self.aws_sqs.initialization(f'client_{client_id}')['QueueUrl']
             message = self.aws_sqs.takeMSG(queue_url)
             print(f"{queue_url}, {message}")
@@ -51,9 +52,7 @@ class amazonRun:
                     command = next((cmd for cmd in commands if cmd['name'] == message.get('command')), None)
                     print(f"找到了匹配的{command}")
                     if command:
-                        print("command", command)
                         new_message = message.get("script")
-                        print("new_message", new_message)
                         result = self.execute_command(command, new_message)
                         print("执行命令result", result)
                     else:
@@ -63,11 +62,11 @@ class amazonRun:
                     # is_running = False  # 设置为 False，停止运行
                 finally:
                     self.aws_sqs.delFIFO(queue_url)
-                    time.sleep(60)
+
 
             else:
                 print("没有接收到消息，继续等待...")
-                time.sleep(60)
+                # time.sleep(60)
 
 
 if __name__ == '__main__':

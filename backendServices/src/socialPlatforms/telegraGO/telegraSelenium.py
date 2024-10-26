@@ -37,28 +37,21 @@ class telegraSelenium:
             @Author ：eblis
             @Motto：简单描述用途
         """
-        print(genre, platform, stacking_min, stacking_max, alt_text)
 
-
-        sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=int(genre),
-                                       platform=platform, limit=100000)
+        sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=str(genre),
+                                       platform=str(platform), limit=100000)
 
         print("sql_data", len(sql_data))
         if sql_data is not None:
+            all_links = [data["url"] for data in sql_data] if sql_data else []
 
-            try:
-                all_links = [data["url"] for data in sql_data] if sql_data else []
-            except:
-                print("出现异常")
-            else:
-                print("all_links",all_links)
-                if all_links:
-                    res_list = self.run(all_links, stacking_min, stacking_max, alt_text)
-                    query = {"url": {"$in": res_list}}
-                    sql_data = self.mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
-                    print(f"删除结果：{sql_data}")
+            if all_links:
+                res_list = self.run(all_links, stacking_min, stacking_max, alt_text)
+                query = {"url": {"$in": res_list}}
+                sql_data = self.mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
+                print(f"删除结果：{sql_data}")
 
-                    return res_list
+                return res_list
         return None
 
 
@@ -174,16 +167,19 @@ if __name__ == '__main__':
     start_time = datetime.now()
     tele = telegraSelenium()
     mossql = mongo_sqlGO()
-    sql_data = mossql.telegra_interim_findAll("seo_external_links_post", genre=0,
-                                                   platform="telegra")
-    all_links = [data["url"] for data in sql_data] if sql_data else []
+    genre = "0"
+    platform = "telegra"
+    sql_data = mossql.telegra_interim_findAll("seo_external_links_post", genre=genre,
+                                                   platform=platform, limit=100000)
 
-    if all_links:
-        tele.main(all_links, configCall.stacking_min, configCall.stacking_max, configCall.stacking_text)
-        # query = {"url": {"$in": all_links}}
-        # sql_data = mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
-        # print(f"删除结果：{sql_data}")
-        execution_time = (datetime.now() - start_time).total_seconds()
-        print(f"代码执行耗时: {execution_time:.5f} 秒")
-    else:
-        print("没有可执行的数据")
+    # all_links = [data["url"] for data in sql_data] if sql_data else []
+    #
+    # if all_links:
+    #     tele.main(all_links, configCall.stacking_min, configCall.stacking_max, configCall.stacking_text)
+    #     # query = {"url": {"$in": all_links}}
+    #     # sql_data = mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
+    #     # print(f"删除结果：{sql_data}")
+    #     execution_time = (datetime.now() - start_time).total_seconds()
+    #     print(f"代码执行耗时: {execution_time:.5f} 秒")
+    # else:
+    #     print("没有可执行的数据")

@@ -90,7 +90,10 @@ class MongoDB:
                     return mycol.find_one(query, projection)  # 单条查询
                 else:
                     result = mycol.find(query, projection)
+                    print("query",query)
+                    print("result",result)
                     if limit:
+                        print("有数量限制")
                         result = result.limit(limit)  # 设置返回结果的限制数量
                     return list(result)  # 查询全部
             except Exception as e:
