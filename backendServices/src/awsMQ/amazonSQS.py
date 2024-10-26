@@ -9,106 +9,133 @@
 import os
 import sys
 from datetime import datetime
+import time
+import middleware.public.configurationCall as configCall
+
 
 base_dr = str(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 bae_idr = base_dr.replace('\\', '/')
 sys.path.append(bae_idr)
+
 import boto3
+from botocore.exceptions import ClientError, SSLError
+from botocore.config import Config
 import json
-
-import middleware.public.configurationCall as configCall
-
-
-# AWS 访问密钥和密钥 ID
-
+from middleware.public.commonUse import otherUse
 
 class amazonSQS():
     def __init__(self):
-        # 创建 SQS 客户端
-        self.sqs = boto3.client('sqs', region_name=configCall.aws_region_name,
+        self.usego = otherUse()
+        self.max_retries = 3
+        self.retry_delay = 1  # 秒
+        
+        config = Config(
+            region_name=configCall.aws_region_name,
+            signature_version='v4',
+            retries={
+                'max_attempts': 10,
+                'mode': 'standard'
+            }
+        )
+        
+        self.sqs = boto3.client('sqs', 
+                                region_name=configCall.aws_region_name,
                                 aws_access_key_id=configCall.aws_access_key,
-                                aws_secret_access_key=configCall.aws_secret_key)
+                                aws_secret_access_key=configCall.aws_secret_key,
+                                config=config,
+                                verify=True)
+
 
     def initialization(self, taskid):
-        """
-            @Datetime ： 2024/5/10 10:06
-            @Author ：eblis
-            @Motto：简单描述用途
-        """
-        # 创建或获取 SQS FIFO 队列的 URL
         queue_name = f'SQS-{taskid}.fifo'
-        print(f"SQS FIFO 队列的 名称:{queue_name}")
+
+        self.usego.sendlog(f"Creating SQS FIFO queue: {queue_name}")
         policy_document = eval(configCall.aws_policy_document)
         policy_string = json.dumps(policy_document)
 
-        response = self.sqs.create_queue(
-            QueueName=queue_name,
-            Attributes={
-                'FifoQueue': 'true',
-                "DelaySeconds": "0",
-                "VisibilityTimeout": "60",
-                'ContentBasedDeduplication': 'true',
-                'Policy': policy_string
-            }
-        )
-        return response
+        for attempt in range(self.max_retries):
+            try:
+                response = self.sqs.create_queue(
+                    QueueName=queue_name,
+                    Attributes={
+                        'FifoQueue': 'true',
+                        "DelaySeconds": "0",
+                        "VisibilityTimeout": "60",
+                        'ContentBasedDeduplication': 'true',
+                        'Policy': policy_string
+                    }
+                )
 
-    #
-
-    def delete_message(self, queue_url, receipt_handle=None):
-        """
-            @Datetime ： 2024/5/10 10:39
-            @Author ：eblis
-            @Motto：删除 FIFO 队列
-        """
-        if receipt_handle is None:
-            response = self.sqs.delete_message(
-                QueueUrl=queue_url
-            )
-        else:
-            response = self.sqs.delete_message(
-                QueueUrl=queue_url,
-                ReceiptHandle=receipt_handle,
-            )
-        return response
+                self.usego.sendlog(f"Queue created successfully: {response['QueueUrl']}")
+                return response
+            except (ClientError, SSLError) as e:
+                if attempt == self.max_retries - 1:
+                    self.usego.sendlog(f"Failed to create queue after {self.max_retries} attempts: {str(e)}")
+                    raise
+                self.usego.sendlog(f"Attempt {attempt + 1} failed. Retrying in {self.retry_delay} seconds...")
+                time.sleep(self.retry_delay)
 
     def send_task(self, queue_url, task_data):
-        """
-        发送任务到指定的SQS队列
-        """
-        message_body = json.dumps(task_data)
-        message_group_id = 'task_group'
-        response = self.sqs.send_message(
-            QueueUrl=queue_url,
-            MessageBody=message_body,
-            MessageGroupId=message_group_id
-        )
-        return response
+        self.usego.sendlog(f"Attempting to send message to queue: {queue_url}")
+        for attempt in range(self.max_retries):
+            try:
+                response = self.sqs.send_message(
+                    QueueUrl=queue_url,
+                    MessageBody=json.dumps(task_data),
+                    MessageGroupId='task_group'
+                )
+                self.usego.sendlog("Message sent successfully")
+                return response
+            except (ClientError, SSLError) as e:
+                if attempt == self.max_retries - 1:
+                    self.usego.sendlog(f"Failed to send message after {self.max_retries} attempts: {str(e)}")
+                    raise
+                self.usego.sendlog(f"Attempt {attempt + 1} failed. Retrying in {self.retry_delay} seconds...")
+                time.sleep(self.retry_delay)
 
     def receive_result(self, queue_url, wait_time=20):
-        """
-        从指定的SQS队列接收结果
-        """
-        response = self.sqs.receive_message(
-            QueueUrl=queue_url,
-            MaxNumberOfMessages=1,
-            WaitTimeSeconds=wait_time
-        )
+        self.usego.sendlog(f"Attempting to receive message from queue: {queue_url}")
+        for attempt in range(self.max_retries):
+            try:
+                response = self.sqs.receive_message(
+                    QueueUrl=queue_url,
+                    MaxNumberOfMessages=1,
+                    WaitTimeSeconds=wait_time
+                )
 
-        if 'Messages' in response:
-            message = response['Messages'][0]
-            result = json.loads(message['Body'])
-            receipt_handle = message['ReceiptHandle']
+                if 'Messages' in response:
+                    message = response['Messages'][0]
+                    result = json.loads(message['Body'])
+                    receipt_handle = message['ReceiptHandle']
 
-            # 删除已处理的消息
-            self.sqs.delete_message(
-                QueueUrl=queue_url,
-                ReceiptHandle=receipt_handle
-            )
+                    self.sqs.delete_message(
+                        QueueUrl=queue_url,
+                        ReceiptHandle=receipt_handle
+                    )
+                    self.usego.sendlog("Message received and deleted successfully")
+                    return result
+                self.usego.sendlog("No messages in queue")
+                return None
+            except (ClientError, SSLError) as e:
+                if attempt == self.max_retries - 1:
+                    self.usego.sendlog(f"Failed to receive message after {self.max_retries} attempts: {str(e)}")
+                    raise
+                self.usego.sendlog(f"Attempt {attempt + 1} failed. Retrying in {self.retry_delay} seconds...")
+                time.sleep(self.retry_delay)
 
-            return result
-        return None
-
+    def delFIFO(self, queue_url):
+        self.usego.sendlog(f"Attempting to delete queue: {queue_url}")
+        for attempt in range(self.max_retries):
+            try:
+                self.sqs.delete_queue(QueueUrl=queue_url)
+                self.usego.sendlog("Queue deleted successfully")
+                return
+            except (ClientError, SSLError) as e:
+                if attempt == self.max_retries - 1:
+                    self.usego.sendlog(f"Failed to delete queue after {self.max_retries} attempts: {str(e)}")
+                    raise
+                self.usego.sendlog(f"Attempt {attempt + 1} failed. Retrying in {self.retry_delay} seconds...")
+                time.sleep(self.retry_delay)
 
 if __name__ == '__main__':
     pass
