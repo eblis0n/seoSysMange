@@ -149,30 +149,45 @@ class splicingManage():
 
         sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=genre,
                                                        platform=platform, limit=200000)
-        all_links = [data["url"] for data in sql_data] if sql_data else []
-        self.usego.sendlog(f'有 {len(all_links)} 连接需要发送')
+        if sql_data is not None:
 
-        # 平分 all_links
-        split_links = self.usego.split_evenly(all_links, len(resdatas))
+            all_links = [data["url"] for data in sql_data] if sql_data else []
 
-        self.usego.sendlog(f'开始干活啦')
-        results = []
-        for idx, client in enumerate(resdatas):
-            queue_response = self.aws_sqs.initialization(f'client_{client["name"]}')
-            queue_url = queue_response['QueueUrl']
-            task_data = {
-                'command': 'run_telegra_selenium',
-                'all_links': split_links[idx],
-                'alt_text': alt_text,
-                'stacking_min': stacking_min,
-                'stacking_max': stacking_max,
-            }
+            self.usego.sendlog(f'有 {len(all_links)} 连接需要发送')
+            if all_links != []:
+                if len(all_links) > 100000 and:
+                    # 平分 all_links
+                    split_links = self.usego.split_evenly(all_links, len(resdatas))
+                else:
+                    split_links = [all_links]
+                self.usego.sendlog(f'开始干活啦,{split_links}')
+                results = []
+                for idx, client in enumerate(resdatas):
+                    queue_response = self.aws_sqs.initialization(f'client_{client["name"]}')
+                    queue_url = queue_response['QueueUrl']
+                    task_data = {
+                        'command': 'run_telegra_selenium',
+                        'all_links': split_links[idx],
+                        'alt_text': alt_text,
+                        'stacking_min': stacking_min,
+                        'stacking_max': stacking_max,
+                    }
 
-            response = self.aws_sqs.sendMSG(queue_url, "run_telegra_group", "run_telegra_selenium", task_data)
-            self.usego.sendlog(f' run_telegra_selenium，任务发送结果:{response}')
+                    response = self.aws_sqs.sendMSG(queue_url, "run_telegra_group", "run_telegra_selenium", task_data)
+                    self.usego.sendlog(f' run_telegra_selenium，任务发送结果:{response}')
+                    res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
+                    return res.to_json()
+            else:
+                self.usego.sendlog(f'没执行数据')
+                res = ResMsg(code='B0001', msg=f'没执行数据')
+                return res.to_json()
+        else:
+            self.usego.sendlog(f'查询数据失败')
+            res = ResMsg(code='B0001', msg=f'查询数据失败')
+            return res.to_json()
 
-        res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
-        return res.to_json()
+
+
 
 
 
