@@ -152,9 +152,9 @@ class splicingManage():
             task_data = {
                 'genre': genre,
                 'platform': platform,
-                'alt_text': alt_text,
                 'stacking_min': stacking_min,
                 'stacking_max': stacking_max,
+                'alt_text': alt_text
             }
             response = aws.sendMSG(queue_url, "run_telegra_group", "run_telegra_selenium", task_data)
             result[f"{client}"] = response

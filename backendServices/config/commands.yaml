@@ -1,21 +1,21 @@
 # 命令配置列表
 commands:
-  - name: run_telegra_selenium  # 命令名称
-    module: backendServices.src.socialPlatforms.telegraGO.telegraSelenium  # 模块路径
-    class: telegraSelenium  # 类名
-    method: main  # 方法名
-    params:  # 参数列表
-      - genre
-      - platform
-      - stacking_min  # 最小堆叠数
-      - stacking_max  # 最大堆叠数
-      - alt_text  # 替代文本
+    - name: run_telegra_selenium
+        module: backendServices.src.socialPlatforms.telegraGO.telegraSelenium
+        class: telegraSelenium
+        method: main
+        params:
+          - genre
+          - platform
+          - stacking_min
+          - stacking_max
+          - alt_text
 
-  - name: test1  # 另一个命令的名称
-    module: backendServices.examples.test1  # 模块路径
-    class: test  # 类名
-    method: run  # 方法名
-    params: []  # 无参数
+    - name: test1  # 另一个命令的名称
+      module: backendServices.examples.test1  # 模块路径
+      class: test  # 类名
+      method: run  # 方法名
+      params: []  # 无参数
 
 # 可以继续添加更多命令
 # 每个命令都应包含以下字段:
