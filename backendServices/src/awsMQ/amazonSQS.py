@@ -17,6 +17,8 @@ import boto3
 import json
 
 import middleware.public.configurationCall as configCall
+
+
 # AWS 访问密钥和密钥 ID
 
 
@@ -33,7 +35,6 @@ class amazonSQS():
             @Author ：eblis
             @Motto：简单描述用途
         """
-
 
         nowdate = datetime.now().strftime("%Y%m%d%H%M%S")
         # 创建或获取 SQS FIFO 队列的 URL
@@ -55,8 +56,6 @@ class amazonSQS():
         return response
 
     #
-
-
 
     def delete_message(self, queue_url, receipt_handle=None):
         """
@@ -97,20 +96,21 @@ class amazonSQS():
             MaxNumberOfMessages=1,
             WaitTimeSeconds=wait_time
         )
-        
+
         if 'Messages' in response:
             message = response['Messages'][0]
             result = json.loads(message['Body'])
             receipt_handle = message['ReceiptHandle']
-            
+
             # 删除已处理的消息
             self.sqs.delete_message(
                 QueueUrl=queue_url,
                 ReceiptHandle=receipt_handle
             )
-            
+
             return result
         return None
+
 
 if __name__ == '__main__':
     pass

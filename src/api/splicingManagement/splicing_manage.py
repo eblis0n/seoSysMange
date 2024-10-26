@@ -148,7 +148,7 @@ class splicingManage():
             return res.to_json()
 
         sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=genre,
-                                                       platform=platform, limit=500000)
+                                                       platform=platform, limit=200000)
         all_links = [data["url"] for data in sql_data] if sql_data else []
         self.usego.sendlog(f'有 {len(all_links)} 连接需要发送')
 
@@ -160,6 +160,7 @@ class splicingManage():
         for idx, client in enumerate(resdatas):
             queue_response = self.aws_sqs.initialization(f'client_{client["name"]}')
             queue_url = queue_response['QueueUrl']
+
             task_data = {
                 'command': 'run_telegra_selenium',
                 'all_links': split_links[idx],
@@ -168,13 +169,10 @@ class splicingManage():
                 'stacking_max': stacking_max,
             }
 
-            try:
-                self.aws_sqs.send_task(queue_url, task_data)
-                result = self.aws_sqs.receive_result(queue_url)
-                if result:
-                    results.append(result)
-            finally:
-                self.aws_sqs.delete_message(queue_url)
+
+            self.aws_sqs.send_task(queue_url, task_data)
+            self.usego.sendlog(f'任务 地址：{queue_url}')
+
 
         res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
         return res.to_json()
