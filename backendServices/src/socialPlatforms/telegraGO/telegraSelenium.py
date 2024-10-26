@@ -31,34 +31,26 @@ class telegraSelenium:
         self.mossql = mongo_sqlGO()
 
 
-    def main(self, all_links, stacking_min, stacking_max, alt_text):
+    def main(self,  genre, platform, stacking_min, stacking_max, alt_text):
         """
             @Datetime ： 2024/10/26 00:09
             @Author ：eblis
             @Motto：简单描述用途
         """
-        batch_size = 100000
-        all_res = []
-        unique_elements = set()
-        num_iterations = len(all_links) // batch_size
-        if len(all_links) % batch_size != 0:
-            num_iterations += 1
+        sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=genre,
+                                                       platform=platform, limit=200000)
+        if sql_data is not None and sql_data != []:
 
-        for i in range(num_iterations):
-            batch_links = all_links[i * batch_size: (i + 1) * batch_size]
-            res_list = self.run(batch_links, stacking_min, stacking_max, alt_text)
+            all_links = [data["url"] for data in sql_data] if sql_data else []
+            if all_links != []:
+                res_list = self.run(all_links, stacking_min, stacking_max, alt_text)
+                query = {"url": {"$in": res_list}}
+                sql_data = self.mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
+                print(f"删除结果：{sql_data}")
 
-            # 添加每个 res_list 元素到 all_res 中，确保不重复
-            for item in res_list:
-                if item not in unique_elements:
-                    all_res.append(item)
-                    unique_elements.add(item)  # 更新唯一集合
+                return res_list
+        return None
 
-            query = {"url": {"$in": res_list}}
-            sql_data = self.mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
-            print(f"删除结果：{sql_data}")
-
-        return all_res
 
 
 

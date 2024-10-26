@@ -28,22 +28,18 @@ class MongoDB:
         self.password = configCall.mg_65_password
 
     def connect(self):
-        max_retries = 3
+        """连接到 MongoDB 数据库"""
         if self.client is None:  # 仅在第一次调用时连接
             base_url = f'mongodb://{self.username}:{self.password}@{self.host}:{self.port}'
-            for attempt in range(max_retries):
-                """连接到 MongoDB 数据库"""
+            try:
+                self.client = MongoClient(base_url, maxPoolSize=50, minPoolSize=5, connectTimeoutMS=60000)
+            except:
+                print("连接失败")
+                time.sleep(5)
                 try:
                     self.client = MongoClient(base_url, maxPoolSize=50, minPoolSize=5, connectTimeoutMS=60000)
-                    print("MongoDB 连接成功。")
-                    return
-                except Exception as e:
-                    print(f"Attempt {attempt + 1} - Failed to connect: {e}")
-
-                    if attempt < max_retries - 1:
-                        time.sleep(3)  # Optional: Wait before retrying
-            self.client = None  # 确保在失败时将 client 设置为 None
-
+                except:
+                    self.client = None
 
 
 

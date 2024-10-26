@@ -5,7 +5,8 @@ commands:
     class: telegraSelenium  # 类名
     method: run  # 方法名
     params:  # 参数列表
-      - all_links  # 所有链接
+      - genre
+      - platform
       - stacking_min  # 最小堆叠数
       - stacking_max  # 最大堆叠数
       - alt_text  # 替代文本
