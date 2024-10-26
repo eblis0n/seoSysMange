@@ -37,8 +37,13 @@ class telegraSelenium:
             @Author ：eblis
             @Motto：简单描述用途
         """
+        print(genre, platform, stacking_min, stacking_max, alt_text)
+
+
         sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=int(genre),
-                                                       platform=platform, limit=200000)
+                                       platform=platform, limit=100000)
+
+        print("sql_data", len(sql_data))
         if sql_data is not None:
 
             try:
@@ -47,7 +52,7 @@ class telegraSelenium:
                 print("出现异常")
             else:
                 print("all_links",all_links)
-                if all_links != []:
+                if all_links:
                     res_list = self.run(all_links, stacking_min, stacking_max, alt_text)
                     query = {"url": {"$in": res_list}}
                     sql_data = self.mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
