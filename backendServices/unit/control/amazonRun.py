@@ -37,8 +37,7 @@ class amazonRun():
         params = [message.get(param) for param in command['params']]
         return method(*params)
 
-
-    def run_sqs_client(self, ):
+    def run_sqs_client(self):
         """
         运行SQS客户端模式,接收任务并执行
         """
@@ -48,10 +47,10 @@ class amazonRun():
         # 获取当前客户端的ID
         client_id = configCall.client_id
 
-        while True:
-            # 获取或创建队列URL
-            queue_url = self.aws_sqs.initialization(f'client_{client_id}')['QueueUrl']
+        # 获取或创建队列URL
+        queue_url = self.aws_sqs.initialization(f'client_{client_id}')['QueueUrl']
 
+        while True:
             # 接收消息
             message = self.aws_sqs.receive_result(queue_url)
             print(f"接收到 执行命令：{message}")
@@ -70,8 +69,10 @@ class amazonRun():
                     # 发送错误信息
                     self.aws_sqs.send_task(queue_url, {'error': str(e)})
                 finally:
-                    # 删除队列
-                    self.aws_sqs.delFIFO(queue_url)
+                    # 删除消息，而不是删除队列
+                    # 这里你需要使用消息的receipt handle，我假设它在message['ReceiptHandle']
+                    self.aws_sqs.delete_message(queue_url, message['ReceiptHandle'])
             else:
                 # 如果没有消息，等待一段时间再次检查
                 time.sleep(10)
+

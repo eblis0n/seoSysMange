@@ -102,8 +102,6 @@ class splicingManage():
 
         return responseData
 
-
-        
     def splicing_submit_push(self):
         data_request = request.json
         alt_text = data_request['alt_text']
@@ -111,93 +109,76 @@ class splicingManage():
         stacking_max = data_request['stacking_max']
         genre = data_request['genre']
         platform = data_request['platform']
+
         sql_data = self.ssql.pcSettings_select_sql(platform=platform, state=0)
-        if "sql 语句异常" not in str(sql_data):
-            try:
-                resdatas = [{'id': item[0],
-                             'group': item[1],
-                             'name': item[2],
-                             'address': item[3],
-                             'account': item[4],
-                             'password': item[5],
-                             'platform': item[6],
-                             'state': item[7],
-                              'remark': item[8],
-                             'create_at': self.usego.turn_isoformat(item[9]),
-                             'update_at': self.usego.turn_isoformat(item[10])
-                             } for item in sql_data]
 
-            except Exception as e:
-                self.usego.sendlog(f'没有可用的客户端：{e}')
-                res = ResMsg(code='B0001', msg=f'没有可用的客户端')
-                return res.to_json()
-            else:
-                self.usego.sendlog(f'有 {len(resdatas)} 设备符合')
-                if resdatas != []:
-
-                    if platform == "telegra":
-                        sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=genre,
-                                                                       platform=platform)
-                        all_links = [data["url"] for data in sql_data] if sql_data else []
-                        self.usego.sendlog(f'有 {len(all_links)} 连接需要发送')
-                        # 平分 all_links
-                        if len(resdatas) > 1:
-                            # 计算每份的大小，使用列表切片将 all_links 平均分割
-                            avg_size = len(all_links) // len(resdatas)
-                            split_links = [all_links[i:i + avg_size] for i in range(0, len(all_links), avg_size)]
-
-                            # 如果有多余的链接，分配到前几个子列表
-                            remainder = len(all_links) % len(resdatas)
-                            for i in range(remainder):
-                                split_links[i].append(all_links[avg_size * len(resdatas) + i])
-                        else:
-                            split_links = all_links  # 只有一个 resdatas，则不分割
-
-                        # 给每个客户端分配对应的链接子列表
-                        self.usego.sendlog(f'开始干活啦')
-                        results = []
-                        for idx, client in enumerate(resdatas):
-                            queue_response = self.aws_sqs.initialization(f'client_{client["name"]}')
-                            queue_url = queue_response['QueueUrl']
-                            task_data = {
-                                'command': 'run_telegra_selenium',
-                                'all_links': split_links if len(resdatas) == 1 else split_links[idx],  # 直接分配链接列表
-                                'alt_text': alt_text,
-                                'stacking_min': stacking_min,
-                                'stacking_max': stacking_max,
-                            }
-
-                            try:
-                                # 发送任务并接收结果
-                                self.aws_sqs.send_task(queue_url, task_data)
-                                result = self.aws_sqs.receive_result(queue_url)
-                                if result:
-                                    results.append(result)
-                            finally:
-                                # 无论是否成功接收到结果，都删除队列
-                                self.aws_sqs.delFIFO(queue_url)
-
-                        # 根据 results 内容返回相应的响应
-                        res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
-                        return res.to_json()
-                    else:
-                        self.usego.sendlog(f'收到的指令错误:{platform}')
-                        res = ResMsg(code='B0001', msg=f'收到的指令错误')
-                        return res.to_json()
-
-
-                else:
-                    self.usego.sendlog(f'没有可用的客户端{resdatas}')
-                    res = ResMsg(code='B0001', msg=f'没有可用的客户端')
-                    return res.to_json()
-
-
-
-
-        else:
+        if "sql 语句异常" in str(sql_data):
             self.usego.sendlog(f'没有可用的客户端：{sql_data}')
             res = ResMsg(code='B0001', msg=f'没有可用的客户端')
-
             return res.to_json()
+
+        try:
+            resdatas = [{'id': item[0],
+                         'group': item[1],
+                         'name': item[2],
+                         'address': item[3],
+                         'account': item[4],
+                         'password': item[5],
+                         'platform': item[6],
+                         'state': item[7],
+                         'remark': item[8],
+                         'create_at': self.usego.turn_isoformat(item[9]),
+                         'update_at': self.usego.turn_isoformat(item[10])
+                         } for item in sql_data]
+        except Exception as e:
+            self.usego.sendlog(f'没有可用的客户端：{e}')
+            res = ResMsg(code='B0001', msg=f'没有可用的客户端')
+            return res.to_json()
+
+        if not resdatas:
+            self.usego.sendlog(f'没有可用的客户端{resdatas}')
+            res = ResMsg(code='B0001', msg=f'没有可用的客户端')
+            return res.to_json()
+
+        self.usego.sendlog(f'有 {len(resdatas)} 设备符合')
+
+        if platform != "telegra":
+            self.usego.sendlog(f'收到的指令错误:{platform}')
+            res = ResMsg(code='B0001', msg=f'收到的指令错误')
+            return res.to_json()
+
+        sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=genre,
+                                                       platform=platform, limit=500000)
+        all_links = [data["url"] for data in sql_data] if sql_data else []
+        self.usego.sendlog(f'有 {len(all_links)} 连接需要发送')
+
+        # 平分 all_links
+        split_links = self.usego.split_evenly(all_links, len(resdatas))
+
+        self.usego.sendlog(f'开始干活啦')
+        results = []
+        for idx, client in enumerate(resdatas):
+            queue_response = self.aws_sqs.initialization(f'client_{client["name"]}')
+            queue_url = queue_response['QueueUrl']
+            task_data = {
+                'command': 'run_telegra_selenium',
+                'all_links': split_links[idx],
+                'alt_text': alt_text,
+                'stacking_min': stacking_min,
+                'stacking_max': stacking_max,
+            }
+
+            try:
+                self.aws_sqs.send_task(queue_url, task_data)
+                result = self.aws_sqs.receive_result(queue_url)
+                if result:
+                    results.append(result)
+            finally:
+                self.aws_sqs.delete_message(queue_url)
+
+        res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
+        return res.to_json()
+
+
 
 

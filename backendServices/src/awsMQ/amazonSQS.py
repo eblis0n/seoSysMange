@@ -54,23 +54,26 @@ class amazonSQS():
         )
         return response
 
-    # 删除 FIFO 队列
-    def delFIFO(self, queue_url):
+    #
+
+
+
+    def delete_message(self, queue_url, receipt_handle=None):
         """
             @Datetime ： 2024/5/10 10:39
             @Author ：eblis
-            @Motto：简单描述用途
+            @Motto：删除 FIFO 队列
         """
-        self.sqs.delete_queue(QueueUrl=queue_url)
-        print("FIFO queue deleted")
-
-
-    def delete_message(self, queue_url, receipt_handle,):
-        response = self.sqs.delete_message(
-            QueueUrl=queue_url,
-            ReceiptHandle=receipt_handle,
-        )
-        print(response)
+        if receipt_handle is None:
+            response = self.sqs.delete_message(
+                QueueUrl=queue_url
+            )
+        else:
+            response = self.sqs.delete_message(
+                QueueUrl=queue_url,
+                ReceiptHandle=receipt_handle,
+            )
+        return response
 
     def send_task(self, queue_url, task_data):
         """
@@ -111,17 +114,3 @@ class amazonSQS():
 
 if __name__ == '__main__':
     pass
-    # aws = amazonSQS()
-    # response = aws.initialization(79)
-    # queue_url = response['QueueUrl']
-    #
-    # print("queue_url", queue_url)
-    # # 第二步 发送
-    # msg = "print(\'Hello World\')"
-    # aws.send(queue_url, msg)
-    # # 第三步 接收
-    # aws.takeMSG(queue_url)
-    # fifodd = ['SQS-79-20240615165829.fifo','SQS-79-20240615165839.fifo','SQS-79-20240615165848.fifo','SQS-79-20240615165855.fifo']
-    # for ff in fifodd:
-    #     queue_url = f"https://sqs.us-east-1.amazonaws.com/151205356403/{ff}"
-    #     aws.delFIFO(queue_url)

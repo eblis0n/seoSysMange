@@ -305,3 +305,17 @@ the current application" 统一封装;   2、 contents 传参格式统一： f"x
         else:
             new_timedata = timedata
         return new_timedata
+
+    def split_evenly(self, lst, num):
+        """
+            @Datetime ： 2024/5/7 15:39
+            @Author ：eblis
+            @Motto：函数的主要目的是将一个列表均匀地分割成指定数量的小列表
+        """
+
+        avg_size = len(lst) // num
+        split_lst = [lst[i:i + avg_size] for i in range(0, len(lst), avg_size)]
+        remainder = len(lst) % num
+        for i in range(remainder):
+            split_lst[i].append(lst[avg_size * num + i])
+        return split_lst
