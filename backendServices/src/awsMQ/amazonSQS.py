@@ -66,6 +66,9 @@ class AmazonSQS:
         except ClientError as e:
             self.usego.sendlog(f"Failed to list queues: {e}")
 
+        self.usego.sendlog(f"避免翻车，等个60秒比较好")
+        time.sleep(60)
+
 
 
         # 如果队列不存在，则创建新队列
