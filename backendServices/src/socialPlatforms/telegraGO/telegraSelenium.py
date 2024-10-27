@@ -93,8 +93,10 @@ class telegraSelenium:
 
             alll_links_list = alll_links_list[int(this_go):]
             self.save_res(res_list)
+            self.usego.sendlog(f"将数据同步存放数据库")
+            self.usego.sendlog(f"{self.save_datebase(res_list, genre, platform)}")
 
-            self.save_datebase(res_list, genre, platform)
+
 
             alll_links_list.extend(bad_run_list)
             bad_run_list.clear()
