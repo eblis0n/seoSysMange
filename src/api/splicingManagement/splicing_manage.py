@@ -33,7 +33,7 @@ class splicingManage():
         self.usego = otherUse()
         self.tele = telegraSelenium()
 
-        
+
         self.bp.route(self.Myenum.SPLICING_SUBMIT_PUSH, methods=['POST'])(self.splicing_submit_push)
         self.bp.route(self.Myenum.SPLICING_INSERT, methods=['POST'])(self.splicing_insert)
         self.bp.route(self.Myenum.SPLICING_LIST, methods=['GET'])(self.splicing_list)
@@ -147,7 +147,7 @@ class splicingManage():
             result = {}
             response = aws.initialization(f'client_{client["name"]}')
             queue_url = response['QueueUrl']
-            print("queue_url", queue_url)
+            self.usego.sendlog(f"队列地址{queue_url}")
 
             task_data = {
                 'genre': genre,

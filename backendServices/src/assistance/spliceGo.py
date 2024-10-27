@@ -39,7 +39,6 @@ class spliceGo():
             for zy_link in zyurllist
             for url in urllist
         ]
-        # print("new_links_list", new_links_list)
 
         # 批量插入生成的链接
         result = self.mossql.telegra_interim_insert_batch("seo_external_links_post", new_links_list)

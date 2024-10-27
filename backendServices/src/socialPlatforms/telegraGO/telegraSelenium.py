@@ -15,6 +15,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+
 base_dr = str(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 bae_idr = base_dr.replace('\\', '/')
 sys.path.append(bae_idr)
@@ -39,19 +40,19 @@ class telegraSelenium:
         """
 
         sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=str(genre),
-                                       platform=str(platform), limit=100000)
+                                       platform=str(platform), limit=200000)
 
-        print("sql_data", len(sql_data))
+
         if sql_data is not None:
             all_links = [data["url"] for data in sql_data] if sql_data else []
 
             if all_links:
-                res_list = self.run(all_links, stacking_min, stacking_max, alt_text)
-                query = {"url": {"$in": res_list}}
+                all_res = self.run(all_links, stacking_min, stacking_max, alt_text)
+                query = {"url": {"$in": all_res}}
                 sql_data = self.mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
-                print(f"删除结果：{sql_data}")
+                self.usego.sendlog(f"删除结果：{sql_data}")
 
-                return res_list
+                return all_res
         return None
 
 
@@ -59,7 +60,7 @@ class telegraSelenium:
 
 
     def run(self, all_links, stacking_min, stacking_max, alt_text):
-        this_res = []
+        all_res = []
 
         alll_links_list = self.siphon_links(all_links, stacking_min, stacking_max)
         bad_run_list = []
@@ -67,13 +68,16 @@ class telegraSelenium:
         minadsUser = eval(configCall.min_concurrent_user)
         num_users = len(adsUser)
         user_index = 0
+        mun = 0
 
         while alll_links_list:
+            self.usego.sendlog(f"第{mun} 执行开始")
             res_list = []
             threads = []
             this_go = min(minadsUser, len(alll_links_list))
-            
+
             for i in range(this_go):
+
                 user = adsUser[user_index % num_users]
                 link = alll_links_list[i]
                 t = threading.Thread(target=self.post_to_telegraph_wrapper,
@@ -85,15 +89,20 @@ class telegraSelenium:
 
             for thread in threads:
                 thread.join()
+            self.usego.sendlog(f"这波Thread 执行完了：{res_list}")
 
-            alll_links_list = alll_links_list[this_go:]
+            alll_links_list = alll_links_list[int(this_go):]
             self.save_res(res_list)
+
+            self.save_datebase(res_list, genre, platform)
+
             alll_links_list.extend(bad_run_list)
             bad_run_list.clear()
 
-            this_res.extend([item for item in res_list if item not in this_res])
+            all_res.extend([item for item in res_list if item not in all_res])
+            mun = mun + 1
 
-        return this_res
+        return all_res
 
     def post_to_telegraph_wrapper(self, user, result_list, link, all_list, bad_run_list, alt_text):
         with threading.Lock():
@@ -149,19 +158,49 @@ class telegraSelenium:
             return driver.current_url
 
         except Exception as e:
-            print(f"Error in post_to_telegraph: {e}")
+            self.usego.sendlog(f"Error in post_to_telegraph: {e}")
             return None
         finally:
             if driver:
                 self.ads.adsAPI(configCall.adsServer, "stop", adsUser)
 
     def save_res(self, urls):
+        self.usego.sendlog(f"本次需要保存的数据有{len(urls)},{urls}")
         formatted_now = datetime.now().strftime("%Y%m%d")
         file_name = f"telegra_result_{formatted_now}.txt"
         today_file = self.usego.make_file(configCall.telegra_result, file_name)
         with open(today_file, 'a+') as f:
             for url in urls:
                 f.write(f"{url}\n")
+                
+    def save_datebase(self, urls, genre, platform ):
+        """
+            @Datetime ： 2024/10/27 14:06
+            @Author ：eblis
+            @Motto：保存到数据库——seo_result_301_links
+        """
+
+        # 获取当前时间
+        now = datetime.now()
+
+        # 格式化为年月日时分秒
+        created_at = now.strftime("%Y-%m-%d %H:%M:%S")
+        new_links_list = []
+        for url in urls:
+
+            this_dat = {
+                    "url": f"{url}",
+                    "platform": platform,
+                    "genre": genre,
+                    "created_at": created_at
+                }
+            new_links_list.append(this_dat)
+        result = self.mossql.telegra_interim_insert_batch("seo_result_301_links", new_links_list)
+        if result is not None:  # 修改这里，检查 result 是否为 None
+            return f"生成 {len(new_links_list)} 个新链接，已入库"
+        else:
+            return None
+    
 
 if __name__ == '__main__':
     start_time = datetime.now()
@@ -172,14 +211,4 @@ if __name__ == '__main__':
     sql_data = mossql.telegra_interim_findAll("seo_external_links_post", genre=genre,
                                                    platform=platform, limit=100000)
 
-    # all_links = [data["url"] for data in sql_data] if sql_data else []
-    #
-    # if all_links:
-    #     tele.main(all_links, configCall.stacking_min, configCall.stacking_max, configCall.stacking_text)
-    #     # query = {"url": {"$in": all_links}}
-    #     # sql_data = mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
-    #     # print(f"删除结果：{sql_data}")
-    #     execution_time = (datetime.now() - start_time).total_seconds()
-    #     print(f"代码执行耗时: {execution_time:.5f} 秒")
-    # else:
-    #     print("没有可执行的数据")
+

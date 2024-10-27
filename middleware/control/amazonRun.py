@@ -42,6 +42,7 @@ class amazonRun:
         is_running = True  # 运行状态标志
 
         while is_running:
+            print("等待个60秒再说！！！！")
             time.sleep(60)
             queue_url = self.aws_sqs.initialization(f'client_{client_id}')['QueueUrl']
             message = self.aws_sqs.takeMSG(queue_url)
