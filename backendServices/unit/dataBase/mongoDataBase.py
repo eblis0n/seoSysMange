@@ -34,12 +34,12 @@ class MongoDB:
         if self.client is None:  # 仅在第一次调用时连接
             base_url = f'mongodb://{self.username}:{self.password}@{self.host}:{self.port}'
             try:
-                self.client = MongoClient(base_url, maxPoolSize=50, minPoolSize=10, connectTimeoutMS=120000, socketTimeoutMS=120000)
+                self.client = MongoClient(base_url, maxPoolSize=50, minPoolSize=10, connectTimeoutMS=60000, socketTimeoutMS=60000)
             except:
                 self.usego.sendlog(f"连接失败{base_url}")
                 time.sleep(5)
                 try:
-                    self.client = MongoClient(base_url, maxPoolSize=50, minPoolSize=10, connectTimeoutMS=120000, socketTimeoutMS=120000)
+                    self.client = MongoClient(base_url, maxPoolSize=50, minPoolSize=10, connectTimeoutMS=60000, socketTimeoutMS=60000)
                 except:
                     self.client = None
 

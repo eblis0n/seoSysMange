@@ -38,73 +38,80 @@ class telegraSelenium:
             @Author ：eblis
             @Motto：简单描述用途
         """
+        adsUserlist = self.siphon_adsuser(eval(configCall.telegra_ads), eval(configCall.min_concurrent_user))
 
         sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=str(genre),
-                                       platform=str(platform), limit=200000)
+                                       platform=str(platform), limit=1000)
 
 
         if sql_data is not None:
             all_links = [data["url"] for data in sql_data] if sql_data else []
 
             if all_links:
-                all_res = self.run(platform, genre, all_links, stacking_min, stacking_max, alt_text)
-                query = {"url": {"$in": all_res}}
-                sql_data = self.mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
-                self.usego.sendlog(f"删除结果：{sql_data}")
+                alll_links_list = self.siphon_links(all_links, stacking_min, stacking_max)
+                all_res = self.run(platform, genre, adsUserlist, alll_links_list,  alt_text)
+
 
                 return all_res
         return None
+    
 
-
-
-
-
-    def run(self, platform, genre, all_links, stacking_min, stacking_max, alt_text):
+    def run(self, platform, genre, adsUserlist, alll_links_list, alt_text):
         all_res = []
-
-        alll_links_list = self.siphon_links(all_links, stacking_min, stacking_max)
-        bad_run_list = []
-        adsUser = eval(configCall.telegra_ads)
-        minadsUser = eval(configCall.min_concurrent_user)
-        num_users = len(adsUser)
-        user_index = 0
         mun = 0
+        mm = 0
+        # print(f"{alll_links_list},{adsUserlist}")
+        while len(alll_links_list) > 0:
+            self.usego.sendlog(f"第 {mun} 执行开始,剩余{len(alll_links_list)} 组数据待处理")
+            if len(adsUserlist) > mm:
+                res_list = []
+                threads = []
+                bad_run_list = []
+                thisnoneads = adsUserlist[mm]
+                this_go = min(len(thisnoneads), len(alll_links_list))
+                for i in range(this_go):
+                    user = thisnoneads[i]
+                    link = alll_links_list[i]
+                    # print(user, link)
+                    t = threading.Thread(target=self.post_to_telegraph_wrapper,
+                                         args=(user, res_list, link, alll_links_list, bad_run_list, alt_text))
 
-        while alll_links_list:
-            self.usego.sendlog(f"第 {mun} 执行开始")
-            res_list = []
-            threads = []
-            this_go = min(minadsUser, len(alll_links_list))
+                    threads.append(t)
+                    t.start()
+                    time.sleep(3)
 
-            for i in range(this_go):
+                for thread in threads:
+                    thread.join()
+                self.usego.sendlog(f"这波Thread 执行完了：{res_list}")
 
-                user = adsUser[user_index % num_users]
-                link = alll_links_list[i]
-                t = threading.Thread(target=self.post_to_telegraph_wrapper,
-                                     args=(user, res_list, link, alll_links_list, bad_run_list, alt_text))
-                user_index += 1
-                threads.append(t)
-                t.start()
-                time.sleep(3)
+                self.save_res(res_list)
 
-            for thread in threads:
-                thread.join()
-            self.usego.sendlog(f"这波Thread 执行完了：{res_list}")
+                self.usego.sendlog(f"将数据同步存放数据库")
 
-            alll_links_list = alll_links_list[int(this_go):]
-            self.save_res(res_list)
-            self.usego.sendlog(f"将数据同步存放数据库")
-            self.usego.sendlog(f"{self.save_datebase(res_list, genre, platform)}")
+                self.usego.sendlog(f"{self.save_datebase(res_list, genre, platform)}")
 
+                alll_links_list.extend(bad_run_list)
+                bad_run_list.clear()
+
+                all_res.extend([item for item in res_list if item not in all_res])
+
+                mm = mm + 1
+                mun = mun + 1
+            else:
+                self.usego.sendlog(f"初始化一下数据，跑空")
+                mm = 0
 
 
-            alll_links_list.extend(bad_run_list)
-            bad_run_list.clear()
+    def del_run_links(self, links):
+        """
+            @Datetime ： 2024/10/28 02:10
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        query = {"url": {"$in": links}}
+        sql_data = self.mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
+        self.usego.sendlog(f"删除结果：{sql_data}")
 
-            all_res.extend([item for item in res_list if item not in all_res])
-            mun = mun + 1
-
-        return all_res
 
     def post_to_telegraph_wrapper(self, user, result_list, link, all_list, bad_run_list, alt_text):
         with threading.Lock():
@@ -112,8 +119,19 @@ class telegraSelenium:
             if result:
                 result_list.append(result)
                 all_list.remove(link)
+                self.del_run_links(link)
             else:
                 bad_run_list.append(link)
+                
+                
+    def siphon_adsuser(self, lst, group_size):
+        """
+            @Datetime ： 2024/10/28 01:42
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        return [lst[i:i + group_size] for i in range(0, len(lst), group_size)]
+    
 
     def siphon_links(self, all_links, rmin, rmax):
         this_run_list = []
@@ -207,10 +225,15 @@ class telegraSelenium:
 if __name__ == '__main__':
     start_time = datetime.now()
     tele = telegraSelenium()
-    mossql = mongo_sqlGO()
     genre = "0"
     platform = "telegra"
-    sql_data = mossql.telegra_interim_findAll("seo_external_links_post", genre=genre,
-                                                   platform=platform, limit=100000)
+    stacking_min = 200
+    stacking_max = 300
+    alt_text = "test"
+    tele.main(genre, platform, stacking_min, stacking_max, alt_text)
+    # mossql = mongo_sqlGO()
+
+    # sql_data = mossql.telegra_interim_findAll("seo_external_links_post", genre=genre,
+    #                                                platform=platform, limit=100000)
 
 
