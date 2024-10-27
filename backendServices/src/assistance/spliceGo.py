@@ -31,7 +31,7 @@ class spliceGo():
         formatted_now = now.strftime("%Y-%m-%d %H:%M:%S")
         new_links_list = [
             {
-                "url": f"{zy_link}{url}",
+                "url": f"{zy_link}{url}".replace(' ', '').replace('\n', ''),
                 "platform": platform,
                 "genre": genre,
                 "created_at": formatted_now
