@@ -71,7 +71,7 @@ class telegraSelenium:
         mun = 0
 
         while alll_links_list:
-            self.usego.sendlog(f"第{mun} 执行开始")
+            self.usego.sendlog(f"第 {mun} 执行开始")
             res_list = []
             threads = []
             this_go = min(minadsUser, len(alll_links_list))

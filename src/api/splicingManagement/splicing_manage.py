@@ -32,6 +32,7 @@ class splicingManage():
         self.Myenum = MyEnum()
         self.usego = otherUse()
         self.tele = telegraSelenium()
+        self.aws_sqs = AmazonSQS()
 
 
         self.bp.route(self.Myenum.SPLICING_SUBMIT_PUSH, methods=['POST'])(self.splicing_submit_push)
@@ -141,11 +142,11 @@ class splicingManage():
             return res.to_json()
 
         self.usego.sendlog(f'有 {len(resdatas)} 设备符合')
-        aws = AmazonSQS()
+
         results = []
         for idx, client in enumerate(resdatas):
             result = {}
-            response = aws.initialization(f'client_{client["name"]}')
+            response = self.aws_sqs.initialization(f'client_{client["name"]}')
             queue_url = response['QueueUrl']
             self.usego.sendlog(f"队列地址{queue_url}")
 
@@ -156,7 +157,7 @@ class splicingManage():
                 'stacking_max': stacking_max,
                 'alt_text': alt_text
             }
-            response = aws.sendMSG(queue_url, "run_telegra_group", "run_telegra_selenium", task_data)
+            response = self.aws_sqs.sendMSG(queue_url, "run_telegra_group", "run_telegra_selenium", task_data)
             result[f"{client}"] = response
             results.append(result)
             self.usego.sendlog(f' run_telegra_selenium，任务发送结果:{response}')

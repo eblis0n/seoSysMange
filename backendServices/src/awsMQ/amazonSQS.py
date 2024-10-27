@@ -18,11 +18,12 @@ sys.path.append(bae_idr)
 import boto3
 import json
 from botocore.exceptions import ClientError
-
+from middleware.public.commonUse import otherUse
 import middleware.public.configurationCall as configCall
 class AmazonSQS:
 
     def __init__(self):
+        self.usego = otherUse()
         self.sqs = boto3.client('sqs', region_name=configCall.aws_region_name,
                                 aws_access_key_id=configCall.aws_access_key,
                                 aws_secret_access_key=configCall.aws_secret_key)
@@ -49,17 +50,17 @@ class AmazonSQS:
 
             except ClientError as e:
                 if e.response['Error']['Code'] == 'QueueAlreadyExists':
-                    print(f"Queue {queue_name} already exists. Retrieving its URL...")
+                    self.usego.sendlog(f"Queue {queue_name} already exists. Retrieving its URL...")
                     return self.sqs.get_queue_url(QueueName=queue_name)
                 elif e.response['Error']['Code'] == 'QueueDeletedRecently':
                     if attempt < retries - 1:
-                        print(f"Queue '{queue_name}' was recently deleted. Waiting 60 seconds before retrying...")
+                        self.usego.sendlog(f"Queue '{queue_name}' was recently deleted. Waiting 60 seconds before retrying...")
                         time.sleep(60)  # 等待 60 秒后重试
                     else:
-                        print(f"Exceeded maximum retries for '{queue_name}'.")
+                        self.usego.sendlog(f"Exceeded maximum retries for '{queue_name}'.")
                         raise
                 else:
-                    print(f"Unexpected error: {e}")
+                    self.usego.sendlog(f"Unexpected error: {e}")
                     raise
 
     def sendMSG(self, queue_url, msg_group, scriptname, task_data, retries=3, delay=5):
@@ -74,7 +75,7 @@ class AmazonSQS:
                 )
                 return response
             except ClientError as e:
-                print(f"Attempt {attempt + 1} to send message failed: {e}")
+                self.usego.sendlog(f"Attempt {attempt + 1} to send message failed: {e}")
                 time.sleep(delay)  # 等待一段时间后重试
                 if attempt == retries - 1:
                     raise  # 如果重试次数用尽，则抛出异常
@@ -94,11 +95,11 @@ class AmazonSQS:
                     message_body = json.loads(message['Body'])
                     return message_body
                 else:
-                    print("No messages received.")
+                    self.usego.sendlog("No messages received.")
                     return None
 
             except ClientError as e:
-                print(f"Attempt {attempt + 1} to receive message failed: {e}")
+                self.usego.sendlog(f"Attempt {attempt + 1} to receive message failed: {e}")
                 time.sleep(delay)  # 等待一段时间后重试
                 if attempt == retries - 1:
                     raise  # 如果重试次数用尽，则抛出异常
@@ -106,13 +107,13 @@ class AmazonSQS:
     def delFIFO(self, queue_url, receipt_handle=None):
         if receipt_handle is None:
             self.sqs.delete_queue(QueueUrl=queue_url)
-            print("FIFO queue deleted")
+            self.usego.sendlog("FIFO queue deleted")
         else:
             response = self.sqs.delete_message(
                 QueueUrl=queue_url,
                 ReceiptHandle=receipt_handle,
             )
-            print(response)
+            self.usego.sendlog(f"删除结果{response}")
 
 
 if __name__ == '__main__':
