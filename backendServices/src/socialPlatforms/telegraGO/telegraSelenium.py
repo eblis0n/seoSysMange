@@ -41,7 +41,7 @@ class telegraSelenium:
         adsUserlist = self.siphon_adsuser(eval(configCall.telegra_ads), eval(configCall.min_concurrent_user))
 
         sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=str(genre),
-                                       platform=str(platform), limit=1000)
+                                       platform=str(platform), limit=200000)
 
 
         if sql_data is not None:
@@ -51,8 +51,8 @@ class telegraSelenium:
                 alll_links_list = self.siphon_links(all_links, stacking_min, stacking_max)
                 all_res = self.run(platform, genre, adsUserlist, alll_links_list,  alt_text)
 
-
                 return all_res
+
         return None
     
 
