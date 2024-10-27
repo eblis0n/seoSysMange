@@ -57,7 +57,7 @@ class amazonRun:
                     if command:
                         new_message = message.get("script")
                         result = self.execute_command(command, new_message)
-                        self.usego.sendlog(f"执行命令result{result}")
+                        self.usego.sendlog(f"执行命令结果：{result}")
                     else:
                         raise ValueError(f"Unknown command: {message.get('command')}")
                 except Exception as e:

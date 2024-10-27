@@ -12,6 +12,7 @@ import time
 
 from pymongo import MongoClient
 import middleware.public.configurationCall as configCall
+from middleware.public.commonUse import otherUse
 
 # 设置项目根目录
 base_dr = str(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -21,6 +22,7 @@ sys.path.append(bae_idr)
 
 class MongoDB:
     def __init__(self):
+        self.usego = otherUse()
         self.client = None  # 初始化时不连接
         self.host = configCall.mg_65_host
         self.port = eval(configCall.mg_65_port)
@@ -34,7 +36,7 @@ class MongoDB:
             try:
                 self.client = MongoClient(base_url, maxPoolSize=50, minPoolSize=10, connectTimeoutMS=120000, socketTimeoutMS=120000)
             except:
-                print("连接失败")
+                self.usego.sendlog(f"连接失败{base_url}")
                 time.sleep(5)
                 try:
                     self.client = MongoClient(base_url, maxPoolSize=50, minPoolSize=10, connectTimeoutMS=120000, socketTimeoutMS=120000)
@@ -56,10 +58,10 @@ class MongoDB:
             if database_name in db_list:
                 return self.get_database(database_name)
             else:
-                print(f"连接成功！但数据库 '{database_name}' 不存在。")
+                self.usego.sendlog(f"连接成功！但数据库 '{database_name}' 不存在。")
                 return None
         except Exception as e:
-            print(f"连接失败: {e}")
+            self.usego.sendlog(f"连接失败: {e}")
             return None
 
     def get_collection(self, dbname, setname):
@@ -69,7 +71,7 @@ class MongoDB:
             try:
                 return db[setname]  # 获取集合
             except Exception as e:
-                print(f"获取集合失败: {e}")
+                self.usego.sendlog(f"获取集合失败: {e}")
                 return None
         return None
 
@@ -77,7 +79,7 @@ class MongoDB:
         """关闭 MongoDB 连接"""
         if self.client:
             self.client.close()
-            print("MongoDB 连接已关闭。")
+            self.usego.sendlog("MongoDB 连接已关闭。")
 
     def find_data(self, dbname, setname, query=None, projection=None, find_one=False, limit=None):
         """通用查询方法"""
@@ -90,14 +92,13 @@ class MongoDB:
                     return mycol.find_one(query, projection)  # 单条查询
                 else:
                     result = mycol.find(query, projection)
-                    print("query",query)
-                    print("result",result)
+
                     if limit:
-                        print("有数量限制")
+                        self.usego.sendlog(f"有数量限{limit}")
                         result = result.limit(limit)  # 设置返回结果的限制数量
                     return list(result)  # 查询全部
             except Exception as e:
-                print(f"MongoDB 查询错误: {e}")
+                self.usego.sendlog(f"MongoDB 查询错误: {e}")
                 return None
         return None
 
@@ -113,7 +114,7 @@ class MongoDB:
                     result = mycol.insert_one(data)
                     return result.inserted_id
             except Exception as e:
-                print(f"MongoDB 插入错误: {e}")
+                self.usego.sendlog(f"MongoDB 插入错误: {e}")
                 return None
         return None
 
@@ -133,7 +134,7 @@ class MongoDB:
                     "modified_count": result.modified_count
                 }
             except Exception as e:
-                print(f"MongoDB 更新错误: {e}")
+                self.usego.sendlog(f"MongoDB 更新错误: {e}")
                 return None
         return None
 
@@ -151,6 +152,6 @@ class MongoDB:
                     "deleted_count": result.deleted_count
                 }
             except Exception as e:
-                print(f"MongoDB 删除错误: {e}")
+                self.usego.sendlog(f"MongoDB 删除错误: {e}")
                 return None
         return None

@@ -28,11 +28,44 @@ class AmazonSQS:
                                 aws_access_key_id=configCall.aws_access_key,
                                 aws_secret_access_key=configCall.aws_secret_key)
 
+    def list_queues(self, queue_name_prefix=None):
+        """
+        列出所有 SQS 队列，支持根据前缀筛选。
+
+        :param queue_name_prefix: 可选，队列名称前缀，用于筛选
+        :return: 队列 URL 列表
+        """
+        try:
+            if queue_name_prefix:
+                response = self.sqs.list_queues(QueueNamePrefix=queue_name_prefix)
+            else:
+                response = self.sqs.list_queues()
+
+            return response.get('QueueUrls', [])
+        except ClientError as e:
+            self.usego.sendlog(f"Failed to list queues: {e}")
+            return []
+
+
+
     def initialization(self, taskid):
         queue_name = f'SQS-{taskid}.fifo'
         policy_document = json.loads(configCall.aws_policy_document)  # 使用 json.loads
         policy_string = json.dumps(policy_document)
 
+        # 尝试列出现有队列
+        try:
+            queues = self.list_queues(queue_name)  # 使用 list_queues 方法
+            if queues:
+                self.usego.sendlog(f"Queue {queue_name} already exists. Using the existing queue...")
+                return {'QueueUrl': queues[0]}  # 返回第一个找到的队列 URL
+
+        except ClientError as e:
+            self.usego.sendlog(f"Failed to list queues: {e}")
+
+
+
+        # 如果队列不存在，则创建新队列
         retries = 3  # 设置重试次数
         for attempt in range(retries):
             try:
@@ -49,12 +82,10 @@ class AmazonSQS:
                 return response
 
             except ClientError as e:
-                if e.response['Error']['Code'] == 'QueueAlreadyExists':
-                    self.usego.sendlog(f"Queue {queue_name} already exists. Retrieving its URL...")
-                    return self.sqs.get_queue_url(QueueName=queue_name)
-                elif e.response['Error']['Code'] == 'QueueDeletedRecently':
+                if e.response['Error']['Code'] == 'QueueDeletedRecently':
                     if attempt < retries - 1:
-                        self.usego.sendlog(f"Queue '{queue_name}' was recently deleted. Waiting 60 seconds before retrying...")
+                        self.usego.sendlog(
+                            f"Queue '{queue_name}' was recently deleted. Waiting 60 seconds before retrying...")
                         time.sleep(60)  # 等待 60 秒后重试
                     else:
                         self.usego.sendlog(f"Exceeded maximum retries for '{queue_name}'.")
