@@ -51,3 +51,6 @@ class MyEnum():
 
     # public
     PLATFORMS = "/platforms/"
+
+    # amazon
+    AMAZONSQS_LIST  = "/list/"

@@ -123,6 +123,88 @@ class menuDeploy():
         """
         tree_data = [
         {
+            "path": "/implement",
+            "component": "Layout",
+            "redirect": "",
+            "name": "",
+            "meta": {
+                "title": "\u6267\u884c\u7ba1\u7406",
+                "icon": "cascader",
+                "hidden": False,
+                "keepAlive": False,
+                "alwaysShow": False,
+                "params": ""
+            },
+            "children": [
+                {
+                    "path": "queue",
+                    "component": "implement/index",
+                    "redirect": "",
+                    "name": "",
+                    "meta": {
+                        "title": "\u961f\u5217\u7ba1\u7406",
+                        "icon": "",
+                        "hidden": False,
+                        "keepAlive": False,
+                        "alwaysShow": True,
+                        "params": ""
+                    },
+                    "children": [
+                        {
+                            "path": "amazonsqs",
+                            "component": "implement/amazonsqs/index",
+                            "redirect": "",
+                            "name": "amazonsqs",
+                            "meta": {
+                                "title": "AmazonSQS",
+                                "icon": "",
+                                "hidden": False,
+                                "keepAlive": True,
+                                "alwaysShow": False,
+                                "params": ""
+                            },
+                            "children": [
+
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "path": "mission",
+                    "component": "implement/index",
+                    "redirect": "",
+                    "name": "",
+                    "meta": {
+                        "title": "\u4efb\u52a1\u7ba1\u7406",
+                        "icon": "",
+                        "hidden": False,
+                        "keepAlive": False,
+                        "alwaysShow": True,
+                        "params": ""
+                    },
+                    "children": [
+                        {
+                            "path": "Splicing",
+                            "component": "implement/Splicing/index",
+                            "redirect": "",
+                            "name": "go301",
+                            "meta": {
+                                "title": "\u62fc\u63a5",
+                                "icon": "",
+                                "hidden": False,
+                                "keepAlive": True,
+                                "alwaysShow": False,
+                                "params": ""
+                            },
+                            "children": [
+
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "path": "/basis",
             "component": "Layout",
             "redirect": "",
@@ -150,7 +232,6 @@ class menuDeploy():
                         "params": ""
                     },
                     "children": [
-
                         {
                             "path": "ads",
                             "component": "basisManage/AdsBasic/adsBasic",
@@ -268,24 +349,7 @@ class menuDeploy():
                             "children": [
 
                             ]
-                        },
-                        {
-                            "path": "Splicing",
-                            "component": "basisManage/Splicing/index",
-                            "redirect": "",
-                            "name": "go301",
-                            "meta": {
-                                "title": "拼接",
-                                "icon": "",
-                                "hidden": False,
-                                "keepAlive": True,
-                                "alwaysShow": False,
-                                "params": ""
-                            },
-                            "children": [
-
-                            ]
-                        },
+                        }
                     ]
                 }
             ]
@@ -405,12 +469,12 @@ class menuDeploy():
             },
             "children": [
                 {
-                    "path": "spider",
-                    "component": "reportsManage/spider/index",
+                    "path": "googleRecord",
+                    "component": "reportsManage/googleRecord/index",
                     "redirect": "",
                     "name": "",
                     "meta": {
-                        "title": "\u8718\u86db",
+                        "title": " Google\u6536\u5f55",
                         "icon": "",
                         "hidden": False,
                         "keepAlive": True,
@@ -422,12 +486,12 @@ class menuDeploy():
                     ]
                 },
                 {
-                    "path": "googleRecord",
-                    "component": "reportsManage/googleRecord/index",
+                    "path": "spider",
+                    "component": "reportsManage/spider/index",
                     "redirect": "",
                     "name": "",
                     "meta": {
-                        "title": " Google\u6536\u5f55",
+                        "title": "\u8718\u86db",
                         "icon": "",
                         "hidden": False,
                         "keepAlive": True,
@@ -460,7 +524,7 @@ class menuDeploy():
                     "redirect": "",
                     "name": "",
                     "meta": {
-                        "title": "yescaptcha",
+                        "title": "apidocs",
                         "icon": "link",
                         "hidden": False,
                         "keepAlive": False,
@@ -477,7 +541,7 @@ class menuDeploy():
                     "redirect": "",
                     "name": "",
                     "meta": {
-                        "title": "apidocs",
+                        "title": "yescaptcha",
                         "icon": "link",
                         "hidden": False,
                         "keepAlive": False,
@@ -691,12 +755,12 @@ class menuDeploy():
                     ]
                 },
                 {
-                    "path": "dict-demo",
-                    "component": "demo/dict",
+                    "path": "icon-selector",
+                    "component": "demo/icon-selector",
                     "redirect": "",
                     "name": "",
                     "meta": {
-                        "title": "\u5b57\u5178\u7ec4\u4ef6",
+                        "title": "\u56fe\u6807\u9009\u62e9\u5668",
                         "icon": "",
                         "hidden": False,
                         "keepAlive": True,
@@ -708,12 +772,12 @@ class menuDeploy():
                     ]
                 },
                 {
-                    "path": "icon-selector",
-                    "component": "demo/icon-selector",
+                    "path": "dict-demo",
+                    "component": "demo/dict",
                     "redirect": "",
                     "name": "",
                     "meta": {
-                        "title": "\u56fe\u6807\u9009\u62e9\u5668",
+                        "title": "\u5b57\u5178\u7ec4\u4ef6",
                         "icon": "",
                         "hidden": False,
                         "keepAlive": True,

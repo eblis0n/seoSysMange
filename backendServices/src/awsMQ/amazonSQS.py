@@ -20,6 +20,7 @@ import json
 from botocore.exceptions import ClientError
 from middleware.public.commonUse import otherUse
 import middleware.public.configurationCall as configCall
+
 class AmazonSQS:
 
     def __init__(self):
@@ -41,7 +42,8 @@ class AmazonSQS:
             else:
                 response = self.sqs.list_queues()
 
-            return response.get('QueueUrls', [])
+            return response
+
         except ClientError as e:
             self.usego.sendlog(f"Failed to list queues: {e}")
             return []
@@ -55,7 +57,8 @@ class AmazonSQS:
 
         # 尝试列出现有队列
         try:
-            queues = self.list_queues(queue_name)  # 使用 list_queues 方法
+            response = self.list_queues(queue_name)  # 使用 list_queues 方法
+            queues = response.get('QueueUrls', [])
             if queues:
                 self.usego.sendlog(f"Queue {queue_name} already exists. Using the existing queue...")
                 return {'QueueUrl': queues[0]}  # 返回第一个找到的队列 URL
@@ -149,23 +152,29 @@ class AmazonSQS:
 
 if __name__ == '__main__':
     aws = AmazonSQS()
-    response = aws.initialization("client_this_mac_1_not")
-    queue_url = response['QueueUrl']
-    print("queue_url", queue_url)
-
-    # msg = "print('Hello World')"
-    # aws.sendMSG(queue_url, "testgroup", "execute_script", msg)
-
-    # 假设已经初始化了 SQS 客户端并获取了 queue_url
-    task_data = {
-        'command': 'test1',  # 指定要执行的命令
-    }
-
-    msg_group = "test1"  # 消息分组
-    scriptname = "test1"  # 脚本名称
-
-    # 发送消息到 SQS 队列
-    response = aws.sendMSG(queue_url, msg_group, scriptname, task_data)
-
-    # 打印响应（可选）
-    print("Message sent:", response)
+    response = aws.list_queues()
+    queues = response.get('QueueUrls', [])
+    if queues:
+        print("123")
+    else:
+        print(456)
+    # response = aws.initialization("client_this_mac_1_not")
+    # queue_url = response['QueueUrl']
+    # print("queue_url", queue_url)
+    #
+    # # msg = "print('Hello World')"
+    # # aws.sendMSG(queue_url, "testgroup", "execute_script", msg)
+    #
+    # # 假设已经初始化了 SQS 客户端并获取了 queue_url
+    # task_data = {
+    #     'command': 'test1',  # 指定要执行的命令
+    # }
+    #
+    # msg_group = "test1"  # 消息分组
+    # scriptname = "test1"  # 脚本名称
+    #
+    # # 发送消息到 SQS 队列
+    # response = aws.sendMSG(queue_url, msg_group, scriptname, task_data)
+    #
+    # # 打印响应（可选）
+    # print("Message sent:", response)

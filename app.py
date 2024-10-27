@@ -23,6 +23,8 @@ from src.api.pcSettingsManagement.pc_settings_manage import pcManage
 from src.api.uploadFileManagement.upload_file_manage import uploadFileManage
 from src.api.splicingManagement.splicing_manage import splicingManage
 from src.api.publicManagement.public_manage import publicManage
+from src.api.amazonManagement.amazon_management import amazonManage
+
 
 
 
@@ -70,6 +72,8 @@ pcManage_bp = pcManage().bp
 uploadFile_bp = uploadFileManage().bp
 splicing_bp = splicingManage().bp
 public_bp = publicManage().bp
+amazon_bp = amazonManage().bp
+
 #################################################### 引用 ###########################################################
 
 
@@ -80,6 +84,7 @@ app.register_blueprint(pcManage_bp)
 app.register_blueprint(uploadFile_bp)
 app.register_blueprint(splicing_bp)
 app.register_blueprint(public_bp)
+app.register_blueprint(amazon_bp)
 
 #################################################### amazon ###########################################################
 
@@ -91,8 +96,6 @@ if configCall.isClient == '0':
     # 启动SQS客户端模式
     threading.Thread(target=ama.run_sqs_client, daemon=True).start()
     print("SQS client mode started.")
-
-
 
 
 @app.route('/')
