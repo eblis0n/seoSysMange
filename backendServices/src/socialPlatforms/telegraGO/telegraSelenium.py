@@ -47,7 +47,7 @@ class telegraSelenium:
             all_links = [data["url"] for data in sql_data] if sql_data else []
 
             if all_links:
-                all_res = self.run(all_links, stacking_min, stacking_max, alt_text)
+                all_res = self.run(platform, genre, all_links, stacking_min, stacking_max, alt_text)
                 query = {"url": {"$in": all_res}}
                 sql_data = self.mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
                 self.usego.sendlog(f"删除结果：{sql_data}")
@@ -59,7 +59,7 @@ class telegraSelenium:
 
 
 
-    def run(self, all_links, stacking_min, stacking_max, alt_text):
+    def run(self, platform, genre, all_links, stacking_min, stacking_max, alt_text):
         all_res = []
 
         alll_links_list = self.siphon_links(all_links, stacking_min, stacking_max)
@@ -190,8 +190,8 @@ class telegraSelenium:
 
             this_dat = {
                     "url": f"{url}",
-                    "platform": platform,
-                    "genre": genre,
+                    "platform": f"{platform}",
+                    "genre": f"{genre}",
                     "created_at": created_at
                 }
             new_links_list.append(this_dat)
