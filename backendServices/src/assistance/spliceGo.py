@@ -31,7 +31,7 @@ class spliceGo():
         formatted_now = now.strftime("%Y-%m-%d %H:%M:%S")
         new_links_list = [
             {
-                "url": f"{zy_link}{url}".replace(' ', '').replace('\n', ''),
+                "url": f"{zy_link}{url}".replace('\n', ''),
                 "platform": platform,
                 "genre": genre,
                 "created_at": formatted_now
@@ -39,6 +39,7 @@ class spliceGo():
             for zy_link in zyurllist
             for url in urllist
         ]
+        # self.usego.sendlog(f"拼接结果：{new_links_list}")
 
         # 批量插入生成的链接
         result = self.mossql.telegra_interim_insert_batch("seo_external_links_post", new_links_list)
