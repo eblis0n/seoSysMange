@@ -88,8 +88,8 @@ class splicingManage():
         genre = data_request['genre']
         platform = data_request['platform']
 
-        zyurl_list = zyurl.split(",")
-        url_list = url.split(",")
+        zyurl_list = zyurl.split("\n")
+        url_list = url.split("\n")
         spl = spliceGo()
         result = spl.splice_301(zyurl_list, url_list, platform, genre)
         if result is not None:

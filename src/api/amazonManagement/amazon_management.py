@@ -42,14 +42,15 @@ class amazonManage():
         resdatas = []
         if queues:
             data = {
-                "id":"",
-                "url":""
+                "id": "",
+                "url": ""
 
             }
-            for idx, queue in queues:
-                data["id"] = idx
-                data["url"] = queue
+            for i in range(len(queues)):
+                data["id"] = i
+                data["url"] = queues[i]
 
+                resdatas.append(data)
 
             self.usego.sendlog(f'list结果：{resdatas}')
             res = ResMsg(data=resdatas)
