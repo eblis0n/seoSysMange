@@ -85,15 +85,26 @@ class splicingManage():
     def splicing_insert(self):
 
         data_request = request.json
-        zyurl = data_request['zyurl']
+
         url = data_request['url']
         genre = data_request['genre']
         platform = data_request['platform']
-
-        zyurl_list = zyurl.split("\n")
         url_list = url.split("\n")
         spl = spliceGo()
-        result = spl.splice_301(zyurl_list, url_list, platform, genre)
+
+        try:
+            zyurl = data_request['zyurl']
+
+        except:
+            self.usego.sendlog(f'自成一派')
+            result = spl.splice_301(genre, platform, url_list)
+        else:
+            if zyurl == "":
+                result = spl.splice_301(genre, platform, url_list)
+            else:
+                zyurl_list = zyurl.split("\n")
+                result = spl.splice_301(genre, platform, url_list, zyurl_list)
+
         if result is not None:
             self.usego.sendlog(f'添加成功：{result}')
             res = ResMsg(data=result)

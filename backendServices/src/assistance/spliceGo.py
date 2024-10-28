@@ -22,23 +22,34 @@ class spliceGo():
         self.usego = otherUse()
         self.mossql = mongo_sqlGO()
 
-    def splice_301(self, zyurllist, urllist, platform, genre):
+    def splice_301(self, genre, platform,  urllist, zyurllist=None):
 
         # 获取当前时间
         now = datetime.now()
 
         # 格式化为年月日时分秒
         formatted_now = now.strftime("%Y-%m-%d %H:%M:%S")
-        new_links_list = [
-            {
-                "url": f"{zy_link}{url}".replace('\n', ''),
-                "platform": platform,
-                "genre": genre,
-                "created_at": formatted_now
-            }
-            for zy_link in zyurllist
-            for url in urllist
-        ]
+        if zyurllist is None:
+            new_links_list = [
+                {
+                    "url": f"{url}".replace('\n', ''),
+                    "platform": platform,
+                    "genre": genre,
+                    "created_at": formatted_now
+                }
+                for url in urllist
+            ]
+        else:
+            new_links_list = [
+                {
+                    "url": f"{zy_link}{url}".replace('\n', ''),
+                    "platform": platform,
+                    "genre": genre,
+                    "created_at": formatted_now
+                }
+                for zy_link in zyurllist
+                for url in urllist
+            ]
         # self.usego.sendlog(f"拼接结果：{new_links_list}")
 
         # 批量插入生成的链接
