@@ -41,7 +41,7 @@ class telegraSelenium:
         adsUserlist = self.siphon_adsuser(eval(configCall.telegra_ads), eval(configCall.min_concurrent_user))
 
         sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=str(genre),
-                                       platform=str(platform), limit=200000)
+                                       platform=str(platform), limit=eval(configCall.max_limit))
 
 
         if sql_data is not None:
@@ -246,15 +246,10 @@ class telegraSelenium:
 if __name__ == '__main__':
     start_time = datetime.now()
     tele = telegraSelenium()
+    # 调试，通过配置文件修改
     genre = "0"
     platform = "telegra"
-    stacking_min = 200
-    stacking_max = 300
-    alt_text = "test"
+    stacking_min = configCall.stacking_min
+    stacking_max = configCall.stacking_max
+    alt_text = configCall.stacking_text
     tele.main(genre, platform, stacking_min, stacking_max, alt_text)
-    # mossql = mongo_sqlGO()
-
-    # sql_data = mossql.telegra_interim_findAll("seo_external_links_post", genre=genre,
-    #                                                platform=platform, limit=100000)
-
-
