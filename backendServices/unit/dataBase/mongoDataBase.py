@@ -102,6 +102,22 @@ class MongoDB:
                 return None
         return None
 
+    def find_count(self, dbname, setname, query=None):
+        """通用查询方法"""
+        mycol = self.get_collection(dbname, setname)
+        if mycol is not None:
+            try:
+                # 查询总数
+                if query is None:
+                    query = {}
+                count = mycol.count_documents(query)
+                return count
+
+            except Exception as e:
+                self.usego.sendlog(f"MongoDB 查询错误: {e}")
+                return None
+        return None
+
     def insert_data(self, dbname, setname, data):
         """插入数据到集合：支持单条插入和批量插入"""
         mycol = self.get_collection(dbname, setname)
@@ -138,15 +154,19 @@ class MongoDB:
                 return None
         return None
 
-    def delete_data(self, dbname, setname, query, multiple=False):
+    def delete_data(self, dbname, setname, query=None, multiple=False, clear_all=False):
         """删除集合中的单个或多个文档"""
         mycol = self.get_collection(dbname, setname)
         if mycol is not None:
             try:
-                if multiple:  # 批量删除
+                if clear_all:
+                    # 清空集合中的所有文档
+                    result = mycol.delete_many({})  # 删除所有文档
+                elif multiple:  # 批量删除
                     result = mycol.delete_many(query)
                 else:  # 单条删除
                     result = mycol.delete_one(query)
+
                 return {
                     "acknowledged": result.acknowledged,
                     "deleted_count": result.deleted_count

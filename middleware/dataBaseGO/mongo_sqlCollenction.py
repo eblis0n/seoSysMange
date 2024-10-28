@@ -29,11 +29,11 @@ class mongo_sqlGO():
 
     ############################################# 公共 #####################################################
 
-    ############################################# telegra #####################################################
+    ############################################# splicing #####################################################
 
 
     # 批量插入
-    def telegra_interim_insert_batch(self, setname, dataList):
+    def splicing_interim_insert_batch(self, setname, dataList):
         """
             @Datetime ： 2024/10/19 16:18
             @Author ：eblis
@@ -43,7 +43,7 @@ class mongo_sqlGO():
 
         return sql_data
 
-    def telegra_interim_find_max(self, setname, max):
+    def splicing_interim_find_max(self, setname, max):
         """
             @Datetime ： 2024/10/20 16:06
             @Author ：eblis
@@ -54,7 +54,7 @@ class mongo_sqlGO():
 
         return sql_data
 
-    def telegra_interim_findAll(self, setname, genre=None, platform=None, projection=None, limit=None):
+    def splicing_interim_findAll(self, setname, genre=None, platform=None, projection=None, limit=None):
         """
             @Datetime ： 2024/10/20 16:06
             @Author ：eblis
@@ -73,14 +73,25 @@ class mongo_sqlGO():
 
         return sql_datas
 
+    def splicing_interim_find_count(self, setname):
+        """
+            @Datetime ： 2024/10/28 17:10
+            @Author ：eblis
+            @Motto：查表总数
+        """
+        sql_datas = self.mosql.find_count(self.seo_interim, setname)
 
-    def telegra_interim_multiple_delet(self, setname, query):
+        return sql_datas
+
+
+
+    def splicing_interim_delet(self, setname, query, multiple, clear_all):
         """
             @Datetime ： 2024/10/20 16:06
             @Author ：eblis
             @Motto：query 传字典
         """
-        sql_data = self.mosql.delete_data(self.seo_interim, setname, query, multiple=True)
+        sql_data = self.mosql.delete_data(self.seo_interim, setname, query=query, multiple=multiple,  clear_all=clear_all)
 
 
         return sql_data

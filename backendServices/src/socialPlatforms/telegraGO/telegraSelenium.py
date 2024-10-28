@@ -40,7 +40,7 @@ class telegraSelenium:
         """
         adsUserlist = self.siphon_adsuser(eval(configCall.telegra_ads), eval(configCall.min_concurrent_user))
 
-        sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", genre=str(genre),
+        sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", genre=str(genre),
                                        platform=str(platform), limit=eval(configCall.max_limit))
 
 
@@ -119,7 +119,7 @@ class telegraSelenium:
         """
         # self.usego.sendlog(f"本次要删除 ：{len(links)} 条数据")
         query = {"url": {"$in": links}}
-        sql_data = self.mossql.telegra_interim_multiple_delet("seo_external_links_post", query)
+        sql_data = self.mossql.splicing_interim_delet("seo_external_links_post", query=query, multiple=True, clear_all=False)
         self.usego.sendlog(f"删除结果：{sql_data}")
 
 
@@ -172,25 +172,25 @@ class telegraSelenium:
 
             content_input = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_tl_editor"]/div[1]/p')))
             driver.execute_script("arguments[0].textContent = '';", content_input)
-            all_atab = ""
+            # all_atab = ""
             for link in this_links:
                 self.usego.sendlog(f"这条连接是：{link}")
                 link = link.strip('\n')
-                this_atab = f"""<a href="{link}" target="_blank">{alt_text}</a>&nbsp;"""
-                all_atab += this_atab
+            #     this_atab = f"""<a href="{link}" target="_blank">{alt_text}</a>&nbsp;"""
+            #     all_atab += this_atab
+            #
+            # self.usego.sendlog(f"A 标签 生成效果:{all_atab}")
+            #
+            # driver.execute_script("arguments[0].innerHTML = arguments[1];", content_input, all_atab)
 
-            self.usego.sendlog(f"A 标签 生成效果:{all_atab}")
-
-            driver.execute_script("arguments[0].innerHTML = arguments[1];", content_input, all_atab)
-
-            # driver.execute_script("""
-                #     var a = document.createElement('a');
-                #     a.href = arguments[0];
-                #     a.textContent = arguments[1];
-                #     a.target = '_blank';
-                #     arguments[2].appendChild(a);
-                #     arguments[2].appendChild(document.createTextNode('\u00A0'));
-                # """, link, alt_text, content_input)
+                driver.execute_script("""
+                        var a = document.createElement('a');
+                        a.href = arguments[0];
+                        a.textContent = arguments[1];
+                        a.target = '_blank';
+                        arguments[2].appendChild(a);
+                        arguments[2].appendChild(document.createTextNode('\u00A0'));
+                    """, link, alt_text, content_input)
 
             publish_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_publish_button"]')))
             driver.execute_script("arguments[0].click();", publish_button)
@@ -236,7 +236,7 @@ class telegraSelenium:
                     "created_at": created_at
                 }
             new_links_list.append(this_dat)
-        result = self.mossql.telegra_interim_insert_batch("seo_result_301_links", new_links_list)
+        result = self.mossql.splicing_interim_insert_batch("seo_result_301_links", new_links_list)
         if result is not None:  # 修改这里，检查 result 是否为 None
             return f"生成 {len(new_links_list)} 个新链接，已入库"
         else:

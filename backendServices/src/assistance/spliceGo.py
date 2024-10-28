@@ -42,7 +42,7 @@ class spliceGo():
         # self.usego.sendlog(f"拼接结果：{new_links_list}")
 
         # 批量插入生成的链接
-        result = self.mossql.telegra_interim_insert_batch("seo_external_links_post", new_links_list)
+        result = self.mossql.splicing_interim_insert_batch("seo_external_links_post", new_links_list)
 
         if result is not None:  # 修改这里，检查 result 是否为 None
             return f"生成 {len(new_links_list)} 个新链接，已入库"

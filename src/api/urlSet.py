@@ -48,6 +48,8 @@ class MyEnum():
     SPLICING_SUBMIT_PUSH = "/push/"
     SPLICING_LIST = "/list/"
     SPLICING_INSERT = "/add/"
+    SPLICING_TOTAL = "/total/"
+    SPLICING_DELETE_ALL = "/delete/"
 
     # public
     PLATFORMS = "/platforms/"

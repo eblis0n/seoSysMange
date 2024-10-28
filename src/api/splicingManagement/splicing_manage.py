@@ -38,6 +38,8 @@ class splicingManage():
         self.bp.route(self.Myenum.SPLICING_SUBMIT_PUSH, methods=['POST'])(self.splicing_submit_push)
         self.bp.route(self.Myenum.SPLICING_INSERT, methods=['POST'])(self.splicing_insert)
         self.bp.route(self.Myenum.SPLICING_LIST, methods=['GET'])(self.splicing_list)
+        self.bp.route(self.Myenum.SPLICING_TOTAL, methods=['GET'])(self.splicing_total)
+        self.bp.route(self.Myenum.SPLICING_DELETE_ALL, methods=['GET'])(self.splicing_delete_all)
 
 
     def splicing_list(self):
@@ -46,7 +48,7 @@ class splicingManage():
             @Author ：eblis
             @Motto：简单描述用途
         """
-        sql_data = self.mossql.telegra_interim_findAll("seo_external_links_post", limit=10000)
+        sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", limit=10000)
         resdatas = []
         # print("sql_data", sql_data)
         if "sql 语句异常" not in str(sql_data):
@@ -163,6 +165,30 @@ class splicingManage():
             self.usego.sendlog(f' run_telegra_selenium，任务发送结果:{response}')
         res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
         return res.to_json()
+
+
+    def splicing_total(self):
+        """
+            @Datetime ： 2024/10/28 16:50
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        sql_data = self.mossql.splicing_interim_find_count("seo_external_links_post")
+        self.usego.sendlog(f'查询结果：{sql_data}')
+        datas = {
+            "total": sql_data,
+        }
+        res = ResMsg(data=datas)
+        return res.to_json()
+
+
+    def splicing_delete_all(self):
+        sql_data = self.mossql.splicing_interim_delet("seo_external_links_post", query=None, multiple=False, clear_all=True)
+        self.usego.sendlog(f'删除结果：{sql_data}')
+        res = ResMsg(data=sql_data)
+        return res.to_json()
+
+
 
 
 
