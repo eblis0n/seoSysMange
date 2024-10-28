@@ -55,4 +55,10 @@ class MyEnum():
     PLATFORMS = "/platforms/"
 
     # amazon
-    AMAZONSQS_LIST  = "/list/"
+    AMAZONSQS_LIST = "/list/"
+
+
+    # outcome
+    OUTCOME_LIST = "/list/"
+    OUTCOME_TOTAL = "/total/"
+    OUTCOME_DELETE_DATA = "/delete/"

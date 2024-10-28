@@ -89,6 +89,7 @@ class menuDeploy():
     #
     #         return responseData
 
+
     def sys_menu_list(self):
         """
         @Datetime ： 2024/10/23 22:33
@@ -122,6 +123,39 @@ class menuDeploy():
             @Motto：管理后台用户管理
         """
         tree_data = [
+        {
+            "path": "/outcome",
+            "component": "Layout",
+            "redirect": "",
+            "name": "",
+            "meta": {
+                "title": "\u7ed3\u679c\u5c55\u793a",
+                "icon": "cascader",
+                "hidden": False,
+                "keepAlive": False,
+                "alwaysShow": False,
+                "params": ""
+            },
+            "children": [
+                {
+                    "path": "telegra",
+                    "component": "outcome/teleUpshot/index",
+                    "redirect": "",
+                    "name": "outcome",
+                    "meta": {
+                        "title": "telegra\u7ed3\u679c",
+                        "icon": "",
+                        "hidden": False,
+                        "keepAlive": True,
+                        "alwaysShow": False,
+                        "params": ""
+                    },
+                    "children": [
+
+                    ]
+                }
+            ]
+        },
         {
             "path": "/implement",
             "component": "Layout",
@@ -755,12 +789,12 @@ class menuDeploy():
                     ]
                 },
                 {
-                    "path": "icon-selector",
-                    "component": "demo/icon-selector",
+                    "path": "dict-demo",
+                    "component": "demo/dict",
                     "redirect": "",
                     "name": "",
                     "meta": {
-                        "title": "\u56fe\u6807\u9009\u62e9\u5668",
+                        "title": "\u5b57\u5178\u7ec4\u4ef6",
                         "icon": "",
                         "hidden": False,
                         "keepAlive": True,
@@ -772,12 +806,12 @@ class menuDeploy():
                     ]
                 },
                 {
-                    "path": "dict-demo",
-                    "component": "demo/dict",
+                    "path": "icon-selector",
+                    "component": "demo/icon-selector",
                     "redirect": "",
                     "name": "",
                     "meta": {
-                        "title": "\u5b57\u5178\u7ec4\u4ef6",
+                        "title": "\u56fe\u6807\u9009\u62e9\u5668",
                         "icon": "",
                         "hidden": False,
                         "keepAlive": True,

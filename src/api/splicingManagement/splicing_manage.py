@@ -2,7 +2,7 @@
 """
 @Datetime ： 2024/10/19 16:31
 @Author ： eblis
-@File ：splicing_manage.py
+@File ：outcome_manage.py
 @IDE ：PyCharm
 @Motto：ABC(Always Be Coding)
 """
@@ -198,6 +198,9 @@ class splicingManage():
         self.usego.sendlog(f'删除结果：{sql_data}')
         res = ResMsg(data=sql_data)
         return res.to_json()
+
+
+
 
 
 
