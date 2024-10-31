@@ -255,3 +255,43 @@ class basis_sqlGO():
         return sql_data
 
 
+    ############################################# blogger #####################################################
+
+
+    def blogger_info_list_sql(self):
+        # noinspection SqlNoDataSourceInspection
+        sqlgo = f"""SELECT /*+ NOCACHE */*  FROM seo_blogger_info;"""
+        # 执行 SQL 查询语句
+        sql_data = self.ssql.mysql_select('basis', sqlgo)
+        return sql_data
+
+
+    def blogger_info_insert_sql(self, group,adsNumber, adsID, proxy, bloggerID, create_at):
+        # noinspection SqlNoDataSourceInspection
+        sqlgo = f"""INSERT INTO seo_blogger_info (`group`,`adsNumber`,`adsID`, `proxy`, `bloggerID`, `create_at`) VALUES ('{group}','{adsNumber}','{adsID}','{proxy}','{bloggerID}', '{create_at}');"""
+        # 执行 SQL 查询语句
+        sql_data = self.ssql.mysql_commit('basis', sqlgo)
+        return sql_data
+
+
+    def blogger_info_delete_sql(self, id):
+        # noinspection SqlNoDataSourceInspection
+        sqlgo = f"""DELETE FROM seo_blogger_info WHERE id = {id};"""
+        # 执行 SQL 查询语句
+        sql_data = self.ssql.mysql_commit('basis', sqlgo)
+        return sql_data
+
+    def blogger_info_update_sql(self, group, adsNumber, adsID, proxy, bloggerID, id):
+        """
+            更新 PC 设置的状态、名称和地址
+        """
+
+        sqlgo = f"""
+                        UPDATE seo_blogger_info 
+                        SET `group` = '{group}', `adsNumber` = '{adsNumber}', `adsID` = '{adsID}', `proxy` = '{proxy}', `bloggerID` = '{bloggerID}'
+                        WHERE `id` = {id};
+                    """
+        # 执行 SQL 更新查询
+        sql_data = self.ssql.mysql_commit('basis', sqlgo)
+        return sql_data
+

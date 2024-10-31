@@ -25,6 +25,7 @@ from src.api.splicingManagement.splicing_manage import splicingManage
 from src.api.publicManagement.public_manage import publicManage
 from src.api.amazonManagement.amazon_management import amazonManage
 from src.api.outcomeManagement.outcome_manage import outcomeManage
+from src.api.bloggerManagement.blogger_management import bloggerManage
 
 
 
@@ -75,6 +76,7 @@ splicing_bp = splicingManage().bp
 public_bp = publicManage().bp
 amazon_bp = amazonManage().bp
 outcome_bp = outcomeManage().bp
+blogger_bp = bloggerManage().bp
 
 #################################################### 引用 ###########################################################
 
@@ -88,6 +90,7 @@ app.register_blueprint(splicing_bp)
 app.register_blueprint(public_bp)
 app.register_blueprint(amazon_bp)
 app.register_blueprint(outcome_bp)
+app.register_blueprint(blogger_bp)
 
 
 #################################################### amazon ###########################################################

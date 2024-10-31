@@ -55,7 +55,7 @@ class DriversUtil:
         # options.add_argument('--start-maximized')
 
         # 自动打开开发者工具
-        # options.add_argument('--auto-open-devtools-for-tabs')
+        options.add_argument('--auto-open-devtools-for-tabs')
 
         if debugUP is not None:
             options.add_experimental_option("debuggerAddress", debugUP)

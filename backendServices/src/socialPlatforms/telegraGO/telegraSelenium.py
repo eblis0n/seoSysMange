@@ -38,7 +38,7 @@ class telegraSelenium:
             @Author ：eblis
             @Motto：简单描述用途
         """
-        adsUserlist = self.siphon_adsuser(eval(configCall.telegra_ads), eval(configCall.min_concurrent_user))
+        adsUserlist = self.siphon_adsuser(eval(configCall.stacking_ads), eval(configCall.min_concurrent_user))
 
         sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", genre=str(genre),
                                        platform=str(platform), limit=eval(configCall.max_limit))

@@ -62,3 +62,11 @@ class MyEnum():
     OUTCOME_LIST = "/list/"
     OUTCOME_TOTAL = "/total/"
     OUTCOME_DELETE_DATA = "/delete/"
+
+
+    #blogger
+    BLOGGER_INFO_LIST = "/list/"
+    BLOGGER_INFO_INSERT = "/add/"
+    BLOGGER_INFO_UPDATE = "/update/"
+    BLOGGER_INFO_DELETE = "/delete/"
+

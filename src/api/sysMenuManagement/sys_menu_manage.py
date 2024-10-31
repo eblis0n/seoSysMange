@@ -285,7 +285,7 @@ class menuDeploy():
                         },
                         {
                             "path": "blogger",
-                            "component": "basisManage/Blogger/blogger",
+                            "component": "basisManage/Blogger/index",
                             "redirect": "",
                             "name": "Blogger",
                             "meta": {

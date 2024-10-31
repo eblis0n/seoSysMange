@@ -108,7 +108,7 @@ task_address = conf.get("amazon", "task_address")
 ###################################### ads ######################################
 
 adsServer = conf.get("ads", "adsServer")
-telegra_ads = conf.get("ads", "telegra_ads")
+stacking_ads = conf.get("ads", "stacking_ads")
 min_concurrent_user = conf.get("ads", "min_concurrent_user")
 
 ###################################### telegra ######################################

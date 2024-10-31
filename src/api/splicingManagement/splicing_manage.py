@@ -170,12 +170,15 @@ class splicingManage():
                 'stacking_max': stacking_max,
                 'alt_text': alt_text
             }
-            response = self.aws_sqs.sendMSG(queue_url, "run_telegra_group", "run_telegra_selenium", task_data)
+
+            response = self.aws_sqs.sendMSG(queue_url, f"run_{platform}_group", f"run_{platform}_selenium", task_data)
             result[f"{client}"] = response
             results.append(result)
-            self.usego.sendlog(f' run_telegra_selenium，任务发送结果:{response}')
+            self.usego.sendlog(f' run_{platform}_selenium，任务发送结果:{response}')
         res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
         return res.to_json()
+
+
 
 
     def splicing_total(self):
@@ -198,6 +201,15 @@ class splicingManage():
         self.usego.sendlog(f'删除结果：{sql_data}')
         res = ResMsg(data=sql_data)
         return res.to_json()
+
+
+    def whitch_platform(self,platform):
+        """
+            @Datetime ： 2024/10/31 16:49
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+
 
 
 
