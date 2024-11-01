@@ -48,7 +48,7 @@ class splicingManage():
             @Author ：eblis
             @Motto：简单描述用途
         """
-        sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", limit=10000)
+        sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", end=10000)
         resdatas = []
         # print("sql_data", sql_data)
         if "sql 语句异常" not in str(sql_data):
