@@ -49,7 +49,7 @@ class mongo_sqlGO():
             @Author ：eblis
             @Motto：简单描述用途
         """
-        sql_data = self.mosql.find_data(self.seo_interim, setname, limit=max)
+        sql_data = self.mosql.find_data(self.seo_interim, setname, end=max)
 
 
         return sql_data
@@ -85,7 +85,7 @@ class mongo_sqlGO():
         if platform is not None:
             query['platform'] = platform
 
-        sql_datas = self.mosql.find_count(self.seo_interim, setname)
+        sql_datas = self.mosql.find_count(self.seo_interim, setname, query)
 
         return sql_datas
 

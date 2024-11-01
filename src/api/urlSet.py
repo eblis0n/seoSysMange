@@ -56,6 +56,8 @@ class MyEnum():
 
     # amazon
     AMAZONSQS_LIST = "/list/"
+    AMAZONSQS_DELETE = "/delete/"
+
 
 
     # outcome

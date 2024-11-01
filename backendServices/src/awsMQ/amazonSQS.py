@@ -25,9 +25,13 @@ class AmazonSQS:
 
     def __init__(self):
         self.usego = otherUse()
-        self.sqs = boto3.client('sqs', region_name=configCall.aws_region_name,
-                                aws_access_key_id=configCall.aws_access_key,
-                                aws_secret_access_key=configCall.aws_secret_key)
+
+
+    def _get_sqs_client(self):
+        """每次调用都创建一个新的 SQS 客户端"""
+        return boto3.client('sqs', region_name=configCall.aws_region_name,
+                            aws_access_key_id=configCall.aws_access_key,
+                            aws_secret_access_key=configCall.aws_secret_key)
 
     def list_queues(self, queue_name_prefix=None):
         """
@@ -36,11 +40,13 @@ class AmazonSQS:
         :param queue_name_prefix: 可选，队列名称前缀，用于筛选
         :return: 队列 URL 列表
         """
+        sqs = self._get_sqs_client()  # 获取新的 SQS 客户端
         try:
             if queue_name_prefix:
-                response = self.sqs.list_queues(QueueNamePrefix=queue_name_prefix)
+                response = sqs.list_queues(QueueNamePrefix=queue_name_prefix)
             else:
-                response = self.sqs.list_queues()
+                response = sqs.list_queues()
+                # print("response",response)
 
             return response
 
@@ -51,7 +57,9 @@ class AmazonSQS:
 
 
     def initialization(self, taskid):
+
         queue_name = f'SQS-{taskid}.fifo'
+        sqs = self._get_sqs_client()  # 获取新的 SQS 客户端
         policy_document = json.loads(configCall.aws_policy_document)  # 使用 json.loads
         policy_string = json.dumps(policy_document)
 
@@ -75,7 +83,7 @@ class AmazonSQS:
         retries = 3  # 设置重试次数
         for attempt in range(retries):
             try:
-                response = self.sqs.create_queue(
+                response = sqs.create_queue(
                     QueueName=queue_name,
                     Attributes={
                         'FifoQueue': 'true',
@@ -101,11 +109,13 @@ class AmazonSQS:
                     raise
 
     def sendMSG(self, queue_url, msg_group, scriptname, task_data, retries=3, delay=5):
+        sqs = self._get_sqs_client()
         message_body = {"command": f"{scriptname}", "script": task_data}
+
 
         for attempt in range(retries):
             try:
-                response = self.sqs.send_message(
+                response = sqs.send_message(
                     QueueUrl=queue_url,
                     MessageBody=json.dumps(message_body),
                     MessageGroupId=msg_group
@@ -118,9 +128,10 @@ class AmazonSQS:
                     raise  # 如果重试次数用尽，则抛出异常
 
     def takeMSG(self, queue_url, wait_time=20, retries=3, delay=5):
+        sqs = self._get_sqs_client()
         for attempt in range(retries):
             try:
-                response = self.sqs.receive_message(
+                response = sqs.receive_message(
                     QueueUrl=queue_url,
                     MaxNumberOfMessages=1,
                     VisibilityTimeout=30,
@@ -142,11 +153,12 @@ class AmazonSQS:
                     raise  # 如果重试次数用尽，则抛出异常
 
     def delFIFO(self, queue_url, receipt_handle=None):
+        sqs = self._get_sqs_client()
         if receipt_handle is None:
-            self.sqs.delete_queue(QueueUrl=queue_url)
+            sqs.delete_queue(QueueUrl=queue_url)
             self.usego.sendlog("FIFO queue deleted")
         else:
-            response = self.sqs.delete_message(
+            response = sqs.delete_message(
                 QueueUrl=queue_url,
                 ReceiptHandle=receipt_handle,
             )

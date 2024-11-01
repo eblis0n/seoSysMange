@@ -138,12 +138,29 @@ class menuDeploy():
             },
             "children": [
                 {
-                    "path": "telegra",
-                    "component": "outcome/teleUpshot/index",
+                    "path": "teleUpshot",
+                    "component": "outcome/telegraUpshot/index",
                     "redirect": "",
-                    "name": "outcome",
+                    "name": "teleUpshot",
                     "meta": {
                         "title": "telegra\u7ed3\u679c",
+                        "icon": "",
+                        "hidden": False,
+                        "keepAlive": True,
+                        "alwaysShow": False,
+                        "params": ""
+                    },
+                    "children": [
+
+                    ]
+                },
+                {
+                    "path": "blogUpshot",
+                    "component": "outcome/bloggerUpshot/index",
+                    "redirect": "",
+                    "name": "blogUpshot",
+                    "meta": {
+                        "title": "blogger\u7ed3\u679c",
                         "icon": "",
                         "hidden": False,
                         "keepAlive": True,

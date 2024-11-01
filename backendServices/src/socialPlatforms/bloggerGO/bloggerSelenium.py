@@ -57,7 +57,7 @@ class bloggerSelenium:
 
                     self.usego.sendlog(f"拆分为：{len(alll_links_list)} 组")
 
-                    all_res = self.run(platform, genre, adsUserlist, alll_links_list,  alt_text)
+                    all_res = self.run(platform, genre, adsUserlist, alll_links_list, alt_text)
 
                     return all_res
 
@@ -83,7 +83,7 @@ class bloggerSelenium:
                     user = thisnoneads[i]
                     link = alll_links_list[i]
                     self.usego.sendlog(f"这组 使用的是{user},发布的是{link} 链接")
-                    t = threading.Thread(target=self.post_to_telegraph_wrapper,
+                    t = threading.Thread(target=self.post_to_wrapper,
                                          args=(user, res_list, link, alll_links_list, bad_run_list, alt_text))
 
                     threads.append(t)
@@ -131,7 +131,7 @@ class bloggerSelenium:
         self.usego.sendlog(f"删除结果：{sql_data}")
 
 
-    def post_to_telegraph_wrapper(self, bloggerID, user, result_list, link, all_list, bad_run_list, alt_text):
+    def post_to_wrapper(self, bloggerID, user, result_list, link, all_list, bad_run_list, alt_text):
         with threading.Lock():
             result = self.post_to_blogger(bloggerID, user, link, alt_text)
             if result:
@@ -300,13 +300,13 @@ class bloggerSelenium:
     def save_res(self, urls):
         self.usego.sendlog(f"本次需要保存的数据有{len(urls)},{urls}")
         formatted_now = datetime.now().strftime("%Y%m%d")
-        file_name = f"telegra_result_{formatted_now}.txt"
-        today_file = self.usego.make_file(configCall.telegra_result, file_name)
+        file_name = f"blogger_result_{formatted_now}.txt"
+        today_file = self.usego.make_file(configCall.blogger_result, file_name)
         with open(today_file, 'a+') as f:
             for url in urls:
                 f.write(f"{url}\n")
                 
-    def save_datebase(self, urls, genre, platform ):
+    def save_datebase(self, urls, genre, platform):
         """
             @Datetime ： 2024/10/27 14:06
             @Author ：eblis
@@ -344,7 +344,10 @@ if __name__ == '__main__':
     stacking_min = configCall.stacking_min
     stacking_max = configCall.stacking_max
     alt_text = configCall.stacking_text
-    blog.main(genre, platform, stacking_min, stacking_max, alt_text)
+    start = 0
+    end = 200
+    blog.main(genre, platform, stacking_min, stacking_max, alt_text,start, end)
+    main(genre, platform, stacking_min, stacking_max, alt_text, group, start, end)
     # bloggerID ="3691937055035842433"
     # adsUser = "j4tkc0y"
     # this_links = ["https://padlet.com/redirect?url=https://www.4shared.com/u/NNIxS1ee/partlenportte1982.html","https://padlet.com/redirect?url=https://www.4shared.com/u/ca2gJQWr/lucestisu1980.html","https://padlet.com/redirect?url=https://www.4shared.com/u/LDmYjCBR/nettbullcumto1975.html","https://padlet.com/redirect?url=https://www.4shared.com/u/NNIxS1ee/partlenportte1982.html","https://padlet.com/redirect?url=https://www.4shared.com/u/ca2gJQWr/lucestisu1980.html","https://padlet.com/redirect?url=https://www.4shared.com/u/LDmYjCBR/nettbullcumto1975.html","https://padlet.com/redirect?url=https://www.4shared.com/u/NNIxS1ee/partlenportte1982.html","https://padlet.com/redirect?url=https://www.4shared.com/u/ca2gJQWr/lucestisu1980.html","https://padlet.com/redirect?url=https://www.4shared.com/u/LDmYjCBR/nettbullcumto1975.html","https://padlet.com/redirect?url=https://www.4shared.com/u/NNIxS1ee/partlenportte1982.html","https://padlet.com/redirect?url=https://www.4shared.com/u/ca2gJQWr/lucestisu1980.html","https://padlet.com/redirect?url=https://www.4shared.com/u/LDmYjCBR/nettbullcumto1975.html","https://padlet.com/redirect?url=https://www.4shared.com/u/NNIxS1ee/partlenportte1982.html","https://padlet.com/redirect?url=https://www.4shared.com/u/ca2gJQWr/lucestisu1980.html","https://padlet.com/redirect?url=https://www.4shared.com/u/LDmYjCBR/nettbullcumto1975.html","https://padlet.com/redirect?url=https://www.4shared.com/u/NNIxS1ee/partlenportte1982.html","https://padlet.com/redirect?url=https://www.4shared.com/u/ca2gJQWr/lucestisu1980.html","https://padlet.com/redirect?url=https://www.4shared.com/u/LDmYjCBR/nettbullcumto1975.html"]

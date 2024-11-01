@@ -48,7 +48,7 @@ class outcomeManage():
             @Motto：telegra  的 拼接发布结果
         """
         platform = request.args.get('platform')
-        print("platform", platform)
+        # print("platform", platform)
         if platform is not None:
             sql_data = self.mossql.splicing_interim_findAll("seo_result_301_links", platform=platform, end=10000)
             resdatas = []
@@ -95,6 +95,7 @@ class outcomeManage():
             @Motto：简单描述用途
         """
         platform = request.args.get('platform')
+
         if platform is not None:
 
             sql_data = self.mossql.splicing_interim_find_count("seo_result_301_links", platform=platform)

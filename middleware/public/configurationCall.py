@@ -111,13 +111,14 @@ adsServer = conf.get("ads", "adsServer")
 stacking_ads = conf.get("ads", "stacking_ads")
 min_concurrent_user = conf.get("ads", "min_concurrent_user")
 
-###################################### telegra ######################################
+###################################### splicing ######################################
 
-stacking_text = conf.get("telegra", "stacking_text")
-stacking_min = conf.get("telegra", "stacking_min")
-stacking_max = conf.get("telegra", "stacking_max")
-max_limit = conf.get("telegra", "max_limit")
-telegra_result = conf.get("telegra", "telegra_result")
+stacking_text = conf.get("splicing", "stacking_text")
+stacking_min = conf.get("splicing", "stacking_min")
+stacking_max = conf.get("splicing", "stacking_max")
+max_limit = conf.get("splicing", "max_limit")
+telegra_result = conf.get("splicing", "telegra_result")
+blogger_result = conf.get("splicing", "blogger_result")
 
 ###################################### ahrefs ######################################
 
