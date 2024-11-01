@@ -157,18 +157,26 @@ class splicingManage():
         self.usego.sendlog(f'有 {len(resdatas)} 设备符合')
 
         results = []
+
         for idx, client in enumerate(resdatas):
             result = {}
             response = self.aws_sqs.initialization(f'client_{client["name"]}')
             queue_url = response['QueueUrl']
-            self.usego.sendlog(f"队列地址{queue_url}")
-
+            self.usego.sendlog(f"{idx}队列地址{queue_url}")
+            if idx == 0:
+                start = 0
+                end = 200000
+            else:
+                start = end
+                end = 200000 * (idx + 1)
             task_data = {
                 'genre': genre,
                 'platform': platform,
                 'stacking_min': stacking_min,
                 'stacking_max': stacking_max,
-                'alt_text': alt_text
+                'alt_text': alt_text,
+                'start': start,
+                'end': end
             }
 
             response = self.aws_sqs.sendMSG(queue_url, f"run_{platform}_group", f"run_{platform}_selenium", task_data)

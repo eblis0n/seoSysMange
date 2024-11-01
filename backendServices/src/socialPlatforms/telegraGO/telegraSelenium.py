@@ -32,7 +32,7 @@ class telegraSelenium:
         self.mossql = mongo_sqlGO()
 
 
-    def main(self, genre, platform, stacking_min, stacking_max, alt_text):
+    def main(self, genre, platform, stacking_min, stacking_max, alt_text, start, end):
         """
             @Datetime ： 2024/10/26 00:09
             @Author ：eblis
@@ -40,8 +40,9 @@ class telegraSelenium:
         """
         adsUserlist = self.siphon_adsuser(eval(configCall.stacking_ads), eval(configCall.min_concurrent_user))
 
+
         sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", genre=str(genre),
-                                       platform=str(platform), limit=eval(configCall.max_limit))
+                                       platform=str(platform),  start=int(start), end=int(end))
 
 
         if sql_data is not None:

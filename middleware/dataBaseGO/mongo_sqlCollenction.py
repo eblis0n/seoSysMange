@@ -54,7 +54,7 @@ class mongo_sqlGO():
 
         return sql_data
 
-    def splicing_interim_findAll(self, setname, genre=None, platform=None, projection=None, limit=None):
+    def splicing_interim_findAll(self, setname, genre=None, platform=None, projection=None, start=None, end=None):
         """
             @Datetime ： 2024/10/20 16:06
             @Author ：eblis
@@ -68,7 +68,7 @@ class mongo_sqlGO():
 
 
             # 调用 find_data 方法执行查询
-        sql_datas = self.mosql.find_data(self.seo_interim, setname, query=query, projection=projection, limit=limit)
+        sql_datas = self.mosql.find_data(self.seo_interim, setname, query=query, projection=projection, start=start, end=end)
         # print("sql_datas",sql_datas)
 
         return sql_datas

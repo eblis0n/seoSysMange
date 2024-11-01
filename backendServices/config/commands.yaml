@@ -10,6 +10,8 @@ commands:
       - stacking_min
       - stacking_max
       - alt_text
+      - start
+      - end
   - name: run_blogger_selenium
     module: backendServices.src.socialPlatforms.bloggerGO.bloggerSelenium
     class: bloggerSelenium
@@ -20,6 +22,8 @@ commands:
       - stacking_min
       - stacking_max
       - alt_text
+      - start
+      - end
 
   - name: test1  # 另一个命令的名称
     module: backendServices.examples.test1  # 模块路径

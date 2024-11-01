@@ -81,7 +81,7 @@ class MongoDB:
             self.client.close()
             self.usego.sendlog("MongoDB 连接已关闭。")
 
-    def find_data(self, dbname, setname, query=None, projection=None, find_one=False, limit=None):
+    def find_data(self, dbname, setname, query=None, projection=None, find_one=False, start=None, end=None):
         """通用查询方法"""
         mycol = self.get_collection(dbname, setname)
         if mycol is not None:
@@ -90,13 +90,20 @@ class MongoDB:
                     query = {}
                 if find_one:
                     return mycol.find_one(query, projection)  # 单条查询
-                else:
-                    result = mycol.find(query, projection)
 
-                    if limit:
-                        self.usego.sendlog(f"有数量限{limit}")
-                        result = result.limit(limit)  # 设置返回结果的限制数量
-                    return list(result)  # 查询全部
+                if start is not None and end is not None:
+                    limit = end - start
+                    self.usego.sendlog(f"从第 {start} 条到第 {end} 条（共计 {limit} 条）")
+                    result = mycol.find(query, projection).skip(start).limit(limit)
+                    return list(result)
+                else:
+
+                    result = mycol.find(query, projection)
+                    if end:
+                        self.usego.sendlog(f"有数量限{end}")
+                        result = result.limit(end)  # 设置返回结果的限制数量
+
+                    return list(result)
             except Exception as e:
                 self.usego.sendlog(f"MongoDB 查询错误: {e}")
                 return None
