@@ -295,3 +295,29 @@ class basis_sqlGO():
         sql_data = self.ssql.mysql_commit('basis', sqlgo)
         return sql_data
 
+
+    def blogger_info_select_sql(self, group=None):
+        """
+            @Datetime ： 2024/5/7 10:59
+            @Author ：eblis
+            @Motto：查询 PC 设置
+        """
+        # print("pcSettings_select, locals():", locals())
+
+        # 构建参数字典，过滤掉 None 和空字符串
+        params = {k: v for k, v in locals().items() if k in ['group'] and v not in [None, ""]}
+        print("非 None 的参数名：", list(params.keys()))
+
+        # 根据参数构建 SQL 查询
+        if params:
+            conditions = [f"`{k}` = '{v}'" for k, v in params.items()]
+            sqlgo = f"SELECT /*+ NOCACHE */ * FROM seo_blogger_info WHERE {' AND '.join(conditions)} ORDER BY create_at DESC;"
+        else:
+            sqlgo = "SELECT /*+ NOCACHE */ * FROM seo_blogger_info ORDER BY create_at DESC;"
+
+        # print("生成的 SQL 查询:", sqlgo)
+
+        # 执行查询
+        sql_data = self.ssql.mysql_select('basis', sqlgo)
+        return sql_data
+

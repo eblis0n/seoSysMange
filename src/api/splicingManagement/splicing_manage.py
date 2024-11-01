@@ -123,6 +123,7 @@ class splicingManage():
         stacking_max = data_request['stacking_max']
         genre = data_request['genre']
         platform = data_request['platform']
+        group = data_request['group']
 
         sql_data = self.ssql.pcSettings_select_sql(platform=platform, state=0)
 
@@ -175,9 +176,11 @@ class splicingManage():
                 'stacking_min': stacking_min,
                 'stacking_max': stacking_max,
                 'alt_text': alt_text,
+                'group': group,
                 'start': start,
                 'end': end
             }
+            self.usego.sendlog(f' run_{platform}_selenium，任务信息:{task_data}')
 
             response = self.aws_sqs.sendMSG(queue_url, f"run_{platform}_group", f"run_{platform}_selenium", task_data)
             result[f"{client}"] = response

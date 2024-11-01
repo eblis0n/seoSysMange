@@ -24,6 +24,7 @@ from middleware.deviceManage.adsDevice import adsDevice
 import middleware.public.configurationCall as configCall
 from middleware.public.commonUse import otherUse
 from middleware.dataBaseGO.mongo_sqlCollenction import mongo_sqlGO
+from middleware.dataBaseGO.basis_sqlCollenction import basis_sqlGO
 from middleware.deviceManage.elementUsage import component
 
 
@@ -32,31 +33,33 @@ class bloggerSelenium:
         self.usego = otherUse()
         self.ads = adsDevice()
         self.mossql = mongo_sqlGO()
+        self.ssql = basis_sqlGO()
 
 
-    def main(self, genre, platform, stacking_min, stacking_max, alt_text, start, end):
+    def main(self, genre, platform, stacking_min, stacking_max, alt_text, group, start, end):
         """
             @Datetime ： 2024/10/26 00:09
             @Author ：eblis
             @Motto：简单描述用途
         """
-        adsUserlist = self.siphon_adsuser(eval(configCall.stacking_ads), eval(configCall.min_concurrent_user))
+        adsUserlist = self.siphon_adsuser(group, eval(configCall.min_concurrent_user))
+        if adsUserlist != []:
 
-        sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", genre=str(genre),
-                                       platform=str(platform), start=int(start), end=int(end))
+            sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", genre=str(genre),
+                                           platform=str(platform), start=int(start), end=int(end))
 
 
-        if sql_data is not None:
-            all_links = [data["url"] for data in sql_data] if sql_data else []
+            if sql_data is not None:
+                all_links = [data["url"] for data in sql_data] if sql_data else []
 
-            if all_links:
-                alll_links_list = self.siphon_links(all_links, stacking_min, stacking_max)
+                if all_links:
+                    alll_links_list = self.siphon_links(all_links, stacking_min, stacking_max)
 
-                self.usego.sendlog(f"拆分为：{len(alll_links_list)} 组")
+                    self.usego.sendlog(f"拆分为：{len(alll_links_list)} 组")
 
-                all_res = self.run(platform, genre, adsUserlist, alll_links_list,  alt_text)
+                    all_res = self.run(platform, genre, adsUserlist, alll_links_list,  alt_text)
 
-                return all_res
+                    return all_res
 
         return None
     
@@ -65,7 +68,8 @@ class bloggerSelenium:
         all_res = []
         mun = 0
         mm = 0
-        while len(alll_links_list) > 0:
+        runTure = True
+        while len(alll_links_list) > 0 and runTure:
             self.usego.sendlog(f"第 {mun} 执行开始,剩余{len(alll_links_list)} 组数据待处理")
             if len(adsUserlist) > mm:
                 res_list = []
@@ -109,9 +113,10 @@ class bloggerSelenium:
 
                 mm = mm + 1
                 mun = mun + 1
+
             else:
-                self.usego.sendlog(f"初始化一下数据，跑空")
-                mm = 0
+                self.usego.sendlog(f"{adsUserlist} 都跑过了")
+                runTure = False
 
 
     def del_run_links(self, links):
@@ -140,14 +145,24 @@ class bloggerSelenium:
                 bad_run_list.append(link)
                 
                 
-    def siphon_adsuser(self, lst, group_size):
+    def siphon_adsuser(self, group, group_size):
         """
             @Datetime ： 2024/10/28 01:42
             @Author ：eblis
             @Motto：简单描述用途
         """
-        return [lst[i:i + group_size] for i in range(0, len(lst), group_size)]
-    
+        if group == "all":
+            sql_data = self.ssql.blogger_info_select_sql()
+        else:
+            sql_data = self.ssql.blogger_info_select_sql(group= group)
+
+        if "sql 语句异常" not in str(sql_data):
+            lst = [item[3] for item in sql_data]
+            return [lst[i:i + group_size] for i in range(0, len(lst), group_size)]
+
+        else:
+            return []
+
 
     def siphon_links(self, all_links, rmin, rmax):
         this_run_list = []
@@ -261,7 +276,7 @@ class bloggerSelenium:
         time.sleep(10)
 
         atag = comp.get_element_attribute((By.XPATH, '//*[@id="yDmH0d"]/c-wiz/div[2]/div/c-wiz/div[2]/c-wiz/div/div/div/div[1]/div/span/div/div/div[3]/div[4]/div/a'), "href")
-        print("atag",atag)
+        print("atag", atag)
         self.ads.adsAPI(configCall.adsServer, "stop", adsUser)
         return atag
 

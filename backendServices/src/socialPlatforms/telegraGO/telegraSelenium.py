@@ -32,12 +32,13 @@ class telegraSelenium:
         self.mossql = mongo_sqlGO()
 
 
-    def main(self, genre, platform, stacking_min, stacking_max, alt_text, start, end):
+    def main(self, genre, platform, stacking_min, stacking_max, alt_text, group, start, end):
         """
             @Datetime ： 2024/10/26 00:09
             @Author ：eblis
             @Motto：简单描述用途
         """
+
         adsUserlist = self.siphon_adsuser(eval(configCall.stacking_ads), eval(configCall.min_concurrent_user))
 
 

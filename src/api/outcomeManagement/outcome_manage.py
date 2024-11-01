@@ -50,7 +50,7 @@ class outcomeManage():
         platform = request.args.get('platform')
         print("platform", platform)
         if platform is not None:
-            sql_data = self.mossql.splicing_interim_findAll("seo_result_301_links", platform=platform, limit=10000)
+            sql_data = self.mossql.splicing_interim_findAll("seo_result_301_links", platform=platform, end=10000)
             resdatas = []
             # print("sql_data", sql_data)
             if "sql 语句异常" not in str(sql_data):

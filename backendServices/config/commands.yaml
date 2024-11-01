@@ -10,6 +10,7 @@ commands:
       - stacking_min
       - stacking_max
       - alt_text
+      - group
       - start
       - end
   - name: run_blogger_selenium
@@ -22,6 +23,7 @@ commands:
       - stacking_min
       - stacking_max
       - alt_text
+      - group
       - start
       - end
 
