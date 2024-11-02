@@ -167,50 +167,6 @@ class bloggerSelenium:
         print("标题输入了，下一步")
 
         time.sleep(1)
-        #
-        # menu_bottom = comp.find_ele((By.XPATH,'''//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[2]/div/div/div[3]/span/div/div[2]/div[1]/div[1]/div[1]/div/div[1]/div[1]/div[1]'''))
-        #
-        # if menu_bottom:
-        #     driver.execute_script("arguments[0].click();", menu_bottom)
-        #
-        # print("点击了富文本菜单列表")
-        #
-        # html_ele = comp.find_ele((By.XPATH, '//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[2]/div/div/div[3]/span/div/div[2]/div[1]/div[1]/div[1]/div/div[2]/div[1]/span'))
-        # print("html_ele", html_ele)
-        #
-        # if html_ele:
-        #     try:
-        #         html_ele.click()
-        #     except:
-        #         driver.execute_script("arguments[0].click();", html_ele)
-        # time.sleep(1)
-        # driver.execute_script("arguments[0].click();", menu_bottom)
-        #
-        # pen_ele = comp.find_ele((By.XPATH, '//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[2]/div/div/div[3]/span/div/div[2]/div[1]/div[1]/div[1]/div/div[2]/div[2]/span'))
-        # print("pen_ele", pen_ele)
-        #
-        # if pen_ele:
-        #     try:
-        #         pen_ele.click()
-        #     except:
-        #         driver.execute_script("arguments[0].click();", pen_ele)
-        # time.sleep(5)
-        # pen_bottom = comp.find_ele((By.XPATH, '//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[2]/div/div/div[3]/span/div/div[1]/div[1]/div[1]/div[1]/div/div[1]/div[1]/div[2]/div[2]/span'))
-        # print("pen_bottom",pen_bottom)
-        # try:
-        #     pen_bottom.click()
-        # except:
-        #     driver.execute_script("arguments[0].click();", pen_bottom)
-        #
-        # time.sleep(5)
-        # html_ele1 = comp.find_ele((By.XPATH,
-        #                           '//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[2]/div/div/div[3]/span/div/div[1]/div[1]/div[1]/div[1]/div/div[2]/div[1]/span'))
-        # print("html_ele1", html_ele1)
-        # if html_ele1:
-        #     try:
-        #         html_ele1.click()
-        #     except:
-        #         driver.execute_script("arguments[0].click();", html_ele1)
 
         print("进入html 编辑状态")
 
@@ -226,11 +182,11 @@ class bloggerSelenium:
         #
         time.sleep(5)
         publish_button = comp.find_ele(
-            (By.XPATH, '//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[1]/div[2]/div[@data-tooltip="Publish"]/span'))
+            (By.XPATH, '//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[1]/div[2]/div[4]/span/span/div/div'))
 
         driver.execute_script("arguments[0].click();", publish_button)
 
-        pop_up = comp.find_ele((By.XPATH, "//div[text()='Publish post?']"))
+        pop_up = comp.find_ele((By.XPATH, '''//*[@id="dwrFZd0"]'''))
 
         if pop_up:
 
@@ -354,15 +310,18 @@ class bloggerSelenium:
 if __name__ == '__main__':
     blog = bloggerSelenium()
     # 调试，通过配置文件修改
-    genre = "0"
-    platform = "blogger"
-    stacking_min = configCall.stacking_min
-    stacking_max = configCall.stacking_max
-    alt_text = configCall.stacking_text
-    start = 0
-    end = 200
-    group = "all"
-    blog.main(genre, platform, stacking_min, stacking_max, alt_text, group, start, end)
+    # genre = "0"
+    # platform = "blogger"
+    # stacking_min = configCall.stacking_min
+    # stacking_max = configCall.stacking_max
+    # alt_text = configCall.stacking_text
+    # start = 0
+    # end = 200
+    # group = "all"
+    # blog.main(genre, platform, stacking_min, stacking_max, alt_text, group, start, end)
+    this_links =["https://plantationfl.adventistchurch.org/forwarder/part1?url=https://www.tvgame-museum.com/7270-2/","https://www.eduzones.com/nossl.php?url=https://www.waya-movie.com/9434-dividend-when-i-get/"]
+    alt_text = "你还好吗？"
+    blog.post_to_blogger("5141094995140927017", "klak6mn", this_links, alt_text)
 
 
 
