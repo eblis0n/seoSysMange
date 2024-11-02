@@ -154,7 +154,12 @@ class bloggerSelenium:
 
         # 点击发帖
         new_post_bottom = comp.find_ele((By.XPATH, "//span[text()='New Post']"))
-        driver.execute_script("arguments[0].click();", new_post_bottom)
+        if new_post_bottom:
+            driver.execute_script("arguments[0].click();", new_post_bottom)
+        else:
+            new_post_bottom = comp.find_ele((By.XPATH, '''//*[@id="yDmH0d"]/c-wiz/div[1]/gm-raised-drawer/div/div[2]/div/c-wiz/div[3]/div/div/span/span'''))
+            driver.execute_script("arguments[0].click();", new_post_bottom)
+
         time.sleep(5)
         # 找到 标题元素并输入
         title_input = comp.input(
