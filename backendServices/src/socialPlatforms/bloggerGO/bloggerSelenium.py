@@ -155,6 +155,8 @@ class bloggerSelenium:
         # 点击发帖
         new_post_bottom = comp.find_ele((By.XPATH, "//span[text()='New Post']"))
         if new_post_bottom:
+            print("能识别到New Post")
+
             driver.execute_script("arguments[0].click();", new_post_bottom)
         else:
             new_post_bottom = comp.find_ele((By.XPATH, '''//*[@id="yDmH0d"]/c-wiz/div[1]/gm-raised-drawer/div/div[2]/div/c-wiz/div[3]/div/div/span/span'''))
@@ -166,25 +168,34 @@ class bloggerSelenium:
             (By.XPATH, '''//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[1]/div[1]/div[1]/div/div[1]/input'''), alt_text)
         print("标题输入了，下一步")
 
-        time.sleep(1)
+
 
         print("进入html 编辑状态")
+        time.sleep(5)
 
         conent_ele = comp.find_ele((By.XPATH,
                                     '//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[2]/div/div/div[3]/span/div/div[2]/div[2]/div/div/div'))
         #
 
         all_atab = self.get_links(this_links, alt_text)
-        driver.execute_script("arguments[0].focus();", conent_ele)
 
-        driver.execute_script(f"arguments[0].CodeMirror.setValue('{all_atab}');", conent_ele)
 
+        try:
+            driver.execute_script("arguments[0].focus();", conent_ele)
+            time.sleep(3)
+            driver.execute_script(f"arguments[0].CodeMirror.setValue('{all_atab}');", conent_ele)
+        except:
+            self.ads.adsAPI(configCall.adsServer, "stop", adsUser)
+            return False
         #
         time.sleep(5)
         publish_button = comp.find_ele(
             (By.XPATH, '//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[1]/div[2]/div[4]/span/span/div/div'))
-
-        driver.execute_script("arguments[0].click();", publish_button)
+        try:
+            driver.execute_script("arguments[0].click();", publish_button)
+        except:
+            self.ads.adsAPI(configCall.adsServer, "stop", adsUser)
+            return False
 
         pop_up = comp.find_ele((By.XPATH, '''//*[@id="dwrFZd0"]'''))
 
@@ -196,8 +207,8 @@ class bloggerSelenium:
             try:
                 driver.execute_script("arguments[0].click();", confirm_button)
             except:
-                print("使用 click")
-                confirm_button.click()
+                self.ads.adsAPI(configCall.adsServer, "stop", adsUser)
+                return False
 
         time.sleep(10)
 
@@ -310,18 +321,18 @@ class bloggerSelenium:
 if __name__ == '__main__':
     blog = bloggerSelenium()
     # 调试，通过配置文件修改
-    # genre = "0"
-    # platform = "blogger"
-    # stacking_min = configCall.stacking_min
-    # stacking_max = configCall.stacking_max
-    # alt_text = configCall.stacking_text
-    # start = 0
-    # end = 200
-    # group = "all"
-    # blog.main(genre, platform, stacking_min, stacking_max, alt_text, group, start, end)
-    this_links =["https://plantationfl.adventistchurch.org/forwarder/part1?url=https://www.tvgame-museum.com/7270-2/","https://www.eduzones.com/nossl.php?url=https://www.waya-movie.com/9434-dividend-when-i-get/"]
-    alt_text = "你还好吗？"
-    blog.post_to_blogger("5141094995140927017", "klak6mn", this_links, alt_text)
+    genre = "0"
+    platform = "blogger"
+    stacking_min = configCall.stacking_min
+    stacking_max = configCall.stacking_max
+    alt_text = configCall.stacking_text
+    start = 0
+    end = 2000
+    group = "all"
+    blog.main(genre, platform, stacking_min, stacking_max, alt_text, group, start, end)
+    # this_links =["https://plantationfl.adventistchurch.org/forwarder/part1?url=https://www.tvgame-museum.com/7270-2/","https://www.eduzones.com/nossl.php?url=https://www.waya-movie.com/9434-dividend-when-i-get/"]
+    # alt_text = "你还好吗？"
+    # blog.post_to_blogger("5141094995140927017", "klak6mn", this_links, alt_text)
 
 
 
