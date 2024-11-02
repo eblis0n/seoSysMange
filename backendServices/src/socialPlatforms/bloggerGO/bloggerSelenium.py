@@ -131,12 +131,14 @@ class bloggerSelenium:
         with threading.Lock():
             result = self.post_to_blogger(bloggerID, adsUser, this_links, alt_text)
             if result:
-                result_list.append(result)
-                all_list.remove(this_links)
-                self.usego.sendlog(f"剩余：{len(all_list)}")
+                if "git.html" not in result:
+                    result_list.append(result)
+                    all_list.remove(this_links)
+                    self.usego.sendlog(f"剩余：{len(all_list)}")
 
-                self.del_run_links(this_links)
-
+                    self.del_run_links(this_links)
+                else:
+                    self.usego.sendlog(f"丢弃结果: {result}，因为它包含 'git.html'")
             else:
                 bad_run_list.append(this_links)
     
@@ -167,7 +169,6 @@ class bloggerSelenium:
         title_input = comp.input(
             (By.XPATH, '''//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[1]/div[1]/div[1]/div/div[1]/input'''), alt_text)
         print("标题输入了，下一步")
-
 
 
         print("进入html 编辑状态")

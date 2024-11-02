@@ -177,7 +177,11 @@ class otherUse():
             try:
                 thisStep = ast.literal_eval(data)
             except:
-                thisStep = json.loads(data)
+                try:
+                    thisStep = json.loads(data)
+                except:
+                    thisStep = data
+
         return thisStep
 
     def changeIsinstance(self, data, type):
