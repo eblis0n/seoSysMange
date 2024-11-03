@@ -66,6 +66,8 @@ class bloggerManage():
 
         data_request = request.json
         id = data_request['id']
+        # print("id",id)
+
 
         sql_data = self.ssql.blogger_info_delete_sql(id)
         if "sql 语句异常" not in str(sql_data):

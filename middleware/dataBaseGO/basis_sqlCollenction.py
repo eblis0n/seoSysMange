@@ -276,7 +276,7 @@ class basis_sqlGO():
 
     def blogger_info_delete_sql(self, id):
         # noinspection SqlNoDataSourceInspection
-        sqlgo = f"""DELETE FROM seo_blogger_info WHERE id = {id};"""
+        sqlgo = f"""DELETE FROM seo_blogger_info WHERE `id` = '{id}';"""
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_commit('basis', sqlgo)
         return sql_data
