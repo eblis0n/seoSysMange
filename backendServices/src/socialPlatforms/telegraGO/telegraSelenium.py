@@ -68,7 +68,7 @@ class telegraSelenium:
         while len(alll_links_list) > 0:
             self.usego.sendlog(f"第 {mun} 执行开始,剩余{len(alll_links_list)} 组数据待处理")
             if len(adsUserlist) > mm:
-                res_list = []
+                this_res_list = []
                 threads = []
                 bad_run_list = []
                 thisnoneads = adsUserlist[mm]
@@ -80,7 +80,7 @@ class telegraSelenium:
                     link = alll_links_list[i]
                     self.usego.sendlog(f"这组 使用的是{user},发布的是{link} 链接")
                     t = threading.Thread(target=self.post_to_telegraph_wrapper,
-                                         args=(user, res_list, link, alll_links_list, bad_run_list, alt_text))
+                                         args=(user, this_res_list, link, alll_links_list, bad_run_list, alt_text))
 
                     threads.append(t)
                     t.start()
@@ -89,20 +89,20 @@ class telegraSelenium:
                 for thread in threads:
                     thread.join()
 
-                self.usego.sendlog(f"这波Thread 执行完了：{res_list}")
+                self.usego.sendlog(f"这波Thread 执行完了：{this_res_list}")
 
-                self.save_res(res_list)
+                self.save_res(this_res_list)
+                if this_res_list != []:
+                    self.usego.sendlog(f"将数据同步存放数据库")
+                    self.usego.sendlog(f"{self.save_datebase(this_res_list, genre, platform)}")
 
-                self.usego.sendlog(f"将数据同步存放数据库")
-
-                self.usego.sendlog(f"{self.save_datebase(res_list, genre, platform)}")
                 self.usego.sendlog(f"总剩余：{len(alll_links_list)}")
 
                 alll_links_list.extend(bad_run_list)
                 bad_run_list.clear()
                 self.usego.sendlog(f"最终剩余：{len(alll_links_list)}")
 
-                for link in res_list:
+                for link in this_res_list:
                     if link not in all_res:
                         if link != "https://telegra.ph" or link != "https://telegra.ph/":
                             all_res.append(link)
