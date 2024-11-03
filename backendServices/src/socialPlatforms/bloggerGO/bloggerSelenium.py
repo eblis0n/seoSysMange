@@ -101,9 +101,11 @@ class bloggerSelenium:
 
                 self.save_res(this_res_list)
 
-                self.usego.sendlog(f"将数据同步存放数据库")
+                if this_res_list !=[]:
 
-                self.usego.sendlog(f"{self.save_datebase(this_res_list, genre, platform)}")
+                    self.usego.sendlog(f"将数据同步存放数据库")
+
+                    self.usego.sendlog(f"{self.save_datebase(this_res_list, genre, platform)}")
 
                 self.usego.sendlog(f"总剩余：{len(alll_links_list)}")
 
