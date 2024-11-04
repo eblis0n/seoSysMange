@@ -26,6 +26,7 @@ from src.api.publicManagement.public_manage import publicManage
 from src.api.amazonManagement.amazon_management import amazonManage
 from src.api.outcomeManagement.outcome_manage import outcomeManage
 from src.api.bloggerManagement.blogger_management import bloggerManage
+from src.api.operationsManagement.operations_manage import operationsManage
 
 
 
@@ -77,6 +78,7 @@ public_bp = publicManage().bp
 amazon_bp = amazonManage().bp
 outcome_bp = outcomeManage().bp
 blogger_bp = bloggerManage().bp
+operations_bp = operationsManage().bp
 
 #################################################### 引用 ###########################################################
 
@@ -91,6 +93,7 @@ app.register_blueprint(public_bp)
 app.register_blueprint(amazon_bp)
 app.register_blueprint(outcome_bp)
 app.register_blueprint(blogger_bp)
+app.register_blueprint(operations_bp)
 
 
 #################################################### amazon ###########################################################

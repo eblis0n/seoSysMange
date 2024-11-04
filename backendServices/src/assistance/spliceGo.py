@@ -22,19 +22,28 @@ class spliceGo():
         self.usego = otherUse()
         self.mossql = mongo_sqlGO()
 
-    def splice_301(self, genre, platform,  urllist, zyurllist=None):
+    def splice_301(self, sort, genre, platform,  urllist, zyurllist=None):
+        """
+            @Datetime ： 2024/11/3 15:42
+            @Author ：eblis
+            @Motto：
+            @sort:0拼接，1 不拼接；
+            @genre：0重定向；1镜像，2留痕
+            @platform：投放平台，
+        """
 
         # 获取当前时间
         now = datetime.now()
 
         # 格式化为年月日时分秒
         formatted_now = now.strftime("%Y-%m-%d %H:%M:%S")
-        if zyurllist is None:
+        if zyurllist == "" or zyurllist is None:
             new_links_list = [
                 {
                     "url": f"{url}".replace('\n', ''),
                     "platform": platform,
                     "genre": genre,
+                    "sort": sort,
                     "created_at": formatted_now
                 }
                 for url in urllist
@@ -45,6 +54,7 @@ class spliceGo():
                     "url": f"{zy_link}{url}".replace('\n', ''),
                     "platform": platform,
                     "genre": genre,
+                    "sort": sort,
                     "created_at": formatted_now
                 }
                 for zy_link in zyurllist

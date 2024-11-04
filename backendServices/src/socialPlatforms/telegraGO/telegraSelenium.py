@@ -32,7 +32,7 @@ class telegraSelenium:
         self.mossql = mongo_sqlGO()
 
 
-    def main(self, genre, platform, stacking_min, stacking_max, alt_text, group, start, end):
+    def main(self, genre, platform, stacking_min, stacking_max, alt_text, postingStyle, group, start, end):
         """
             @Datetime ： 2024/10/26 00:09
             @Author ：eblis
@@ -54,14 +54,14 @@ class telegraSelenium:
 
                 self.usego.sendlog(f"拆分为：{len(alll_links_list)} 组")
 
-                all_res = self.run(platform, genre, adsUserlist, alll_links_list,  alt_text)
+                all_res = self.run(postingStyle, platform, genre, adsUserlist, alll_links_list,  alt_text)
 
                 return all_res
 
         return None
     
 
-    def run (self, platform, genre, adsUserlist, alll_links_list, alt_text):
+    def run (self, postingStyle, platform, genre, adsUserlist, alll_links_list, alt_text):
         all_res = []
         mun = 0
         mm = 0
@@ -80,7 +80,7 @@ class telegraSelenium:
                     link = alll_links_list[i]
                     self.usego.sendlog(f"这组 使用的是{user},发布的是{link} 链接")
                     t = threading.Thread(target=self.post_to_telegraph_wrapper,
-                                         args=(user, this_res_list, link, alll_links_list, bad_run_list, alt_text))
+                                         args=(postingStyle, user, this_res_list, link, alll_links_list, bad_run_list, alt_text))
 
                     threads.append(t)
                     t.start()
@@ -125,9 +125,9 @@ class telegraSelenium:
         self.usego.sendlog(f"删除结果：{sql_data}")
 
 
-    def post_to_telegraph_wrapper(self, user, result_list, link, all_list, bad_run_list, alt_text):
+    def post_to_telegraph_wrapper(self, postingStyle, user, result_list, link, all_list, bad_run_list, alt_text):
         with threading.Lock():
-            result = self.post_to_telegra_ph(user, link, alt_text)
+            result = self.post_to_telegra_ph(postingStyle, user, link, alt_text)
             if result:
                 result_list.append(result)
                 all_list.remove(link)
@@ -161,7 +161,7 @@ class telegraSelenium:
 
         return this_run_list
 
-    def post_to_telegra_ph(self, adsUser, this_links, alt_text):
+    def post_to_telegra_ph(self, postingStyle, adsUser, this_links, alt_text):
         this_title = self.usego.redome_string("小写字母", 10, 20)
         driver = None
         try:
@@ -174,25 +174,53 @@ class telegraSelenium:
 
             content_input = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_tl_editor"]/div[1]/p')))
             driver.execute_script("arguments[0].textContent = '';", content_input)
-            # all_atab = ""
-            for link in this_links:
-                self.usego.sendlog(f"这条连接是：{link}")
-                link = link.strip('\n')
-            #     this_atab = f"""<a href="{link}" target="_blank">{alt_text}</a>&nbsp;"""
-            #     all_atab += this_atab
-            #
-            # self.usego.sendlog(f"A 标签 生成效果:{all_atab}")
-            #
-            # driver.execute_script("arguments[0].innerHTML = arguments[1];", content_input, all_atab)
+            if int(postingStyle) == 0:
+                # all_atab = ""
+                for link in this_links:
+                    # self.usego.sendlog(f"这条连接是：{link}")
+                    link = link.strip('\n')
+                    driver.execute_script("""
+                            var a = document.createElement('a');
+                            a.href = arguments[0];
+                            a.textContent = arguments[1];
+                            a.target = '_blank';
+                            arguments[2].appendChild(a);
+                            arguments[2].appendChild(document.createTextNode('\u00A0'));
+                        """, link, alt_text, content_input)
 
-                driver.execute_script("""
-                        var a = document.createElement('a');
-                        a.href = arguments[0];
-                        a.textContent = arguments[1];
-                        a.target = '_blank';
-                        arguments[2].appendChild(a);
-                        arguments[2].appendChild(document.createTextNode('\u00A0'));
-                    """, link, alt_text, content_input)
+            elif int(postingStyle) == 1:
+                for link in this_links:
+                    link = link.strip('\n')
+                    driver.execute_script("""
+                                    var p = document.createElement('p');
+                                    var a = document.createElement('a');
+                                    a.href = arguments[0];
+                                    a.textContent = arguments[0];
+                                    p.appendChild(a);
+                                    arguments[1].appendChild(p);
+                                """, link, content_input)
+
+            else:
+                for index, link in enumerate(this_links):
+                    link = link.strip('\n')
+                    if index < len(this_links):
+                        driver.execute_script("""
+                            var p = document.createElement('p');
+                            p.textContent = arguments[0];
+                            p.setAttribute('dir', 'auto');
+                            arguments[1].appendChild(p);
+                        """, link, content_input)
+                    else:
+                        driver.execute_script("""
+                            var p = document.createElement('p');
+                            var a = document.createElement('a');
+                            a.href = arguments[0];
+                            a.target = '_blank';
+                            a.textContent = arguments[0];
+                            p.setAttribute('dir', 'auto');
+                            p.appendChild(a);
+                            arguments[1].appendChild(p);
+                        """, link, content_input)
 
             publish_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_publish_button"]')))
             driver.execute_script("arguments[0].click();", publish_button)
@@ -254,4 +282,5 @@ if __name__ == '__main__':
     stacking_min = configCall.stacking_min
     stacking_max = configCall.stacking_max
     alt_text = configCall.stacking_text
-    tele.main(genre, platform, stacking_min, stacking_max, alt_text)
+
+    tele.main(genre, platform, stacking_min, stacking_max, alt_text, "2", "all", 0, 2000)

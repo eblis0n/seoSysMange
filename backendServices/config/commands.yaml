@@ -10,6 +10,7 @@ commands:
       - stacking_min
       - stacking_max
       - alt_text
+      - postingStyle
       - group
       - start
       - end
@@ -23,6 +24,7 @@ commands:
       - stacking_min
       - stacking_max
       - alt_text
+      - postingStyle
       - group
       - start
       - end

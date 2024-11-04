@@ -105,6 +105,84 @@ class mongo_sqlGO():
 
 
 
+############################################# operations #################################################################
+
+    def operations_hosts_find(self, setname, query=None, projection=None, find_one=False, start=None, end=None):
+        """
+            @Datetime ： 2024/10/20 16:06
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+
+
+            # 调用 find_data 方法执行查询
+        sql_datas = self.mosql.find_data(self.seo_interim, setname, query=query, projection=projection, find_one=find_one, start=start, end=end)
+        # print("sql_datas",sql_datas)
+
+        return sql_datas
+
+
+    def operations_hosts_insert(self, setname, data):
+        """
+            @Datetime ： 2024/10/19 16:18
+            @Author ：eblis
+            @Motto： 插入单条，data用字典形式
+        """
+        sql_data = self.mosql.insert_data(self.seo_interim, setname, data)
+
+        return sql_data
+
+    def operations_hosts_update(self, setname, query, update):
+        """
+            @Datetime ： 2024/10/19 16:18
+            @Author ：eblis
+            @Motto： 插入单条，data用字典形式
+        """
+        sql_data = self.mosql.update_data(self.seo_interim, setname, query, update, update_operator='$set', multi=False)
+
+        return sql_data
 
 
 
+    def operations_hosts_delet(self, setname, query, multiple, clear_all):
+        """
+            @Datetime ： 2024/10/20 16:06
+            @Author ：eblis
+            @Motto：query 传字典
+        """
+        sql_data = self.mosql.delete_data(self.seo_interim, setname, query=query, multiple=multiple,  clear_all=clear_all)
+
+
+        return sql_data
+
+    ###################################
+
+
+    def operations_tasks_find(self, setname, query=None, projection=None, find_one=False, start=None, end=None):
+        """
+            @Datetime ： 2024/10/20 16:06
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+
+
+            # 调用 find_data 方法执行查询
+        sql_datas = self.mosql.find_data(self.seo_interim, setname, query=query, projection=projection, find_one=find_one, start=start, end=end)
+        # print("sql_datas",sql_datas)
+
+        return sql_datas
+
+
+    def operations_tasks_logs_find(self, setname, query=None, projection=None, find_one=False, start=None, end=None):
+        """
+            @Datetime ： 2024/10/20 16:06
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+
+
+            # 调用 find_data 方法执行查询
+        sql_datas = self.mosql.find_data(self.seo_interim, setname, query=query, projection=projection, find_one=find_one, start=start, end=end)
+        # print("sql_datas",sql_datas)
+
+        return sql_datas

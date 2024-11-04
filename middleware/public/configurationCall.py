@@ -76,6 +76,7 @@ ye_getTaskResult = conf.get("yescaptcha", "ye_getTaskResult")
 
 ###################################### flask 信息 ######################################
 
+refreshTiming = conf.get("flask", "flaskport")
 flaskport = conf.get("flask", "flaskport")
 fixed_salt = conf.get("flask", "fixed_salt")
 crossDomain = conf.get("flask", "crossDomain")

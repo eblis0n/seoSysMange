@@ -72,7 +72,7 @@ class MongoDB:
                 return db[setname]  # 获取集合
             except Exception as e:
                 self.usego.sendlog(f"获取集合失败: {e}")
-                return None
+                return f"sql 语句异常"
         return None
 
     def close(self):

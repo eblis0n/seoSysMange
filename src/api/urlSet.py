@@ -66,9 +66,18 @@ class MyEnum():
     OUTCOME_DELETE_DATA = "/delete/"
 
 
-    #blogger
+    # blogger
     BLOGGER_INFO_LIST = "/list/"
     BLOGGER_INFO_INSERT = "/add/"
     BLOGGER_INFO_UPDATE = "/update/"
     BLOGGER_INFO_DELETE = "/delete/"
+
+
+
+    # operations
+    HOSTS_LIST = "/hosts/list/"
+    HOSTS_UPDATE = "/hosts/update/"
+    HOSTS_UPDATE_STATUS = "/hosts/status/"
+    TASKS_LIST = "/tasks/list/"
+    TASK_IMPLEMENT_LOGS = "/task/logs/"
 

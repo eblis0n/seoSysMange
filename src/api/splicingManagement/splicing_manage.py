@@ -50,8 +50,8 @@ class splicingManage():
         """
         sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", end=10000)
         resdatas = []
-        # print("sql_data", sql_data)
-        if "sql 语句异常" not in str(sql_data):
+        print("sql_data", sql_data)
+        if sql_data is not None:
             try:
                 if len(sql_data) > 0:
                     for i in range(len(sql_data)):
@@ -60,6 +60,7 @@ class splicingManage():
                             "url": sql_data[i]["url"],
                             "platform": sql_data[i]["platform"],
                             "genre": sql_data[i]["genre"],
+                            "sort": sql_data[i]["sort"],
                             "created_at": self.usego.turn_isoformat(sql_data[i]["created_at"])
                         }
                         resdatas.append(thisdata)
@@ -89,6 +90,8 @@ class splicingManage():
         url = data_request['url']
         genre = data_request['genre']
         platform = data_request['platform']
+        sort = data_request['sort']
+
         url_list = url.split("\n")
         spl = spliceGo()
 
@@ -97,13 +100,13 @@ class splicingManage():
 
         except:
             self.usego.sendlog(f'自成一派')
-            result = spl.splice_301(genre, platform, url_list)
+            result = spl.splice_301(sort, genre, platform, url_list)
         else:
             if zyurl == "":
-                result = spl.splice_301(genre, platform, url_list)
+                result = spl.splice_301(sort, genre, platform, url_list)
             else:
                 zyurl_list = zyurl.split("\n")
-                result = spl.splice_301(genre, platform, url_list, zyurl_list)
+                result = spl.splice_301(sort, genre, platform, url_list, zyurl_list)
 
         if result is not None:
             self.usego.sendlog(f'添加成功：{result}')
@@ -111,7 +114,7 @@ class splicingManage():
             responseData = res.to_json()
         else:
             self.usego.sendlog(f'入库失败')
-            res = ResMsg(code='B0001', msg=f'v')
+            res = ResMsg(code='B0001', msg=f'入库失败')
             responseData = res.to_json()
 
         return responseData
@@ -123,7 +126,9 @@ class splicingManage():
         stacking_max = data_request['stacking_max']
         genre = data_request['genre']
         platform = data_request['platform']
+        postingStyle = data_request['postingStyle']
         group = data_request['group']
+        sort
 
         sql_data = self.ssql.pcSettings_select_sql(platform=platform, state=0)
 
@@ -176,6 +181,7 @@ class splicingManage():
                 'stacking_min': stacking_min,
                 'stacking_max': stacking_max,
                 'alt_text': alt_text,
+                'postingStyle': postingStyle,
                 'group': group,
                 'start': start,
                 'end': end
