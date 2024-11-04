@@ -35,18 +35,22 @@ class bloggerSelenium:
         self.mossql = mongo_sqlGO()
         self.ssql = basis_sqlGO()
 
-    def main(self, genre, platform, stacking_min, stacking_max, alt_text, group, start, end):
+    def main(self, genre, platform, stacking_min, stacking_max, alt_text, sort, postingStyle, group, start, end):
         """
             @Datetime ： 2024/10/26 00:09
             @Author ：eblis
             @Motto：简单描述用途
         """
         adsUserlist = self.siphon_adsuser(group, eval(configCall.min_concurrent_user))
-        print("adsUserlist",adsUserlist)
+        # print("adsUserlist",adsUserlist)
         if adsUserlist != []:
-
-            sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", genre=str(genre),
-                                                            platform=str(platform), start=int(start), end=int(end))
+            query = {
+                "genre": str(genre),
+                "platform": str(platform),
+                "sort": str(sort),
+            }
+            sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", query, start=int(start),
+                                                            end=int(end))
 
             if sql_data is not None:
                 all_links = [data["url"] for data in sql_data] if sql_data else []
