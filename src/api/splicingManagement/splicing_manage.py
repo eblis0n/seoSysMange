@@ -221,12 +221,7 @@ class splicingManage():
         return res.to_json()
 
 
-    def whitch_platform(self,platform):
-        """
-            @Datetime ： 2024/10/31 16:49
-            @Author ：eblis
-            @Motto：简单描述用途
-        """
+
 
 
 
