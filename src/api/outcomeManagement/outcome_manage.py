@@ -48,7 +48,7 @@ class outcomeManage():
         """
         platform = request.args.get('platform')
         # print("platform", platform)
-        query = {}
+
         if platform is not None:
             query = {
                 "platform": str(platform),
