@@ -128,7 +128,7 @@ class splicingManage():
         platform = data_request['platform']
         postingStyle = data_request['postingStyle']
         group = data_request['group']
-        sort
+        sort = data_request['sort']
 
         sql_data = self.ssql.pcSettings_select_sql(platform=platform, state=0)
 
@@ -181,6 +181,7 @@ class splicingManage():
                 'stacking_min': stacking_min,
                 'stacking_max': stacking_max,
                 'alt_text': alt_text,
+                'sort': sort,
                 'postingStyle': postingStyle,
                 'group': group,
                 'start': start,

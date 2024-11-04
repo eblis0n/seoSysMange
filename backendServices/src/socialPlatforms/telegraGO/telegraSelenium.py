@@ -165,7 +165,7 @@ class telegraSelenium:
         return this_run_list
 
     def post_to_telegra_ph(self, postingStyle, adsUser, this_links, alt_text):
-        this_title = self.usego.redome_string("小写字母", 10, 20)
+        this_title = f""""{configCall.stacking_text}-{self.usego.redome_string("小写字母", 10, 20)}"""
         driver = None
         try:
             driver = self.ads.basicEncapsulation(adsUser, configCall.adsServer)
