@@ -60,14 +60,14 @@ class bloggerSelenium:
 
                     self.usego.sendlog(f"拆分为：{len(alll_links_list)} 组")
 
-                    all_res = self.run(platform, genre, adsUserlist, alll_links_list, alt_text)
+                    all_res = self.run(postingStyle,platform, genre, adsUserlist, alll_links_list, alt_text)
 
                     return all_res
 
         return None
 
 
-    def run (self, platform, genre, adsUserlist, alll_links_list, alt_text):
+    def run (self, postingStyle, platform, genre, adsUserlist, alll_links_list, alt_text):
         """
             @Datetime ： 2024/11/2 12:56
             @Author ：eblis
@@ -92,7 +92,7 @@ class bloggerSelenium:
                     link = alll_links_list[i]
                     self.usego.sendlog(f"这组 使用的是{user},发布的是{link} 链接")
 
-                    t = threading.Thread(target=self.post_wrapper, args=(this_res_list, link, alll_links_list, bad_run_list, user["bloggerID"], user["adsID"],  alt_text))
+                    t = threading.Thread(target=self.post_wrapper, args=(postingStyle, this_res_list, link, alll_links_list, bad_run_list, user["bloggerID"], user["adsID"],  alt_text))
 
                     threads.append(t)
                     t.start()
@@ -128,14 +128,14 @@ class bloggerSelenium:
                 self.usego.sendlog(f"{adsUserlist} 都跑过了")
                 runTure = False
     
-    def post_wrapper(self, result_list, this_links, all_list, bad_run_list, bloggerID, adsUser,  alt_text):
+    def post_wrapper(self, postingStyle, result_list, this_links, all_list, bad_run_list, bloggerID, adsUser,  alt_text):
         """
             @Datetime ： 2024/11/2 13:26
             @Author ：eblis
             @Motto：简单描述用途
         """
         with threading.Lock():
-            result = self.post_to_blogger(bloggerID, adsUser, this_links, alt_text)
+            result = self.post_to_blogger(postingStyle, bloggerID, adsUser, this_links, alt_text)
             if result:
                 if "git.html" not in result:
                     result_list.append(result)
@@ -150,9 +150,9 @@ class bloggerSelenium:
     
                 
 
-    def post_to_blogger(self, bloggerID, adsUser, this_links, alt_text):
+    def post_to_blogger(self, postingStyle, bloggerID, adsUser, this_links, alt_text):
         # this_title = self.usego.redome_string("小写字母", 10, 20)
-        all_atab = self.get_links(this_links, alt_text)
+        all_atab = self.get_links(postingStyle, this_links, alt_text)
         driver = self.ads.basicEncapsulation(adsUser, configCall.adsServer)
         driver.get(f"https://www.blogger.com/blog/posts/{bloggerID}")
         # wait = WebDriverWait(driver, 5)
@@ -226,19 +226,34 @@ class bloggerSelenium:
         self.ads.adsAPI(configCall.adsServer, "stop", adsUser)
         return atag
 
-    def get_links(self, this_links, alt_text):
+    def get_links(self, postingStyle, this_links, alt_text):
         """
             @Datetime ： 2024/10/30 16:56
             @Author ：eblis
             @Motto：简单描述用途
         """
         all_atab = ''
-        for link in this_links:
-            # self.usego.sendlog(f"这条连接是：{link}")
-            link = link.strip('\n')
-            this_atab = f"""<a href="{link}" target="_blank">{alt_text}</a>&nbsp;"""
-            all_atab += this_atab
-        # print("all_atab", all_atab)
+        if int(postingStyle) == 0:
+            for link in this_links:
+                # self.usego.sendlog(f"这条连接是：{link}")
+                link = link.strip('\n')
+                this_atab = f"""<a href="{link}" target="_blank">{alt_text}</a>&nbsp;"""
+                all_atab += this_atab
+        elif int(postingStyle) == 1:
+            for link in this_links:
+                # self.usego.sendlog(f"这条连接是：{link}")
+                link = link.strip('\n')
+                this_atab = f"""<p><a href="{link}" target="_blank">{alt_text}</a></p>;"""
+                all_atab += this_atab
+        else:
+            for index, link in enumerate(this_links):
+                link = link.strip('\n')
+                if index < len(this_links):
+                    this_atab = f"""<p>{link}</p>;"""
+                    all_atab += this_atab
+                else:
+                    this_atab = f"""<p><a href="{link}" target="_blank">{alt_text}</a></p>;"""
+                    all_atab += this_atab
         return all_atab
 
 
