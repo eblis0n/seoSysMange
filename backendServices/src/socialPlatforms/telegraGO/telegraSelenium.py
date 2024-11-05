@@ -85,6 +85,7 @@ class telegraSelenium:
                 this_res_list = []
                 threads = []
                 bad_run_list = []
+                is_run_list = []
                 thisnoneads = adsUserlist[mm]
                 self.usego.sendlog(f"这组ads选手分别是{thisnoneads}")
                 this_go = min(len(thisnoneads), len(alll_links_list))
@@ -98,7 +99,7 @@ class telegraSelenium:
                     link = alll_links_list[i]
                     self.usego.sendlog(f"{i}组使用的是 {user} 发布：{len(link)}, {link} 这些链接")
                     t = threading.Thread(target=self.post_to_wrapper,
-                                         args=(arts, postingStyle, user, this_res_list, link, alll_links_list, bad_run_list, alt_text))
+                                         args=(arts, postingStyle, user, this_res_list, link, bad_run_list, is_run_list, alt_text))
 
                     threads.append(t)
                     t.start()
@@ -109,23 +110,35 @@ class telegraSelenium:
 
                 self.usego.sendlog(f"这波Thread 执行完了：{this_res_list}")
 
-                self.save_res(this_res_list)
+                # 创建一个包含目标链接的列表
+                to_remove = ["https://telegra.ph", "https://telegra.ph/"]
+                # 使用 for 循环遍历并删除
+                this_res_list = [link for link in this_res_list if link not in to_remove]
 
                 if this_res_list != []:
 
+                    for link in this_res_list:
+                        if link not in all_res:
+                            all_res.append(link)
+
+                    self.save_res(this_res_list)
                     self.usego.sendlog(f"将数据同步存放数据库")
                     self.usego.sendlog(f"{self.save_datebase(this_res_list, genre, platform)}")
 
-                self.usego.sendlog(f"剩余：{len(alll_links_list)}，失败的：{len(bad_run_list)}")
+                self.usego.sendlog(f"失败的：{len(bad_run_list)}")
 
                 alll_links_list.extend(bad_run_list)
                 bad_run_list.clear()
                 self.usego.sendlog(f"最终剩余：{len(alll_links_list)}")
+                self.usego.sendlog(f"将成功发送的数据，从数据库中移除")
+                # 将成功发送的数据，从数据库中移除
+                for link in is_run_list:
+                    self.del_run_links(link)
+                    alll_links_list.remove(link)
+                is_run_list.clear()
 
-                for link in this_res_list:
-                    if link not in all_res:
-                        if link != "https://telegra.ph" or link != "https://telegra.ph/":
-                            all_res.append(link)
+                self.usego.sendlog(f"<--------------- end --------------- >")
+
                 mm = mm + 1
                 mun = mun + 1
             else:
@@ -176,14 +189,15 @@ class telegraSelenium:
         self.usego.sendlog(f"删除结果：{sql_data}")
 
 
-    def post_to_wrapper(self, arts, postingStyle, user, this_res_list, link, alll_links_list, bad_run_list, alt_text):
+    def post_to_wrapper(self, arts, postingStyle, user, this_res_list, link, bad_run_list, is_run_list, alt_text):
         with threading.Lock():
             result = self.post_to_telegra(postingStyle, user, link, alt_text, arts)
             if result:
                 this_res_list.append(result)
-                alll_links_list.remove(link)
-                self.usego.sendlog(f"剩余：{len(alll_links_list)} 组需要执行")
-                self.del_run_links(link)
+                is_run_list.append(link)
+                # alll_links_list.remove(link)
+                # self.usego.sendlog(f"剩余：{len(alll_links_list)} 组需要执行")
+                # self.del_run_links(link)
 
             else:
                 self.usego.sendlog(f"执行失败了，{link} 这些需要回炉再造")
