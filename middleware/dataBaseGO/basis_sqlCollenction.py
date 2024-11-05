@@ -238,7 +238,7 @@ class basis_sqlGO():
         sqlgo = f"""
                         UPDATE pro_pc_settings 
                         SET  `state` = {state}
-                        WHERE `name` = '{name}';
+                        WHERE `name` = '{name}' and `state` != 2;
                     """
         # 执行 SQL 更新查询
         sql_data = self.ssql.mysql_commit('basis', sqlgo)
