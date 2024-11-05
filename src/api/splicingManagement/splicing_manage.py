@@ -173,36 +173,40 @@ class splicingManage():
         results = []
 
         for idx, client in enumerate(resdatas):
-            result = {}
-            response = self.aws_sqs.initialization(f'client_{client["name"]}')
-            queue_url = response['QueueUrl']
-            self.usego.sendlog(f'{idx}，client_{client["name"]}，队列地址{queue_url}')
-            if idx == 0:
-                start = 0
-                end = 200000
-            else:
-                start = end
-                end = 200000 * (idx + 1)
-            task_data = {
-                'pcname': client["name"],
-                'genre': genre,
-                'platform': platform,
-                'stacking_min': stacking_min,
-                'stacking_max': stacking_max,
-                'alt_text': alt_text,
-                'sort': sort,
-                'isarts': isarts,
-                'postingStyle': postingStyle,
-                'group': group,
-                'start': start,
-                'end': end
-            }
-            self.usego.sendlog(f' run_{platform}_selenium，任务信息:{task_data}')
+            if client["state"] != 2 or client["state"] != "2":
+                result = {}
+                response = self.aws_sqs.initialization(f'client_{client["name"]}')
+                queue_url = response['QueueUrl']
+                self.usego.sendlog(f'{idx}，client_{client["name"]}，队列地址{queue_url}')
+                if idx == 0:
+                    start = 0
+                    end = 200000
+                else:
+                    start = end
+                    end = 200000 * (idx + 1)
+                task_data = {
+                    'pcname': client["name"],
+                    'genre': genre,
+                    'platform': platform,
+                    'stacking_min': stacking_min,
+                    'stacking_max': stacking_max,
+                    'alt_text': alt_text,
+                    'sort': sort,
+                    'isarts': isarts,
+                    'postingStyle': postingStyle,
+                    'group': group,
+                    'start': start,
+                    'end': end
+                }
+                self.usego.sendlog(f' run_{platform}_selenium，任务信息:{task_data}')
 
-            response = self.aws_sqs.sendMSG(queue_url, f"run_{platform}_group", f"run_{platform}_selenium", task_data)
-            result[f"{client}"] = response
-            results.append(result)
-            self.usego.sendlog(f' run_{platform}_selenium，任务发送结果:{response}')
+                response = self.aws_sqs.sendMSG(queue_url, f"run_{platform}_group", f"run_{platform}_selenium", task_data)
+                result[f"{client}"] = response
+                results.append(result)
+                self.usego.sendlog(f' run_{platform}_selenium，任务发送结果:{response}')
+            else:
+                self.usego.sendlog(f'{client["name"]},设备下线了')
+
         res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
         return res.to_json()
 

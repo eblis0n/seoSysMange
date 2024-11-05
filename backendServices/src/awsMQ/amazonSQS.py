@@ -1,22 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-@Datetime ： 2024/10/19 13:37
-@Author ： eblis
-@File ：mongoDataBase.py
-@IDE ：PyCharm
-@Motto：ABC(Always Be Coding)
-"""
 import os
 import sys
 import time
-
-# 设置项目根目录
-base_dr = str(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-bae_idr = base_dr.replace('\\', '/')
-sys.path.append(bae_idr)
-
-import boto3
 import json
+import boto3
 from botocore.exceptions import ClientError
 from middleware.public.commonUse import otherUse
 import middleware.public.configurationCall as configCall
@@ -25,7 +11,6 @@ class AmazonSQS:
 
     def __init__(self):
         self.usego = otherUse()
-
 
     def _get_sqs_client(self):
         """每次调用都创建一个新的 SQS 客户端"""
@@ -46,7 +31,6 @@ class AmazonSQS:
                 response = sqs.list_queues(QueueNamePrefix=queue_name_prefix)
             else:
                 response = sqs.list_queues()
-                # print("response",response)
 
             return response
 
@@ -54,10 +38,7 @@ class AmazonSQS:
             self.usego.sendlog(f"Failed to list queues: {e}")
             return []
 
-
-
     def initialization(self, taskid):
-
         queue_name = f'SQS-{taskid}.fifo'
         sqs = self._get_sqs_client()  # 获取新的 SQS 客户端
         policy_document = json.loads(configCall.aws_policy_document)  # 使用 json.loads
@@ -76,8 +57,6 @@ class AmazonSQS:
 
         self.usego.sendlog(f"避免翻车，等个60秒比较好")
         time.sleep(60)
-
-
 
         # 如果队列不存在，则创建新队列
         retries = 3  # 设置重试次数
@@ -111,7 +90,6 @@ class AmazonSQS:
     def sendMSG(self, queue_url, msg_group, scriptname, task_data, retries=3, delay=5):
         sqs = self._get_sqs_client()
         message_body = {"command": f"{scriptname}", "script": task_data}
-
 
         for attempt in range(retries):
             try:
@@ -153,43 +131,54 @@ class AmazonSQS:
                     raise  # 如果重试次数用尽，则抛出异常
 
     def delFIFO(self, queue_url, receipt_handle=None):
+        """
+        删除 FIFO 队列或消息
+        """
         sqs = self._get_sqs_client()
-        if receipt_handle is None:
-            sqs.delete_queue(QueueUrl=queue_url)
-            self.usego.sendlog("FIFO queue deleted")
-        else:
-            response = sqs.delete_message(
-                QueueUrl=queue_url,
-                ReceiptHandle=receipt_handle,
-            )
-            self.usego.sendlog(f"删除结果{response}")
-
+        try:
+            if receipt_handle is None:
+                # 删除整个队列
+                self.usego.sendlog(f"Deleting the FIFO queue: {queue_url}")
+                sqs.delete_queue(QueueUrl=queue_url)
+                self.usego.sendlog("FIFO queue deleted successfully.")
+            else:
+                # 删除消息
+                response = sqs.delete_message(
+                    QueueUrl=queue_url,
+                    ReceiptHandle=receipt_handle,
+                )
+                self.usego.sendlog(f"Message deleted: {response}")
+        except ClientError as e:
+            error_code = e.response['Error']['Code']
+            if error_code == 'QueueDoesNotExist':
+                self.usego.sendlog(f"Queue {queue_url} does not exist.")
+            elif error_code == 'QueueDeletedRecently':
+                self.usego.sendlog(f"Queue {queue_url} was deleted recently. It cannot be deleted again.")
+            else:
+                self.usego.sendlog(f"Failed to delete FIFO queue or message: {e}")
+                raise  # 抛出异常，保证错误不被忽视
 
 if __name__ == '__main__':
     aws = AmazonSQS()
     response = aws.list_queues()
     queues = response.get('QueueUrls', [])
     if queues:
-        print("123")
+        print("Queues found:", queues)
     else:
-        print(456)
+        print("No queues found.")
+
+    # Example of initializing a queue
     # response = aws.initialization("client_this_mac_1_not")
     # queue_url = response['QueueUrl']
     # print("queue_url", queue_url)
-    #
-    # # msg = "print('Hello World')"
-    # # aws.sendMSG(queue_url, "testgroup", "execute_script", msg)
-    #
-    # # 假设已经初始化了 SQS 客户端并获取了 queue_url
-    # task_data = {
-    #     'command': 'test1',  # 指定要执行的命令
-    # }
-    #
-    # msg_group = "test1"  # 消息分组
-    # scriptname = "test1"  # 脚本名称
-    #
-    # # 发送消息到 SQS 队列
+
+    # Send a message to the queue
+    # task_data = {'command': 'test1', 'script': 'print("Hello World")'}
+    # msg_group = "test1"
+    # scriptname = "test1"
     # response = aws.sendMSG(queue_url, msg_group, scriptname, task_data)
-    #
-    # # 打印响应（可选）
     # print("Message sent:", response)
+
+    # Receive a message from the queue
+    # message = aws.takeMSG(queue_url)
+    # print("Received message:", message)
