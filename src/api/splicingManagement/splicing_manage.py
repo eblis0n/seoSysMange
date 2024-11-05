@@ -131,9 +131,12 @@ class splicingManage():
         sort = data_request['sort']
         try:
             isarts = data_request['isarts']
+            self.usego.sendlog(
+                f"接收到的参数：{genre}, {platform}, {stacking_min}, {stacking_max}, {alt_text}, {sort}, {postingStyle}, {isarts}")
 
         except:
             isarts = "1"
+
 
 
         sql_data = self.ssql.pcSettings_select_sql(platform=platform, state=0)

@@ -41,6 +41,9 @@ class bloggerSelenium:
             @Author ：eblis
             @Motto：简单描述用途
         """
+
+        self.usego.sendlog(f"接收到的参数：genre{genre}, platform{platform}, stacking_min{stacking_min}, stacking_max{stacking_max},alt_text {alt_text},sort {sort}, postingStyle{postingStyle}, isarts{isarts}")
+
         adsUserlist = self.siphon_adsuser(group, eval(configCall.min_concurrent_user))
         # print("adsUserlist",adsUserlist)
         if adsUserlist != []:
@@ -156,6 +159,8 @@ class bloggerSelenium:
 
     def post_to_blogger(self,arts, postingStyle, bloggerID, adsUser, this_links, alt_text):
         # this_title = self.usego.redome_string("小写字母", 10, 20)
+        self.usego.sendlog(f"接收到的postingStyle: {type(postingStyle)},{postingStyle}")
+        self.usego.sendlog(f"arts: {type(arts)},{arts}")
         all_atab = self.get_links(arts, postingStyle, this_links, alt_text)
         driver = self.ads.basicEncapsulation(adsUser, configCall.adsServer)
         driver.get(f"https://www.blogger.com/blog/posts/{bloggerID}")
@@ -187,9 +192,6 @@ class bloggerSelenium:
         conent_ele = comp.find_ele((By.XPATH,
                                     '//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[2]/div/div/div[3]/span/div/div[2]/div[2]/div/div/div'))
         #
-
-
-
 
         try:
             driver.execute_script("arguments[0].focus();", conent_ele)
@@ -266,7 +268,7 @@ class bloggerSelenium:
             @Motto：简单描述用途
         """
         all_atab = ''
-        if arts is not None:
+        if arts is not None or arts != "None":
             this_atab = f"""<p>{arts}</p>&nbsp;"""
             all_atab += this_atab
 

@@ -36,8 +36,9 @@ class telegraSelenium:
         """
             @Datetime ： 2024/10/26 00:09
             @Author ：eblis
-            @Motto：简单描述用途
+            @Motto：genre 类型，platform：平台 isarts：是否贴文 postingStyle：A标签形式
         """
+        self.usego.sendlog(f"接收到的参数：genre{genre}, platform{platform}, stacking_min{stacking_min}, stacking_max{stacking_max},alt_text {alt_text},sort {sort}, postingStyle{postingStyle}, isarts{isarts}")
 
         adsUserlist = self.siphon_adsuser(eval(configCall.stacking_ads), eval(configCall.min_concurrent_user))
 
@@ -77,7 +78,7 @@ class telegraSelenium:
                 thisnoneads = adsUserlist[mm]
                 self.usego.sendlog(f"这组ads选手分别是{thisnoneads}")
                 this_go = min(len(thisnoneads), len(alll_links_list))
-                self.usego.sendlog(f"需要建立{this_go} 个 线程")
+                self.usego.sendlog(f"需要建立{this_go} 个 线程,接收到的 isarts 是{type(isarts)},{isarts}")
                 for i in range(this_go):
                     if int(isarts) == 0:
                         arts = self.read_file()
@@ -202,6 +203,7 @@ class telegraSelenium:
     def post_to_telegra_ph(self, postingStyle, adsUser, this_links, alt_text, arts):
         this_title = f"""{configCall.stacking_text}-{self.usego.redome_string("小写字母", 10, 20)}"""
         driver = None
+        self.usego.sendlog(f"接收到的postingStyle: {type(postingStyle)},{postingStyle}")
         try:
             driver = self.ads.basicEncapsulation(adsUser, configCall.adsServer)
             driver.get("https://telegra.ph/")
@@ -212,7 +214,7 @@ class telegraSelenium:
 
             content_input = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_tl_editor"]/div[1]/p')))
             driver.execute_script("arguments[0].textContent = '';", content_input)
-            if arts is not None:
+            if arts is not None or arts != "None":
                 # 先添加心灵鸡汤短文
                 driver.execute_script("""
                     var p = document.createElement('p');
@@ -330,4 +332,4 @@ if __name__ == '__main__':
     stacking_max = configCall.stacking_max
     alt_text = configCall.stacking_text
 
-    tele.main(genre, platform, stacking_min, stacking_max, alt_text, "2", "all", 0, 2000)
+    tele.main(genre, platform, stacking_min, stacking_max, alt_text, "1", "0", "1", "all", 0, 20)
