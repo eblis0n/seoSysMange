@@ -105,6 +105,8 @@ class AmazonSQS:
                 if attempt == retries - 1:
                     raise  # 如果重试次数用尽，则抛出异常
 
+
+
     def takeMSG(self, queue_url, wait_time=20, retries=3, delay=5):
         sqs = self._get_sqs_client()
         for attempt in range(retries):
@@ -157,6 +159,24 @@ class AmazonSQS:
             else:
                 self.usego.sendlog(f"Failed to delete FIFO queue or message: {e}")
                 raise  # 抛出异常，保证错误不被忽视
+
+    def has_more_messages(self, queue_url):
+        """
+        检查队列中是否有更多的消息
+        :param queue_url: 队列 URL
+        :return: 如果队列中还有消息，则返回 True，否则返回 False
+        """
+        sqs = self._get_sqs_client()
+        response = sqs.receive_message(
+            QueueUrl=queue_url,
+            MaxNumberOfMessages=1,
+            VisibilityTimeout=30,
+            WaitTimeSeconds=5  # 设置一个较短的等待时间
+        )
+
+        if 'Messages' in response:
+            return True  # 如果队列中有消息，返回 True
+        return False  # 如果没有消息，返回 False
 
 if __name__ == '__main__':
     aws = AmazonSQS()
