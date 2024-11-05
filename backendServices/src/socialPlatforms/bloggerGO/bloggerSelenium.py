@@ -187,7 +187,7 @@ class bloggerSelenium:
             time.sleep(10)
 
             # 输入内容
-            self._input_content(comp, all_atab)
+            self._input_content(driver, comp, all_atab)
 
             # 点击发布
             self._click_publish_button(comp, driver)
@@ -232,7 +232,7 @@ class bloggerSelenium:
             self.usego.sendlog(f"输入标题时发生错误: {str(e)}")
             raise
 
-    def _input_content(self, comp, all_atab):
+    def _input_content(self, driver, comp, all_atab):
         try:
             content_ele = comp.find_ele((By.XPATH,
                                          '//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[2]/div/div/div[3]/span/div/div[2]/div[2]/div/div/div'))

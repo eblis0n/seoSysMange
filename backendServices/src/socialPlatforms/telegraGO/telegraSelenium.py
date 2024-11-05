@@ -177,8 +177,7 @@ class telegraSelenium:
 
     def post_to_wrapper(self, arts, postingStyle, user, this_res_list, link, alll_links_list, bad_run_list, alt_text):
         with threading.Lock():
-
-            result = self.post_to_telegra_ph(postingStyle, user, link, alt_text, arts)
+            result = self.post_to_telegra(postingStyle, user, link, alt_text, arts)
             if result:
                 this_res_list.append(result)
                 alll_links_list.remove(link)
@@ -212,7 +211,7 @@ class telegraSelenium:
 
         return this_run_list
 
-    def post_to_telegram(self, postingStyle, adsUser, this_links, alt_text, arts):
+    def post_to_telegra(self, postingStyle, adsUser, this_links, alt_text, arts):
         # 生成标题
         this_title = f"""{configCall.stacking_text}-{self.usego.redome_string("小写字母", 10, 20)}"""
         driver = None

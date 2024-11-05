@@ -173,6 +173,7 @@ class splicingManage():
         results = []
 
         for idx, client in enumerate(resdatas):
+            self.usego.sendlog(f'{idx}，client_{client["name"]}，{client["state"]}')
             if client["state"] != 2 or client["state"] != "2":
                 result = {}
                 response = self.aws_sqs.initialization(f'client_{client["name"]}')
