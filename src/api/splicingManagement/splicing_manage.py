@@ -50,7 +50,7 @@ class splicingManage():
         """
         sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", end=10000)
         resdatas = []
-        print("sql_data", sql_data)
+        # print("sql_data", sql_data)
         if sql_data is not None:
             try:
                 if len(sql_data) > 0:
