@@ -175,6 +175,7 @@ class splicingManage():
         for idx, client in enumerate(resdatas):
             self.usego.sendlog(f'{idx}，client_{client["name"]}，{client["state"]}')
             if client["state"] != 2 or client["state"] != "2":
+                self.usego.sendlog(f'{idx}，client_{client["name"]} 这台设备可用！！')
                 result = {}
                 response = self.aws_sqs.initialization(f'client_{client["name"]}')
                 queue_url = response['QueueUrl']

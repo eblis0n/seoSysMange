@@ -96,7 +96,7 @@ class telegraSelenium:
                         arts = None
                     user = thisnoneads[i]
                     link = alll_links_list[i]
-                    self.usego.sendlog(f"{i}组使用的是 {user} 发布：{len({link})}, {link} 这些链接")
+                    self.usego.sendlog(f"{i}组使用的是 {user} 发布：{len(link)}, {link} 这些链接")
                     t = threading.Thread(target=self.post_to_wrapper,
                                          args=(arts, postingStyle, user, this_res_list, link, alll_links_list, bad_run_list, alt_text))
 
