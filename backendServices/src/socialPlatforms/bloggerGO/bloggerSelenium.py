@@ -43,6 +43,9 @@ class bloggerSelenium:
         """
 
         self.usego.sendlog(f"接收到的参数：genre{genre}, platform{platform}, stacking_min{stacking_min}, stacking_max{stacking_max},alt_text {alt_text},sort {sort}, postingStyle{postingStyle}, isarts{isarts}")
+        # 将 执行pc 状态 修改
+        sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=1)
+        self.usego.sendlog(f"pc执行结果{sql_data}")
 
         adsUserlist = self.siphon_adsuser(group, eval(configCall.min_concurrent_user))
         # print("adsUserlist",adsUserlist)
@@ -64,9 +67,10 @@ class bloggerSelenium:
                     self.usego.sendlog(f"拆分为：{len(alll_links_list)} 组")
 
                     all_res = self.run(isarts, postingStyle, platform, genre, adsUserlist, alll_links_list, alt_text)
-
+                    sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
                     return all_res
 
+        sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
         return None
 
 
@@ -154,83 +158,124 @@ class bloggerSelenium:
                     self.usego.sendlog(f"丢弃结果: {result}，因为它包含 'git.html'")
             else:
                 bad_run_list.append(this_links)
-    
-                
 
-    def post_to_blogger(self,arts, postingStyle, bloggerID, adsUser, this_links, alt_text):
-        # this_title = self.usego.redome_string("小写字母", 10, 20)
-        self.usego.sendlog(f"接收到的postingStyle: {type(postingStyle)},{postingStyle}")
-        self.usego.sendlog(f"arts: {type(arts)},{arts}")
-        all_atab = self.get_links(arts, postingStyle, this_links, alt_text)
-        driver = self.ads.basicEncapsulation(adsUser, configCall.adsServer)
-        driver.get(f"https://www.blogger.com/blog/posts/{bloggerID}")
-        # wait = WebDriverWait(driver, 5)
-        comp = component(driver)
-
-        time.sleep(3)
-
-        # 点击发帖
-        new_post_bottom = comp.find_ele((By.XPATH, "//span[text()='New Post']"))
-        if new_post_bottom:
-            print("能识别到New Post")
-
-            driver.execute_script("arguments[0].click();", new_post_bottom)
-        else:
-            new_post_bottom = comp.find_ele((By.XPATH, '''//*[@id="yDmH0d"]/c-wiz/div[1]/gm-raised-drawer/div/div[2]/div/c-wiz/div[3]/div/div/span/span'''))
-            driver.execute_script("arguments[0].click();", new_post_bottom)
-
-        time.sleep(5)
-        # 找到 标题元素并输入
-        title_input = comp.input(
-            (By.XPATH, '''//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[1]/div[1]/div[1]/div/div[1]/input'''), alt_text)
-        print("标题输入了，下一步")
-
-
-        print("进入html 编辑状态")
-        time.sleep(10)
-
-        conent_ele = comp.find_ele((By.XPATH,
-                                    '//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[2]/div/div/div[3]/span/div/div[2]/div[2]/div/div/div'))
-        #
-
+    def post_to_blogger(self, arts, postingStyle, bloggerID, adsUser, this_links, alt_text):
         try:
-            driver.execute_script("arguments[0].focus();", conent_ele)
+            # 输出接收到的参数
+            self.usego.sendlog(f"接收到的postingStyle: {type(postingStyle)},{postingStyle}")
+            self.usego.sendlog(f"arts: {type(arts)},{arts}")
+
+            # 获取文章内容链接
+            all_atab = self.get_links(arts, postingStyle, this_links, alt_text)
+
+            # 获取浏览器驱动
+            driver = self.ads.basicEncapsulation(adsUser, configCall.adsServer)
+            driver.get(f"https://www.blogger.com/blog/posts/{bloggerID}")
             time.sleep(3)
-            driver.execute_script(f"arguments[0].CodeMirror.setValue('{all_atab}');", conent_ele)
-        except:
+
+            # 初始化组件
+            comp = component(driver)
+
+            # 点击“New Post”
+            self._click_new_post_button(comp, driver)
+
+            # 输入标题
+            self._input_title(comp, alt_text)
+
+            # 进入HTML编辑模式
+            self.usego.sendlog("进入html 编辑状态")
+            time.sleep(10)
+
+            # 输入内容
+            self._input_content(comp, all_atab)
+
+            # 点击发布
+            self._click_publish_button(comp, driver)
+
+            # 确认弹窗
+            self._handle_popup(comp, driver)
+
+            # 获取发布后的链接
+            atag = self._get_publish_link(comp)
+
+            self.ads.adsAPI(configCall.adsServer, "stop", adsUser)
+
+            return atag
+
+        except Exception as e:
+            self.usego.sendlog(f"出错了: {str(e)}")
             self.ads.adsAPI(configCall.adsServer, "stop", adsUser)
             return False
-        #
-        time.sleep(5)
-        publish_button = comp.find_ele(
-            (By.XPATH, '//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[1]/div[2]/div[4]/span/span/div/div'))
+
+    def _click_new_post_button(self, comp, driver):
         try:
+            new_post_button = comp.find_ele((By.XPATH, "//span[text()='New Post']"))
+            if new_post_button:
+                self.usego.sendlog("能识别到New Post")
+                driver.execute_script("arguments[0].click();", new_post_button)
+            else:
+                new_post_button = comp.find_ele((By.XPATH,
+                                                 '''//*[@id="yDmH0d"]/c-wiz/div[1]/gm-raised-drawer/div/div[2]/div/c-wiz/div[3]/div/div/span/span'''))
+                driver.execute_script("arguments[0].click();", new_post_button)
+            time.sleep(5)
+        except Exception as e:
+            self.usego.sendlog(f"点击New Post时发生错误: {str(e)}")
+            raise
+
+    def _input_title(self, comp, alt_text):
+        try:
+            title_input = comp.input(
+                (By.XPATH, '''//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[1]/div[1]/div[1]/div/div[1]/input'''),
+                alt_text)
+            self.usego.sendlog("标题输入了，下一步")
+        except Exception as e:
+            self.usego.sendlog(f"输入标题时发生错误: {str(e)}")
+            raise
+
+    def _input_content(self, comp, all_atab):
+        try:
+            content_ele = comp.find_ele((By.XPATH,
+                                         '//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[2]/div/div/div[3]/span/div/div[2]/div[2]/div/div/div'))
+            driver.execute_script("arguments[0].focus();", content_ele)
+            time.sleep(3)
+            driver.execute_script(f"arguments[0].CodeMirror.setValue('{all_atab}');", content_ele)
+            time.sleep(5)
+        except Exception as e:
+            self.usego.sendlog(f"输入内容时发生错误: {str(e)}")
+            raise
+
+    def _click_publish_button(self, comp, driver):
+        try:
+            publish_button = comp.find_ele(
+                (By.XPATH, '//*[@id="yDmH0d"]/c-wiz[2]/div/c-wiz/div/div[1]/div[2]/div[4]/span/span/div/div'))
             driver.execute_script("arguments[0].click();", publish_button)
-        except:
-            self.ads.adsAPI(configCall.adsServer, "stop", adsUser)
-            return False
+        except Exception as e:
+            self.usego.sendlog(f"点击发布按钮时发生错误: {str(e)}")
+            raise
 
-        pop_up = comp.find_ele((By.XPATH, '''//*[@id="dwrFZd0"]'''))
-
-        if pop_up:
-
-            confirm_button = comp.find_ele((By.XPATH, '//*[@id="yDmH0d"]/div[4]/div/div[2]/div[3]/div[2]'))
-            print("confirm_button", confirm_button)
-
-            try:
+    def _handle_popup(self, comp, driver):
+        try:
+            pop_up = comp.find_ele((By.XPATH, '''//*[@id="dwrFZd0"]'''))
+            if pop_up:
+                confirm_button = comp.find_ele((By.XPATH, '//*[@id="yDmH0d"]/div[4]/div/div[2]/div[3]/div[2]'))
+                self.usego.sendlog(f"confirm_button: {confirm_button}")
                 driver.execute_script("arguments[0].click();", confirm_button)
-            except:
-                self.ads.adsAPI(configCall.adsServer, "stop", adsUser)
-                return False
+        except Exception as e:
+            self.usego.sendlog(f"处理弹窗时发生错误: {str(e)}")
+            raise
 
-        time.sleep(10)
-
-        atag = comp.get_element_attribute((By.XPATH,
-                                           '//*[@id="yDmH0d"]/c-wiz/div[2]/div/c-wiz/div[2]/c-wiz/div/div/div/div[1]/div/span/div/div/div[3]/div[4]/div/a'),
-                                          "href")
-        print("atag", atag)
-        self.ads.adsAPI(configCall.adsServer, "stop", adsUser)
-        return atag
+    def _get_publish_link(self, comp):
+        try:
+            atag = comp.get_element_attribute(
+                (By.XPATH,
+                 '//*[@id="yDmH0d"]/c-wiz/div[2]/div/c-wiz/div[2]/c-wiz/div/div/div/div[1]/div/span/div/div/div[3]/div[4]/div/a'),
+                "href"
+            )
+            self.usego.sendlog(f"atag结果：{atag}")
+            return atag
+        except Exception as e:
+            self.usego.sendlog(f"获取发布链接时发生错误: {str(e)}")
+            raise
 
     def read_file(self):
         """
