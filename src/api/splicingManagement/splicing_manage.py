@@ -129,17 +129,15 @@ class splicingManage():
         postingStyle = data_request['postingStyle']
         group = data_request['group']
         sort = data_request['sort']
-        try:
-            isarts = data_request['isarts']
-            self.usego.sendlog(
-                f"接收到的参数：{genre}, {platform}, {stacking_min}, {stacking_max}, {alt_text}, {sort}, {postingStyle}, {isarts}")
+        isarts = data_request['isarts']
 
-        except:
-            isarts = "1"
+        self.usego.sendlog(
+            f"接收到的参数：{genre}, {platform}, {stacking_min}, {stacking_max}, {alt_text}, {sort}, {postingStyle}, {isarts}")
+        #
 
+        self.usego.sendlog("第一步，先查数据库，查看是否存在符合条件的PC")
 
-
-        sql_data = self.ssql.pcSettings_select_sql(platform=platform, state=0)
+        sql_data = self.ssql.pcSettings_select_sql(platform=platform)
 
         if "sql 语句异常" in str(sql_data):
             self.usego.sendlog(f'没有可用的客户端：{sql_data}')
@@ -170,6 +168,7 @@ class splicingManage():
             return res.to_json()
 
         self.usego.sendlog(f'有 {len(resdatas)} 设备符合')
+        self.usego.sendlog(f'第二步，向符合条件的PC 队列发消息')
 
         results = []
 
@@ -177,7 +176,7 @@ class splicingManage():
             result = {}
             response = self.aws_sqs.initialization(f'client_{client["name"]}')
             queue_url = response['QueueUrl']
-            self.usego.sendlog(f"{idx}队列地址{queue_url}")
+            self.usego.sendlog(f'{idx}，client_{client["name"]}，队列地址{queue_url}')
             if idx == 0:
                 start = 0
                 end = 200000
@@ -185,6 +184,7 @@ class splicingManage():
                 start = end
                 end = 200000 * (idx + 1)
             task_data = {
+                'pcname': client["name"],
                 'genre': genre,
                 'platform': platform,
                 'stacking_min': stacking_min,

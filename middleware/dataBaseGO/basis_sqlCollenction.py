@@ -229,6 +229,21 @@ class basis_sqlGO():
         sql_data = self.ssql.mysql_commit('basis', sqlgo)
         return sql_data
 
+
+    def pcSettings_update_state_sql(self, name, state):
+        """
+            更新 PC 设置的状态、名称和地址
+        """
+
+        sqlgo = f"""
+                        UPDATE pro_pc_settings 
+                        SET  `state` = {state}
+                        WHERE `name` = '{name}';
+                    """
+        # 执行 SQL 更新查询
+        sql_data = self.ssql.mysql_commit('basis', sqlgo)
+        return sql_data
+
     def pcSettings_select_sql(self, platform=None, state=None):
         """
             @Datetime ： 2024/5/7 10:59
@@ -238,15 +253,15 @@ class basis_sqlGO():
         # print("pcSettings_select, locals():", locals())
 
         # 构建参数字典，过滤掉 None 和空字符串
-        params = {k: v for k, v in locals().items() if k in ['platform', 'state'] and v not in [None, ""]}
+        params = {k: v for k, v in locals().items() if k in ['platform','state'] and v not in [None, ""]}
         print("非 None 的参数名：", list(params.keys()))
 
         # 根据参数构建 SQL 查询
         if params:
             conditions = [f"`{k}` = '{v}'" for k, v in params.items()]
-            sqlgo = f"SELECT /*+ NOCACHE */ * FROM pro_pc_settings WHERE {' AND '.join(conditions)} ORDER BY create_at DESC;"
+            sqlgo = f"SELECT /*+ NOCACHE */ * FROM pro_pc_settings WHERE {' AND '.join(conditions)} ORDER BY state ;"
         else:
-            sqlgo = "SELECT /*+ NOCACHE */ * FROM pro_pc_settings ORDER BY create_at DESC;"
+            sqlgo = "SELECT /*+ NOCACHE */ * FROM pro_pc_settings ORDER BY state ;"
 
         # print("生成的 SQL 查询:", sqlgo)
 

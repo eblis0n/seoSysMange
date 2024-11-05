@@ -64,7 +64,7 @@ class adsDevice():
             asdchrome["debugD"] = ws.get('selenium')
             return asdchrome
         except Exception as e:
-            self.usego.sendlog(f"出现了异常{e}")
+            self.usego.sendlog(f"chromeStartUp出现了异常{e}")
             return False
 
 

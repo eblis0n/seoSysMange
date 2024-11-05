@@ -39,8 +39,6 @@ class operationsManage():
         self.bp.route(self.Myenum.HOSTS_UPDATE, methods=['POST'])(self.hosts_update)
         self.bp.route(self.Myenum.TASK_IMPLEMENT_LOGS, methods=['POST'])(self.task_implement_logs)
 
-
-        
     def hosts_list(self):
         """
             @Datetime ： 2024/11/3 15:42
@@ -49,47 +47,36 @@ class operationsManage():
         """
         sql_data = self.mossql.operations_hosts_find("seo_operations_hosts")
         resdatas = []
-        # print("sql_data", sql_data)
         current_time = datetime.now()
-        if sql_data is not None:
-            try:
-                if len(sql_data) > 0:
-                    for i in range(len(sql_data)):
 
-                        # 5分钟的时间间隔
-
-                        thisdata = {
-                            "id": sql_data[i]["id"],
-                            "host_ip": sql_data[i]["host_ip"],
-                            "status": sql_data[i]["status"],
-                            "host_group": sql_data[i]["host_group"],
-                            "remark": sql_data[i]["remark"],
-                            "ping_time": sql_data[i]["ping_time"],
-                            "online": 0
-                        }
-                        minutes_ago = current_time - timedelta(seconds=configCall.refreshTiming)
-                        if sql_data[i]["ping_time"] > minutes_ago:
-                            thisdata["online"] = 1
-
-                        resdatas.append(thisdata)
-
-                    self.usego.sendlog(f'list结果：{len(resdatas)}')
-                    res = ResMsg(data=resdatas)
-
-                else:
-                    self.usego.sendlog(f'list结果：{len(resdatas)}')
-                    res = ResMsg(data=resdatas)
-
-            except Exception as e:
-                self.usego.sendlog(f'list查询失败：{e}')
-                res = ResMsg(code='B0001', msg=f'list查询失败')
-
-        else:
+        if not sql_data:  # 如果sql_data为空或None，直接返回
             self.usego.sendlog(f'list查询失败：{sql_data}')
-            res = ResMsg(code='B0001', msg=f'list查询失败')
+            return ResMsg(code='B0001', msg='list查询失败').to_json()
 
+        for record in sql_data:
+            # 提取数据
+            thisdata = {
+                "id": str(record["_id"]),  # 转换 ObjectId 为字符串
+                "host_ip": record["host_ip"],
+                "is_disabled": record["is_disabled"],
+                "host_group": record["host_group"],
+                "remark": record["remark"],
+                "ping_time": record["ping_time"],
+                "online": "1"  # 默认离线
+            }
 
-        return res.to_json()
+            # 获取ping时间并判断是否在线
+            ping_time = self.parse_ping_time(thisdata["ping_time"])
+            if ping_time:
+                # 如果ping时间在5分钟内，视为在线
+                minutes_ago = current_time - timedelta(seconds=int(configCall.refreshTiming))
+                if ping_time > minutes_ago:
+                    thisdata["online"] = "0"  # 视为在线
+
+            resdatas.append(thisdata)
+
+        self.usego.sendlog(f'list结果：{len(resdatas)}')
+        return ResMsg(data=resdatas).to_json()
 
 
 
@@ -244,5 +231,16 @@ class operationsManage():
             responseData = res.to_json()
 
         return responseData
+################################################################# 非接口 #########################################
+    def parse_ping_time(self, ping_time_str):
+        """
+        封装时间解析功能，确保代码结构清晰。
+        """
+        try:
+            # 根据实际时间格式调整解析
+            return datetime.strptime(ping_time_str, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            self.usego.sendlog(f'无效的时间格式: {ping_time_str}')
+            return None
 
 

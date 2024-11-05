@@ -24,22 +24,29 @@ from middleware.deviceManage.adsDevice import adsDevice
 import middleware.public.configurationCall as configCall
 from middleware.public.commonUse import otherUse
 from middleware.dataBaseGO.mongo_sqlCollenction import mongo_sqlGO
+from middleware.dataBaseGO.basis_sqlCollenction import basis_sqlGO
 
 class telegraSelenium:
     def __init__(self):
         self.usego = otherUse()
         self.ads = adsDevice()
         self.mossql = mongo_sqlGO()
+        self.ssql = basis_sqlGO()
 
 
-    def main(self, genre, platform, stacking_min, stacking_max, alt_text, sort, isarts,  postingStyle, group, start, end):
+    def main(self,pcname, genre, platform, stacking_min, stacking_max, alt_text, sort, isarts,  postingStyle, group, start, end):
 
         """
             @Datetime ： 2024/10/26 00:09
             @Author ：eblis
             @Motto：genre 类型，platform：平台 isarts：是否贴文 postingStyle：A标签形式
         """
-        self.usego.sendlog(f"接收到的参数：genre{genre}, platform{platform}, stacking_min{stacking_min}, stacking_max{stacking_max},alt_text {alt_text},sort {sort}, postingStyle{postingStyle}, isarts{isarts}")
+        self.usego.sendlog(f"接收到的参数：pcname:{pcname},genre:{genre}, platform:{platform}, stacking_min:{stacking_min}, stacking_max:{stacking_max},alt_text:{alt_text},sort:{sort}, postingStyle:{postingStyle}, isarts:{isarts}")
+
+        # 将 执行pc 状态 修改
+        sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=1)
+        self.usego.sendlog(f"pc执行结果{sql_data}")
+
 
         adsUserlist = self.siphon_adsuser(eval(configCall.stacking_ads), eval(configCall.min_concurrent_user))
 
@@ -60,9 +67,10 @@ class telegraSelenium:
                 self.usego.sendlog(f"拆分为：{len(alll_links_list)} 组")
 
                 all_res = self.run(isarts, postingStyle, platform, genre, adsUserlist, alll_links_list,  alt_text)
+                sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
 
                 return all_res
-
+        sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
         return None
     
 
@@ -79,7 +87,7 @@ class telegraSelenium:
                 thisnoneads = adsUserlist[mm]
                 self.usego.sendlog(f"这组ads选手分别是{thisnoneads}")
                 this_go = min(len(thisnoneads), len(alll_links_list))
-                self.usego.sendlog(f"需要建立{this_go} 个 线程,接收到的 isarts 是{type(isarts)},{isarts}")
+                self.usego.sendlog(f"需要建立{this_go} 个线程")
                 for i in range(this_go):
                     if int(isarts) == 0:
                         arts = self.read_file()
@@ -87,8 +95,8 @@ class telegraSelenium:
                         arts = None
                     user = thisnoneads[i]
                     link = alll_links_list[i]
-                    self.usego.sendlog(f"这组 使用的是{user},发布的是{link} 链接")
-                    t = threading.Thread(target=self.post_to_telegraph_wrapper,
+                    self.usego.sendlog(f"{i}组使用的是 {user} 发布：{len({link})}, {link} 这些链接")
+                    t = threading.Thread(target=self.post_to_wrapper,
                                          args=(arts, postingStyle, user, this_res_list, link, alll_links_list, bad_run_list, alt_text))
 
                     threads.append(t)
@@ -101,11 +109,13 @@ class telegraSelenium:
                 self.usego.sendlog(f"这波Thread 执行完了：{this_res_list}")
 
                 self.save_res(this_res_list)
+
                 if this_res_list != []:
+
                     self.usego.sendlog(f"将数据同步存放数据库")
                     self.usego.sendlog(f"{self.save_datebase(this_res_list, genre, platform)}")
 
-                self.usego.sendlog(f"总剩余：{len(alll_links_list)}")
+                self.usego.sendlog(f"剩余：{len(alll_links_list)}，失败的：{len(bad_run_list)}")
 
                 alll_links_list.extend(bad_run_list)
                 bad_run_list.clear()
@@ -165,17 +175,18 @@ class telegraSelenium:
         self.usego.sendlog(f"删除结果：{sql_data}")
 
 
-    def post_to_telegraph_wrapper(self, arts, postingStyle, user, result_list, link, all_list, bad_run_list, alt_text):
+    def post_to_wrapper(self, arts, postingStyle, user, this_res_list, link, alll_links_list, bad_run_list, alt_text):
         with threading.Lock():
+
             result = self.post_to_telegra_ph(postingStyle, user, link, alt_text, arts)
             if result:
-                result_list.append(result)
-                all_list.remove(link)
-                self.usego.sendlog(f"剩余：{len(all_list)}")
-
+                this_res_list.append(result)
+                alll_links_list.remove(link)
+                self.usego.sendlog(f"剩余：{len(alll_links_list)} 组需要执行")
                 self.del_run_links(link)
 
             else:
+                self.usego.sendlog(f"执行失败了，{link} 这些需要回炉再造")
                 bad_run_list.append(link)
                 
                 
@@ -201,89 +212,140 @@ class telegraSelenium:
 
         return this_run_list
 
-    def post_to_telegra_ph(self, postingStyle, adsUser, this_links, alt_text, arts):
+    def post_to_telegram(self, postingStyle, adsUser, this_links, alt_text, arts):
+        # 生成标题
         this_title = f"""{configCall.stacking_text}-{self.usego.redome_string("小写字母", 10, 20)}"""
         driver = None
+
         self.usego.sendlog(f"接收到的postingStyle: {type(postingStyle)},{postingStyle}")
+
         try:
+            # 初始化浏览器驱动
             driver = self.ads.basicEncapsulation(adsUser, configCall.adsServer)
-            driver.get("https://telegra.ph/")
-            wait = WebDriverWait(driver, 5)
 
-            title_input = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_tl_editor"]/div[1]/h1')))
-            driver.execute_script("arguments[0].textContent = arguments[1];", title_input, this_title)
+            try:
+                driver.get("https://telegra.ph/")
+            except Exception as e:
+                self.usego.sendlog(f"driver.get 出现异常: {e}")
+                return None
 
-            content_input = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_tl_editor"]/div[1]/p')))
-            driver.execute_script("arguments[0].textContent = '';", content_input)
-            if arts is not None or arts != "None":
-                # 先添加心灵鸡汤短文
-                driver.execute_script("""
-                    var p = document.createElement('p');
-                    p.textContent = arguments[0];
-                    arguments[1].appendChild(p);
-                """, arts, content_input)
+            # 等待页面元素加载
+            wait = WebDriverWait(driver, 10)
 
+            try:
+                # 设置标题
+                title_input = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_tl_editor"]/div[1]/h1')))
+                driver.execute_script("arguments[0].textContent = arguments[1];", title_input, this_title)
+            except Exception as e:
+                self.usego.sendlog(f"标题设置失败: {e}")
+                return None
+
+            try:
+                # 设置内容输入框为空
+                content_input = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_tl_editor"]/div[1]/p')))
+                driver.execute_script("arguments[0].textContent = '';", content_input)
+            except Exception as e:
+                self.usego.sendlog(f"内容输入框设置失败: {e}")
+                return None
+
+            # 如果有文章内容，则添加
+            if arts:
+                try:
+                    driver.execute_script("""
+                        var p = document.createElement('p');
+                        p.textContent = arguments[0];
+                        arguments[1].appendChild(p);
+                    """, arts, content_input)
+                except Exception as e:
+                    self.usego.sendlog(f"添加文章内容失败: {e}")
+                    return None
+
+            # 根据 postingStyle 执行不同的链接处理
             if int(postingStyle) == 0:
-                # all_atab = ""
-                for link in this_links:
-                    # self.usego.sendlog(f"这条连接是：{link}")
-                    link = link.strip('\n')
-
-                    driver.execute_script("""
-                            var a = document.createElement('a');
-                            a.href = arguments[0];
-                            a.textContent = arguments[1];
-                            a.target = '_blank';
-                            arguments[2].appendChild(a);
-                            arguments[2].appendChild(document.createTextNode('\u00A0'));
-                        """, link, alt_text, content_input)
-
+                self.add_links_as_text(this_links, alt_text, content_input, driver)
             elif int(postingStyle) == 1:
-                for link in this_links:
-                    link = link.strip('\n')
-                    driver.execute_script("""
-                                    var p = document.createElement('p');
-                                    var a = document.createElement('a');
-                                    a.href = arguments[0];
-                                    a.textContent = arguments[0];
-                                    p.appendChild(a);
-                                    arguments[1].appendChild(p);
-                                """, link, content_input)
-
+                self.add_links_as_paragraph(this_links, content_input, driver)
             else:
-                for index, link in enumerate(this_links):
-                    link = link.strip('\n')
-                    if index < len(this_links):
-                        driver.execute_script("""
-                            var p = document.createElement('p');
-                            p.textContent = arguments[0];
-                            p.setAttribute('dir', 'auto');
-                            arguments[1].appendChild(p);
-                        """, link, content_input)
-                    else:
-                        driver.execute_script("""
-                            var p = document.createElement('p');
-                            var a = document.createElement('a');
-                            a.href = arguments[0];
-                            a.target = '_blank';
-                            a.textContent = arguments[0];
-                            p.setAttribute('dir', 'auto');
-                            p.appendChild(a);
-                            arguments[1].appendChild(p);
-                        """, link, content_input)
+                self.add_links_in_mixed_style(this_links, content_input, driver)
 
-            publish_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_publish_button"]')))
-            driver.execute_script("arguments[0].click();", publish_button)
+            # 发布文章
+            try:
+                publish_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_publish_button"]')))
+                driver.execute_script("arguments[0].click();", publish_button)
+            except Exception as e:
+                self.usego.sendlog(f"点击发布按钮失败: {e}")
+                return None
 
+            # 随机等待一段时间
             time.sleep(self.usego.randomRandint(5, 10))
             return driver.current_url
 
         except Exception as e:
-            self.usego.sendlog(f"页面获取失败: {e}")
+            self.usego.sendlog(f"页面操作失败: {e}")
             return None
+
         finally:
+            # 结束后停止广告服务
             if driver:
                 self.ads.adsAPI(configCall.adsServer, "stop", adsUser)
+
+    def add_links_as_text(self, this_links, alt_text, content_input, driver):
+        for link in this_links:
+            link = link.strip('\n')
+            try:
+                driver.execute_script("""
+                    var a = document.createElement('a');
+                    a.href = arguments[0];
+                    a.textContent = arguments[1];
+                    a.target = '_blank';
+                    arguments[2].appendChild(a);
+                    arguments[2].appendChild(document.createTextNode('\u00A0'));
+                """, link, alt_text, content_input)
+            except Exception as e:
+                self.usego.sendlog(f"添加链接失败: {e}")
+                continue
+
+    def add_links_as_paragraph(self, this_links, content_input, driver):
+        for link in this_links:
+            link = link.strip('\n')
+            try:
+                driver.execute_script("""
+                    var p = document.createElement('p');
+                    var a = document.createElement('a');
+                    a.href = arguments[0];
+                    a.textContent = arguments[0];
+                    p.appendChild(a);
+                    arguments[1].appendChild(p);
+                """, link, content_input)
+            except Exception as e:
+                self.usego.sendlog(f"添加链接作为段落失败: {e}")
+                continue
+
+    def add_links_in_mixed_style(self, this_links, content_input, driver):
+        for index, link in enumerate(this_links):
+            link = link.strip('\n')
+            try:
+                if index < len(this_links) - 1:
+                    driver.execute_script("""
+                        var p = document.createElement('p');
+                        p.textContent = arguments[0];
+                        p.setAttribute('dir', 'auto');
+                        arguments[1].appendChild(p);
+                    """, link, content_input)
+                else:
+                    driver.execute_script("""
+                        var p = document.createElement('p');
+                        var a = document.createElement('a');
+                        a.href = arguments[0];
+                        a.target = '_blank';
+                        a.textContent = arguments[0];
+                        p.setAttribute('dir', 'auto');
+                        p.appendChild(a);
+                        arguments[1].appendChild(p);
+                    """, link, content_input)
+            except Exception as e:
+                self.usego.sendlog(f"添加混合风格的链接失败: {e}")
+                continue
 
     def save_res(self, urls):
         self.usego.sendlog(f"本次需要保存的数据有{len(urls)},{urls}")
