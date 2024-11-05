@@ -207,6 +207,7 @@ class splicingManage():
                 self.usego.sendlog(f' run_{platform}_selenium，任务发送结果:{response}')
             else:
                 self.usego.sendlog(f'{client["name"]},设备下线了')
+                continue
 
         res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
         return res.to_json()

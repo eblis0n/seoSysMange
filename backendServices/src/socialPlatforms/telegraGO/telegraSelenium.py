@@ -70,6 +70,7 @@ class telegraSelenium:
                 sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
 
                 return all_res
+
         sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
         return None
     
