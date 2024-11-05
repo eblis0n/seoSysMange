@@ -178,7 +178,7 @@ class splicingManage():
                 result = {}
                 response = self.aws_sqs.initialization(f'client_{client["name"]}')
                 queue_url = response['QueueUrl']
-                self.usego.sendlog(f'{idx}，client_{client["name"]}，队列地址{queue_url}')
+                self.usego.sendlog(f'{idx}，client_{client["name"]}，{client["state"]}，队列地址{queue_url}')
                 if idx == 0:
                     start = 0
                     end = 200000
