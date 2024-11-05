@@ -129,7 +129,12 @@ class splicingManage():
         postingStyle = data_request['postingStyle']
         group = data_request['group']
         sort = data_request['sort']
-        isarts = data_request['isarts']
+        try:
+            isarts = data_request['isarts']
+
+        except:
+            isarts = "1"
+
 
         sql_data = self.ssql.pcSettings_select_sql(platform=platform, state=0)
 
