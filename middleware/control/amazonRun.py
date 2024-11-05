@@ -79,13 +79,6 @@ class amazonRun:
 
             except Exception as e:
                 self.usego.sendlog(f"处理消息时出错: {e}")
-            finally:
-                try:
-                    # 确保删除消息，防止 FIFO 队列重复问题
-                    self.aws_sqs.delFIFO(queue_url)
-                    self.usego.sendlog(f"成功删除队列: {queue_url}")
-                except Exception as e:
-                    self.usego.sendlog(f"删除队列时出错: {e}")
 
 if __name__ == '__main__':
     ama = amazonRun()
