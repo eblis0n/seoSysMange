@@ -11,6 +11,7 @@ commands:
       - stacking_max
       - alt_text
       - sort
+      - isarts
       - postingStyle
       - group
       - start
@@ -26,6 +27,7 @@ commands:
       - stacking_max
       - alt_text
       - sort
+      - isarts
       - postingStyle
       - group
       - start

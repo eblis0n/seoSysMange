@@ -120,6 +120,7 @@ stacking_max = conf.get("splicing", "stacking_max")
 max_limit = conf.get("splicing", "max_limit")
 telegra_result = conf.get("splicing", "telegra_result")
 blogger_result = conf.get("splicing", "blogger_result")
+splicing_articie_path = conf.get("splicing", "splicing_articie_path")
 
 ###################################### ahrefs ######################################
 

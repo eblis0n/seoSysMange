@@ -129,6 +129,7 @@ class splicingManage():
         postingStyle = data_request['postingStyle']
         group = data_request['group']
         sort = data_request['sort']
+        isarts = data_request['isarts']
 
         sql_data = self.ssql.pcSettings_select_sql(platform=platform, state=0)
 
@@ -182,6 +183,7 @@ class splicingManage():
                 'stacking_max': stacking_max,
                 'alt_text': alt_text,
                 'sort': sort,
+                'isarts': isarts,
                 'postingStyle': postingStyle,
                 'group': group,
                 'start': start,

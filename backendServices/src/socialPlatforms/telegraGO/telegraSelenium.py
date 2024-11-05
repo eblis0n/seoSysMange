@@ -32,7 +32,7 @@ class telegraSelenium:
         self.mossql = mongo_sqlGO()
 
 
-    def main(self, genre, platform, stacking_min, stacking_max, alt_text, sort, postingStyle, group, start, end):
+    def main(self, genre, platform, stacking_min, stacking_max, alt_text, sort, postingStyle, isarts, group, start, end):
         """
             @Datetime ： 2024/10/26 00:09
             @Author ：eblis
@@ -42,7 +42,7 @@ class telegraSelenium:
         adsUserlist = self.siphon_adsuser(eval(configCall.stacking_ads), eval(configCall.min_concurrent_user))
 
         query = {
-            "genre":str(genre),
+            "genre": str(genre),
             "platform": str(platform),
             "sort": str(sort),
         }
@@ -57,14 +57,14 @@ class telegraSelenium:
 
                 self.usego.sendlog(f"拆分为：{len(alll_links_list)} 组")
 
-                all_res = self.run(postingStyle, platform, genre, adsUserlist, alll_links_list,  alt_text)
+                all_res = self.run(isarts, postingStyle, platform, genre, adsUserlist, alll_links_list,  alt_text)
 
                 return all_res
 
         return None
     
 
-    def run (self, postingStyle, platform, genre, adsUserlist, alll_links_list, alt_text):
+    def run (self, isarts, postingStyle, platform, genre, adsUserlist, alll_links_list, alt_text):
         all_res = []
         mun = 0
         mm = 0
@@ -79,11 +79,15 @@ class telegraSelenium:
                 this_go = min(len(thisnoneads), len(alll_links_list))
                 self.usego.sendlog(f"需要建立{this_go} 个 线程")
                 for i in range(this_go):
+                    if int(isarts) == 0:
+                        arts = self.read_file()
+                    else:
+                        arts = None
                     user = thisnoneads[i]
                     link = alll_links_list[i]
                     self.usego.sendlog(f"这组 使用的是{user},发布的是{link} 链接")
                     t = threading.Thread(target=self.post_to_telegraph_wrapper,
-                                         args=(postingStyle, user, this_res_list, link, alll_links_list, bad_run_list, alt_text))
+                                         args=(arts, postingStyle, user, this_res_list, link, alll_links_list, bad_run_list, alt_text))
 
                     threads.append(t)
                     t.start()
@@ -115,6 +119,37 @@ class telegraSelenium:
                 self.usego.sendlog(f"初始化一下数据，跑空")
                 mm = 0
 
+    def read_file(self):
+        """
+            @Datetime ： 2024/11/5 02:55
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        # 存储已经读取过的文件名，避免重复读取
+        read = []
+        all_files = os.listdir(configCall.splicing_articie_path)
+
+        # 去除已读取过的文件名
+        unread_files = [f for f in all_files if f not in read]
+
+        if not unread_files:
+            print("所有文件已读取完毕,那就重新来")
+            read.clear()
+            filename = self.usego.randomChoice(all_files)
+        else:
+            filename = self.usego.randomChoice(unread_files)
+
+
+        file_path = f"{configCall.splicing_articie_path}/{filename}"
+
+        # 读取文件内容并记录文件名
+        with open(file_path, 'r', encoding='utf-8') as f:
+            arts = f.read()
+            read.append(filename)  # 将文件名添加到已读列表中
+
+        return arts
+
+
 
     def del_run_links(self, links):
         """
@@ -128,9 +163,9 @@ class telegraSelenium:
         self.usego.sendlog(f"删除结果：{sql_data}")
 
 
-    def post_to_telegraph_wrapper(self, postingStyle, user, result_list, link, all_list, bad_run_list, alt_text):
+    def post_to_telegraph_wrapper(self, arts, postingStyle, user, result_list, link, all_list, bad_run_list, alt_text):
         with threading.Lock():
-            result = self.post_to_telegra_ph(postingStyle, user, link, alt_text)
+            result = self.post_to_telegra_ph(postingStyle, user, link, alt_text, arts)
             if result:
                 result_list.append(result)
                 all_list.remove(link)
@@ -164,8 +199,8 @@ class telegraSelenium:
 
         return this_run_list
 
-    def post_to_telegra_ph(self, postingStyle, adsUser, this_links, alt_text):
-        this_title = f""""{configCall.stacking_text}-{self.usego.redome_string("小写字母", 10, 20)}"""
+    def post_to_telegra_ph(self, postingStyle, adsUser, this_links, alt_text, arts):
+        this_title = f"""{configCall.stacking_text}-{self.usego.redome_string("小写字母", 10, 20)}"""
         driver = None
         try:
             driver = self.ads.basicEncapsulation(adsUser, configCall.adsServer)
@@ -177,11 +212,20 @@ class telegraSelenium:
 
             content_input = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_tl_editor"]/div[1]/p')))
             driver.execute_script("arguments[0].textContent = '';", content_input)
+            if arts is not None:
+                # 先添加心灵鸡汤短文
+                driver.execute_script("""
+                    var p = document.createElement('p');
+                    p.textContent = arguments[0];
+                    arguments[1].appendChild(p);
+                """, arts, content_input)
+
             if int(postingStyle) == 0:
                 # all_atab = ""
                 for link in this_links:
                     # self.usego.sendlog(f"这条连接是：{link}")
                     link = link.strip('\n')
+
                     driver.execute_script("""
                             var a = document.createElement('a');
                             a.href = arguments[0];

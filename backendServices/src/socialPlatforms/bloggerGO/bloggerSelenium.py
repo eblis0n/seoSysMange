@@ -35,7 +35,7 @@ class bloggerSelenium:
         self.mossql = mongo_sqlGO()
         self.ssql = basis_sqlGO()
 
-    def main(self, genre, platform, stacking_min, stacking_max, alt_text, sort, postingStyle, group, start, end):
+    def main(self, genre, platform, stacking_min, stacking_max, alt_text, sort, postingStyle, isarts,group, start, end):
         """
             @Datetime ： 2024/10/26 00:09
             @Author ：eblis
@@ -60,14 +60,14 @@ class bloggerSelenium:
 
                     self.usego.sendlog(f"拆分为：{len(alll_links_list)} 组")
 
-                    all_res = self.run(postingStyle,platform, genre, adsUserlist, alll_links_list, alt_text)
+                    all_res = self.run(isarts, postingStyle, platform, genre, adsUserlist, alll_links_list, alt_text)
 
                     return all_res
 
         return None
 
 
-    def run (self, postingStyle, platform, genre, adsUserlist, alll_links_list, alt_text):
+    def run (self, isarts, postingStyle, platform, genre, adsUserlist, alll_links_list, alt_text):
         """
             @Datetime ： 2024/11/2 12:56
             @Author ：eblis
@@ -88,11 +88,15 @@ class bloggerSelenium:
                 this_go = min(len(this_group_ads), len(alll_links_list))
                 self.usego.sendlog(f"需要建立{this_go} 个 线程")
                 for i in range(this_go):
+                    if int(isarts) == 0:
+                        arts = self.read_file()
+                    else:
+                        arts = None
                     user = self.usego.changeDict(this_group_ads[i])
                     link = alll_links_list[i]
                     self.usego.sendlog(f"这组 使用的是{user},发布的是{link} 链接")
 
-                    t = threading.Thread(target=self.post_wrapper, args=(postingStyle, this_res_list, link, alll_links_list, bad_run_list, user["bloggerID"], user["adsID"],  alt_text))
+                    t = threading.Thread(target=self.post_wrapper, args=(arts, postingStyle, this_res_list, link, alll_links_list, bad_run_list, user["bloggerID"], user["adsID"],  alt_text))
 
                     threads.append(t)
                     t.start()
@@ -128,14 +132,14 @@ class bloggerSelenium:
                 self.usego.sendlog(f"{adsUserlist} 都跑过了")
                 runTure = False
     
-    def post_wrapper(self, postingStyle, result_list, this_links, all_list, bad_run_list, bloggerID, adsUser,  alt_text):
+    def post_wrapper(self, arts, postingStyle, result_list, this_links, all_list, bad_run_list, bloggerID, adsUser,  alt_text):
         """
             @Datetime ： 2024/11/2 13:26
             @Author ：eblis
             @Motto：简单描述用途
         """
         with threading.Lock():
-            result = self.post_to_blogger(postingStyle, bloggerID, adsUser, this_links, alt_text)
+            result = self.post_to_blogger(arts, postingStyle, bloggerID, adsUser, this_links, alt_text)
             if result:
                 if "git.html" not in result:
                     result_list.append(result)
@@ -150,9 +154,9 @@ class bloggerSelenium:
     
                 
 
-    def post_to_blogger(self, postingStyle, bloggerID, adsUser, this_links, alt_text):
+    def post_to_blogger(self,arts, postingStyle, bloggerID, adsUser, this_links, alt_text):
         # this_title = self.usego.redome_string("小写字母", 10, 20)
-        all_atab = self.get_links(postingStyle, this_links, alt_text)
+        all_atab = self.get_links(arts, postingStyle, this_links, alt_text)
         driver = self.ads.basicEncapsulation(adsUser, configCall.adsServer)
         driver.get(f"https://www.blogger.com/blog/posts/{bloggerID}")
         # wait = WebDriverWait(driver, 5)
@@ -226,13 +230,46 @@ class bloggerSelenium:
         self.ads.adsAPI(configCall.adsServer, "stop", adsUser)
         return atag
 
-    def get_links(self, postingStyle, this_links, alt_text):
+    def read_file(self):
+        """
+            @Datetime ： 2024/11/5 02:55
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        # 存储已经读取过的文件名，避免重复读取
+        read = []
+        all_files = os.listdir(configCall.splicing_articie_path)
+
+        # 去除已读取过的文件名
+        unread_files = [f for f in all_files if f not in read]
+
+        if not unread_files:
+            print("所有文件已读取完毕,那就重新来")
+            read.clear()
+            filename = self.usego.randomChoice(all_files)
+        else:
+            filename = self.usego.randomChoice(unread_files)
+
+        file_path = f"{configCall.splicing_articie_path}/{filename}"
+
+        # 读取文件内容并记录文件名
+        with open(file_path, 'r', encoding='utf-8') as f:
+            arts = f.read()
+            read.append(filename)  # 将文件名添加到已读列表中
+
+        return arts
+
+    def get_links(self, arts, postingStyle, this_links, alt_text):
         """
             @Datetime ： 2024/10/30 16:56
             @Author ：eblis
             @Motto：简单描述用途
         """
         all_atab = ''
+        if arts is not None:
+            this_atab = f"""<p>{arts}</p>&nbsp;"""
+            all_atab += this_atab
+
         if int(postingStyle) == 0:
             for link in this_links:
                 # self.usego.sendlog(f"这条连接是：{link}")
