@@ -64,10 +64,13 @@ class amazonRun:
                         result = self.execute_command(command, new_message)
                         self.usego.sendlog(f"命令执行结果: {result}")
 
-                        # 只在当前队列中的消息处理完毕后才删除队列
+                        # 检查队列是否还有待处理消息，立即删除队列
                         if not self.aws_sqs.has_more_messages(queue_url):
                             self.usego.sendlog(f"所有消息已处理，删除队列 {queue_url}")
                             self.aws_sqs.delFIFO(queue_url)
+                        else:
+                            self.usego.sendlog(f"队列 {queue_url} 仍然有未处理消息，继续等待...")
+
                     else:
                         self.usego.sendlog(f"未找到匹配的命令: {message.get('command')}")
                         raise ValueError(f"未知的命令: {message.get('command')}")
