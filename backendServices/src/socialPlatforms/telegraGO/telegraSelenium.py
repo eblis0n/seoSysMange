@@ -34,7 +34,7 @@ class telegraSelenium:
         self.ssql = basis_sqlGO()
 
 
-    def main(self,pcname, genre, platform, stacking_min, stacking_max, alt_text, sort, isarts,  postingStyle, group, start, end):
+    def main(self,pcname, genre, platform, stacking_min, stacking_max, title_alt, alt_text, sort, isarts,  postingStyle, group, start, end):
 
         """
             @Datetime ： 2024/10/26 00:09
@@ -66,7 +66,7 @@ class telegraSelenium:
 
                 self.usego.sendlog(f"拆分为：{len(alll_links_list)} 组")
 
-                all_res = self.run(isarts, postingStyle, platform, genre, adsUserlist, alll_links_list,  alt_text)
+                all_res = self.run(isarts, postingStyle, platform, genre, adsUserlist, alll_links_list, title_alt, alt_text)
                 sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
 
                 return all_res
@@ -75,7 +75,7 @@ class telegraSelenium:
         return None
     
 
-    def run (self, isarts, postingStyle, platform, genre, adsUserlist, alll_links_list, alt_text):
+    def run (self, isarts, postingStyle, platform, genre, adsUserlist, alll_links_list, title_alt, alt_text):
         all_res = []
         mun = 0
         mm = 0
@@ -99,7 +99,7 @@ class telegraSelenium:
                     link = alll_links_list[i]
                     self.usego.sendlog(f"{i}组使用的是 {user} 发布：{len(link)}, {link} 这些链接")
                     t = threading.Thread(target=self.post_to_wrapper,
-                                         args=(arts, postingStyle, user, this_res_list, link, bad_run_list, is_run_list, alt_text))
+                                         args=(arts, postingStyle, user, this_res_list, link, bad_run_list, is_run_list, title_alt, alt_text))
 
                     threads.append(t)
                     t.start()
@@ -189,9 +189,9 @@ class telegraSelenium:
         self.usego.sendlog(f"删除结果：{sql_data}")
 
 
-    def post_to_wrapper(self, arts, postingStyle, user, this_res_list, link, bad_run_list, is_run_list, alt_text):
+    def post_to_wrapper(self, arts, postingStyle, user, this_res_list, link, bad_run_list, is_run_list, title_alt, alt_text):
         with threading.Lock():
-            result = self.post_to_telegra(postingStyle, user, link, alt_text, arts)
+            result = self.post_to_telegra(postingStyle, user, link, title_alt, alt_text, arts)
             if result:
                 this_res_list.append(result)
                 is_run_list.append(link)
@@ -226,9 +226,9 @@ class telegraSelenium:
 
         return this_run_list
 
-    def post_to_telegra(self, postingStyle, adsUser, this_links, alt_text, arts):
+    def post_to_telegra(self, postingStyle, adsUser, this_links, title_alt, alt_text, arts):
         # 生成标题
-        this_title = f"""{configCall.stacking_text}-{self.usego.redome_string("小写字母", 10, 20)}"""
+        this_title = f"""{title_alt}-{self.usego.redome_string("小写字母", 10, 20)}"""
         driver = None
 
         self.usego.sendlog(f"接收到的postingStyle: {type(postingStyle)},{postingStyle}")

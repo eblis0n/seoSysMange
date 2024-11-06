@@ -121,6 +121,7 @@ class splicingManage():
 
     def splicing_submit_push(self):
         data_request = request.json
+        title_alt = data_request['title_alt']
         alt_text = data_request['alt_text']
         stacking_min = data_request['stacking_min']
         stacking_max = data_request['stacking_max']
@@ -192,6 +193,7 @@ class splicingManage():
                     'platform': platform,
                     'stacking_min': stacking_min,
                     'stacking_max': stacking_max,
+                    'title_alt': title_alt,
                     'alt_text': alt_text,
                     'sort': sort,
                     'isarts': isarts,

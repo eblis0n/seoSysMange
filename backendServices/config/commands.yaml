@@ -10,6 +10,7 @@ commands:
       - platform
       - stacking_min
       - stacking_max
+      - title_alt
       - alt_text
       - sort
       - isarts
@@ -27,6 +28,7 @@ commands:
       - platform
       - stacking_min
       - stacking_max
+      - title_alt
       - alt_text
       - sort
       - isarts
