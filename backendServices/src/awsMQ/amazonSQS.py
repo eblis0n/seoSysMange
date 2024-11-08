@@ -25,12 +25,12 @@ class AmazonSQS:
         :param queue_name_prefix: 可选，队列名称前缀，用于筛选
         :return: 队列 URL 列表
         """
-        sqs = self._get_sqs_client()  # 获取新的 SQS 客户端
+        aws_sqs = self._get_sqs_client()  # 获取新的 SQS 客户端
         try:
             if queue_name_prefix:
-                response = sqs.list_queues(QueueNamePrefix=queue_name_prefix)
+                response = aws_sqs.list_queues(QueueNamePrefix=queue_name_prefix)
             else:
-                response = sqs.list_queues()
+                response = aws_sqs.list_queues()
 
             return response
 
@@ -40,7 +40,7 @@ class AmazonSQS:
 
     def initialization(self, taskid):
         queue_name = f'SQS-{taskid}.fifo'
-        sqs = self._get_sqs_client()  # 获取新的 SQS 客户端
+        aws_sqs = self._get_sqs_client()  # 获取新的 SQS 客户端
         policy_document = json.loads(configCall.aws_policy_document)  # 使用 json.loads
         policy_string = json.dumps(policy_document)
 
@@ -62,7 +62,7 @@ class AmazonSQS:
         retries = 3  # 设置重试次数
         for attempt in range(retries):
             try:
-                response = sqs.create_queue(
+                response = aws_sqs.create_queue(
                     QueueName=queue_name,
                     Attributes={
                         'FifoQueue': 'true',
@@ -88,12 +88,12 @@ class AmazonSQS:
                     raise
 
     def sendMSG(self, queue_url, msg_group, scriptname, task_data, retries=3, delay=5):
-        sqs = self._get_sqs_client()
+        aws_sqs = self._get_sqs_client()
         message_body = {"command": f"{scriptname}", "script": task_data}
 
         for attempt in range(retries):
             try:
-                response = sqs.send_message(
+                response = aws_sqs.send_message(
                     QueueUrl=queue_url,
                     MessageBody=json.dumps(message_body),
                     MessageGroupId=msg_group
@@ -106,11 +106,13 @@ class AmazonSQS:
                     raise  # 如果重试次数用尽，则抛出异常
 
     def takeMSG(self, queue_url):
+
         """
         接收消息并返回消息内容和接收句柄
         """
+        aws_sqs = self._get_sqs_client()
         try:
-            response = self.sqs.receive_message(
+            response = aws_sqs.receive_message(
                 QueueUrl=queue_url,
                 MaxNumberOfMessages=1,
                 WaitTimeSeconds=20
@@ -127,12 +129,13 @@ class AmazonSQS:
             print(f"接收消息时出错: {e}")
             return None
 
-    def deleteMSG(self, queue_url, receipt_handle):
+    def deleteMSG(self, queue_url, receipt_handle=None):
         """
         删除指定的消息
         """
+        aws_sqs = self._get_sqs_client()
         try:
-            self.sqs.delete_message(
+            aws_sqs.delete_message(
                 QueueUrl=queue_url,
                 ReceiptHandle=receipt_handle
             )

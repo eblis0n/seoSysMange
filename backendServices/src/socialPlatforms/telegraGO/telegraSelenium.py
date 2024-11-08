@@ -35,7 +35,7 @@ class telegraSelenium:
         self.ssql = basis_sqlGO()
 
 
-    def main(self, pcname, genre, platform, stacking_min, stacking_max, title_alt, alt_text, sort, isarts,  postingStyle, group, start, end):
+    def main(self, pcname, queue_url, genre, platform, stacking_min, stacking_max, title_alt, alt_text, sort, isarts,  postingStyle, group, start, end):
 
         """
             @Datetime ： 2024/10/26 00:09
