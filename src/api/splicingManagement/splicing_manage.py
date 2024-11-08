@@ -189,7 +189,7 @@ class splicingManage():
                     end = 200000 * (idx + 1)
                 task_data = {
                     'pcname': client["name"],
-                    'queue_url':queue_url,
+                    'queue_url': queue_url,
                     'genre': genre,
                     'platform': platform,
                     'stacking_min': stacking_min,
