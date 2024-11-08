@@ -27,7 +27,7 @@ from cachetools import TTLCache
 import bcrypt
 import jwt
 import middleware.public.configurationCall as configCall
-
+import logging
 
 class verifyGO():
 
@@ -81,6 +81,14 @@ class customCache():
 
 
 class otherUse():
+    def __init__(self):
+        # 初始化基础日志记录器
+        self.logger = logging.getLogger(__name__)
+        self.app = None
+
+    def init_app(self, app):
+        """初始化与Flask应用的连接"""
+        self.app = app
 
 
     def build_tree(self, menu_items):
@@ -200,14 +208,19 @@ class otherUse():
 
     def sendlog(self, contents):
         """
-            @Datetime ： 2024/5/7 15:23
-            @Author ：eblis
-            @Motto：1、避免出现"This typically means that you attempted to use functionality that needed
-the current application" 统一封装;   2、 contents 传参格式统一： f"xxx{}xx,xxxx"
+        统一的日志记录方法，确保在应用上下文中运行
         """
         try:
-            current_app.logger.info(contents)
-        except:
+            if self.app:
+                # 使用应用上下文
+                with self.app.app_context():
+                    self.app.logger.info(contents)
+            else:
+                # 如果没有应用实例，使用基础日志记录器
+                self.logger.info(contents)
+        except Exception as e:
+            # 确保至少能打印到控制台
+            print(f"日志记录错误: {e}")
             print(contents)
 
     def make_folder(self, path, name=None):
