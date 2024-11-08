@@ -8,6 +8,7 @@
 """
 import os
 import sys
+import time
 
 from bson import ObjectId
 
@@ -35,10 +36,12 @@ class operationsManage():
 
 
         self.bp.route(self.Myenum.HOSTS_LIST, methods=['GET'])(self.hosts_list)
-        self.bp.route(self.Myenum.TASKS_LIST, methods=['GET'])(self.tasks_list)
         self.bp.route(self.Myenum.HOSTS_DISABLE, methods=['POST'])(self.hosts_disable)
         self.bp.route(self.Myenum.HOSTS_UPDATE, methods=['POST'])(self.hosts_update)
+
+        self.bp.route(self.Myenum.TASKS_LIST, methods=['GET'])(self.tasks_list)
         self.bp.route(self.Myenum.TASK_IMPLEMENT_LOGS, methods=['POST'])(self.task_implement_logs)
+        self.bp.route(self.Myenum.TASKS_INSERT, methods=['POST'])(self.tasks_insert)
 
     # def hosts_list(self):
     #     """
@@ -145,7 +148,35 @@ class operationsManage():
 
         return res.to_json()
 
-    ################################################################################################################
+    ##################################################### tasks ###########################################################
+
+    def tasks_insert(self):
+        """
+            @Datetime ： 2024/11/8 14:18
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        data_request = request.json
+        query = {
+            "task_id": self.generate_task_id(),
+            "host_ip": data_request["host_ip"],
+            "script_name": data_request["script_name"],
+            "script_content": data_request["script_content"],
+            "task_type": data_request["task_type"]
+        }
+        sql_data = self.mossql.operations_tasks_insert("seo_operations_tasks", query)
+
+        if sql_data is not None:
+            self.usego.sendlog(f'添加成功：{sql_data}')
+            res = ResMsg(data=sql_data)
+
+
+        else:
+            self.usego.sendlog(f'添加失败：{sql_data}')
+            res = ResMsg(code='B0001', msg=f'添加失败：{sql_data}')
+
+        return res.to_json()
+
 
     def tasks_list(self):
         """
@@ -233,7 +264,15 @@ class operationsManage():
             responseData = res.to_json()
 
         return responseData
+
 ################################################################# 非接口 #########################################
+
+    def generate_task_id(self):
+        """生成基于时间戳的任务ID"""
+        timestamp = int(time.time() * 1000)  # 毫秒级时间戳
+        random_suffix = self.usego.randomRandint(100, 999)  # 3位随机数
+        return f"{timestamp}{random_suffix}"
+
     def parse_ping_time(self, ping_time_str):
         """
         封装时间解析功能，确保代码结构清晰。

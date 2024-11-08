@@ -105,32 +105,41 @@ class AmazonSQS:
                 if attempt == retries - 1:
                     raise  # 如果重试次数用尽，则抛出异常
 
+    def takeMSG(self, queue_url):
+        """
+        接收消息并返回消息内容和接收句柄
+        """
+        try:
+            response = self.sqs.receive_message(
+                QueueUrl=queue_url,
+                MaxNumberOfMessages=1,
+                WaitTimeSeconds=20
+            )
+            
+            if 'Messages' in response:
+                message = response['Messages'][0]
+                return {
+                    'message': json.loads(message['Body']),
+                    'receipt_handle': message['ReceiptHandle']
+                }
+            return None
+        except Exception as e:
+            print(f"接收消息时出错: {e}")
+            return None
 
-
-    def takeMSG(self, queue_url, wait_time=20, retries=3, delay=5):
-        sqs = self._get_sqs_client()
-        for attempt in range(retries):
-            try:
-                response = sqs.receive_message(
-                    QueueUrl=queue_url,
-                    MaxNumberOfMessages=1,
-                    VisibilityTimeout=30,
-                    WaitTimeSeconds=wait_time
-                )
-
-                if 'Messages' in response:
-                    message = response['Messages'][0]
-                    message_body = json.loads(message['Body'])
-                    return message_body
-                else:
-                    self.usego.sendlog("No messages received.")
-                    return None
-
-            except ClientError as e:
-                self.usego.sendlog(f"Attempt {attempt + 1} to receive message failed: {e}")
-                time.sleep(delay)  # 等待一段时间后重试
-                if attempt == retries - 1:
-                    raise  # 如果重试次数用尽，则抛出异常
+    def deleteMSG(self, queue_url, receipt_handle):
+        """
+        删除指定的消息
+        """
+        try:
+            self.sqs.delete_message(
+                QueueUrl=queue_url,
+                ReceiptHandle=receipt_handle
+            )
+            return True
+        except Exception as e:
+            print(f"删除消息时出错: {e}")
+            return False
 
     def delFIFO(self, queue_url, receipt_handle=None):
         """

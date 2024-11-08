@@ -1,3 +1,9 @@
+'''
+version: 1.0.0
+Author: Eblis
+Date: 2024-10-26 16:39:34
+LastEditTime: 2024-11-08 16:26:48
+'''
 import os
 import sys
 import yaml
@@ -43,37 +49,42 @@ class amazonRun:
             return
 
         client_id = configCall.client_id
-        is_running = True  # 运行状态标志
+        is_running = True
 
         while is_running:
             self.usego.sendlog("等待 60 秒再说...")
             time.sleep(60)
 
             try:
-                # 初始化 SQS 客户端并获取队列 URL
                 queue_url = self.aws_sqs.initialization(f'client_{client_id}')['QueueUrl']
-                message = self.aws_sqs.takeMSG(queue_url)
+                message_result = self.aws_sqs.takeMSG(queue_url)
 
-                if message:
+                if message_result:
+                    message = message_result.get('message')
+                    receipt_handle = message_result.get('receipt_handle')
+                    
                     self.usego.sendlog(f"接收到消息: {message}")
                     command = next((cmd for cmd in commands if cmd['name'] == message.get('command')), None)
 
                     if command:
-                        self.usego.sendlog(f"找到了匹配的命令: {command}")
-                        new_message = message.get("script")
-                        result = self.execute_command(command, new_message)
-                        self.usego.sendlog(f"命令执行结果: {result}")
-
-                        # 检查队列是否还有待处理消息，立即删除队列
-                        if not self.aws_sqs.has_more_messages(queue_url):
-                            self.usego.sendlog(f"所有消息已处理，删除队列 {queue_url}")
-                            self.aws_sqs.delFIFO(queue_url)
-                        else:
-                            self.usego.sendlog(f"队列 {queue_url} 仍然有未处理消息，继续等待...")
-
+                        try:
+                            self.usego.sendlog(f"开始执行命令: {command}")
+                            new_message = message.get("script")
+                            result = self.execute_command(command, new_message)
+                            
+                            if result:  # 只有在任务成功执行后才删除消息
+                                self.usego.sendlog(f"命令执行成功: {result}")
+                                if receipt_handle:
+                                    self.aws_sqs.deleteMSG(queue_url, receipt_handle)
+                                    self.usego.sendlog(f"消息已删除: {receipt_handle}")
+                            else:
+                                self.usego.sendlog("命令执行失败，保留消息以便重试")
+                                
+                        except Exception as e:
+                            self.usego.sendlog(f"命令执行出错: {e}")
+                            # 不删除消息，允许后续重试
                     else:
                         self.usego.sendlog(f"未找到匹配的命令: {message.get('command')}")
-                        raise ValueError(f"未知的命令: {message.get('command')}")
                 else:
                     self.usego.sendlog("没有接收到消息，继续等待...")
 

@@ -6,6 +6,7 @@ commands:
     method: main
     params:
       - pcname
+      - queue_url
       - genre
       - platform
       - stacking_min
@@ -24,6 +25,7 @@ commands:
     method: main
     params:
       - pcname
+      - queue_url
       - genre
       - platform
       - stacking_min

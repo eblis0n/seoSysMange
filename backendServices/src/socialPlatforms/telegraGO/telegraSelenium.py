@@ -25,6 +25,7 @@ import middleware.public.configurationCall as configCall
 from middleware.public.commonUse import otherUse
 from middleware.dataBaseGO.mongo_sqlCollenction import mongo_sqlGO
 from middleware.dataBaseGO.basis_sqlCollenction import basis_sqlGO
+from backendServices.src.awsMQ.amazonSQS import AmazonSQS
 
 class telegraSelenium:
     def __init__(self):
@@ -56,7 +57,7 @@ class telegraSelenium:
             "sort": str(sort),
         }
         sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", query,  start=int(start), end=int(end))
-
+        aws_sqs = AmazonSQS()
 
         if sql_data is not None:
             all_links = [data["url"] for data in sql_data] if sql_data else []
@@ -68,9 +69,10 @@ class telegraSelenium:
 
                 all_res = self.run(isarts, postingStyle, platform, genre, adsUserlist, alll_links_list, title_alt, alt_text)
                 sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
+                aws_sqs.deleteMSG(queue_url)
 
                 return all_res
-
+        aws_sqs.deleteMSG(queue_url)
         sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
         return None
     

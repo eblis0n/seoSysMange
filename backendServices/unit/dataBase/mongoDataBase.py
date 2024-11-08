@@ -72,7 +72,7 @@ class MongoDB:
                 return db[setname]  # 获取集合
             except Exception as e:
                 self.usego.sendlog(f"获取集合失败: {e}")
-                return f"sql 语句异常"
+                return None
         return None
 
     def close(self):
@@ -125,16 +125,16 @@ class MongoDB:
                 return None
         return None
 
-    def insert_data(self, dbname, setname, data):
+    def insert_data(self, dbname, setname, query):
         """插入数据到集合：支持单条插入和批量插入"""
         mycol = self.get_collection(dbname, setname)
         if mycol is not None:
             try:
-                if isinstance(data, list):  # 批量插入
-                    result = mycol.insert_many(data)
+                if isinstance(query, list):  # 批量插入
+                    result = mycol.insert_many(query)
                     return result.inserted_ids
                 else:  # 单条插入
-                    result = mycol.insert_one(data)
+                    result = mycol.insert_one(query)
                     return result.inserted_id
             except Exception as e:
                 self.usego.sendlog(f"MongoDB 插入错误: {e}")

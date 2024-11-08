@@ -79,5 +79,6 @@ class MyEnum():
     HOSTS_UPDATE = "/hosts/update/"
     HOSTS_DISABLE = "/hosts/disable/"
     TASKS_LIST = "/tasks/list/"
+    TASKS_INSERT = "/tasks/insert/"
     TASK_IMPLEMENT_LOGS = "/task/logs/"
 

@@ -149,7 +149,17 @@ class mongo_sqlGO():
 
         return sql_data
 
-    ###################################
+    ############################################ tasks #############################################################
+
+    def operations_tasks_insert(self, setname, query):
+        """
+            @Datetime ： 2024/10/19 16:18
+            @Author ：eblis
+            @Motto： 插入单条，query用字典形式
+        """
+        sql_data = self.mosql.insert_data(self.seo_interim, setname, query)
+
+        return sql_data
 
 
     def operations_tasks_find(self, setname, query=None, projection=None, find_one=False, start=None, end=None):
