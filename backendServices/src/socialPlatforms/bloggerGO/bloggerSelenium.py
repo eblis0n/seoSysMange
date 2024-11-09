@@ -68,6 +68,7 @@ class bloggerSelenium:
                     self.usego.sendlog(f"拆分为：{len(alll_links_list)} 组")
 
                     all_res = self.run(isarts, postingStyle, platform, genre, adsUserlist, alll_links_list, title_alt, alt_text)
+
                     sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
                     
                     aws_sqs.deleteMSG(queue_url)
@@ -329,7 +330,7 @@ class bloggerSelenium:
             @Author ：eblis
             @Motto：简单描述用途
         """
-        print(type(arts), arts)
+        # print(type(arts), arts)
         all_atab = ''
         if arts is not None and arts != "None":
             this_atab = f"""<p>{arts}</p>&nbsp"""

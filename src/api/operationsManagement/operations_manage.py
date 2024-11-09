@@ -6,6 +6,7 @@
 @IDE ：PyCharm
 @Motto：ABC(Always Be Coding)
 """
+
 import os
 import sys
 import time
@@ -157,18 +158,22 @@ class operationsManage():
             @Motto：简单描述用途
         """
         data_request = request.json
+        # content = data_request["script_content"]
+        # if isinstance(content, dict):
+        #     content = json.dumps(content)
         query = {
             "task_id": self.generate_task_id(),
             "host_ip": data_request["host_ip"],
             "script_name": data_request["script_name"],
-            "script_content": data_request["script_content"],
+            "script_content": str(data_request["script_content"]),
             "task_type": data_request["task_type"]
         }
         sql_data = self.mossql.operations_tasks_insert("seo_operations_tasks", query)
 
+
         if sql_data is not None:
             self.usego.sendlog(f'添加成功：{sql_data}')
-            res = ResMsg(data=sql_data)
+            res = ResMsg(data="成功")
 
 
         else:
