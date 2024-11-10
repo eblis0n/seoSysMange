@@ -37,9 +37,31 @@ class amazonRun:
             method = getattr(instance, command['method'])
             params = [message.get(param) for param in command['params']]
             return method(*params)
+        except AttributeError as e:
+            self.usego.sendlog(f"模块或类方法不存在: {e}")
+        except ImportError as e:
+            self.usego.sendlog(f"导入模块失败: {e}")
         except Exception as e:
             self.usego.sendlog(f"执行命令时出错: {e}")
-            return str(e)
+        return str(e)
+
+    def handle_message(self, command, message, queue_url, receipt_handle):
+        """处理接收到的消息并执行相关命令"""
+        try:
+            self.usego.sendlog(f"开始执行命令: {command}")
+            result = self.execute_command(command, message.get("script"))
+
+            if result:  # 只有在任务成功执行后才删除消息
+                self.usego.sendlog(f"命令执行成功: {result}")
+                if receipt_handle:
+                    self.aws_sqs.deleteMSG(queue_url, receipt_handle)
+                    self.usego.sendlog(f"消息已删除: {receipt_handle}")
+            else:
+                self.usego.sendlog("命令执行失败，保留消息以便重试")
+
+        except Exception as e:
+            self.usego.sendlog(f"命令执行出错: {e}")
+            # 不删除消息，允许后续重试
 
     def run_sqs_client(self):
         """处理 SQS 消息并执行相应的命令"""
@@ -56,33 +78,19 @@ class amazonRun:
             time.sleep(60)
 
             try:
+                # 获取队列URL并接收消息
                 queue_url = self.aws_sqs.initialization(f'client_{client_id}')['QueueUrl']
                 message_result = self.aws_sqs.takeMSG(queue_url)
 
                 if message_result:
                     message = message_result.get('message')
                     receipt_handle = message_result.get('receipt_handle')
-                    
+
                     self.usego.sendlog(f"接收到消息: {message}")
                     command = next((cmd for cmd in commands if cmd['name'] == message.get('command')), None)
 
                     if command:
-                        try:
-                            self.usego.sendlog(f"开始执行命令: {command}")
-                            new_message = message.get("script")
-                            result = self.execute_command(command, new_message)
-                            
-                            if result:  # 只有在任务成功执行后才删除消息
-                                self.usego.sendlog(f"命令执行成功: {result}")
-                                if receipt_handle:
-                                    self.aws_sqs.deleteMSG(queue_url, receipt_handle)
-                                    self.usego.sendlog(f"消息已删除: {receipt_handle}")
-                            else:
-                                self.usego.sendlog("命令执行失败，保留消息以便重试")
-                                
-                        except Exception as e:
-                            self.usego.sendlog(f"命令执行出错: {e}")
-                            # 不删除消息，允许后续重试
+                        self.handle_message(command, message, queue_url, receipt_handle)
                     else:
                         self.usego.sendlog(f"未找到匹配的命令: {message.get('command')}")
                 else:
@@ -90,6 +98,7 @@ class amazonRun:
 
             except Exception as e:
                 self.usego.sendlog(f"处理消息时出错: {e}")
+                time.sleep(10)  # 错误发生时适当等待
 
 if __name__ == '__main__':
     ama = amazonRun()

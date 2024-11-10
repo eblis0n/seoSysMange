@@ -5,6 +5,7 @@ from botocore.exceptions import ClientError
 from middleware.public.commonUse import otherUse
 import middleware.public.configurationCall as configCall
 
+
 class AmazonSQS:
     def __init__(self):
         self.usego = otherUse()
@@ -22,19 +23,23 @@ class AmazonSQS:
             )
         return self._sqs
 
+    def _handle_error(self, error_message: str, exception: Exception, fallback_value=None):
+        """统一的错误处理函数"""
+        self.usego.sendlog(f"{error_message}: {exception}")
+        return fallback_value
+
     def list_queues(self, queue_name_prefix=None):
         """列出所有 SQS 队列"""
         try:
             params = {'QueueNamePrefix': queue_name_prefix} if queue_name_prefix else {}
             return self.sqs.list_queues(**params)
         except ClientError as e:
-            self.usego.sendlog(f"Failed to list queues: {e}")
-            return {'QueueUrls': []}
+            return self._handle_error("Failed to list queues", e, {'QueueUrls': []})
 
     def initialization(self, taskid):
         """初始化或获取现有队列"""
         queue_name = f'SQS-{taskid}.fifo'
-        
+
         # 检查现有队列
         response = self.list_queues(queue_name)
         if queues := response.get('QueueUrls'):
@@ -57,8 +62,7 @@ class AmazonSQS:
                 }
             )
         except ClientError as e:
-            self.usego.sendlog(f"Failed to create queue: {e}")
-            raise
+            return self._handle_error("Failed to create queue", e)
 
     def sendMSG(self, queue_url, msg_group, scriptname, task_data):
         """发送消息到队列"""
@@ -74,8 +78,7 @@ class AmazonSQS:
                 MessageGroupId=msg_group
             )
         except ClientError as e:
-            self.usego.sendlog(f"Failed to send message: {e}")
-            raise
+            return self._handle_error("Failed to send message", e)
 
     def takeMSG(self, queue_url):
         """接收消息"""
@@ -83,9 +86,9 @@ class AmazonSQS:
             response = self.sqs.receive_message(
                 QueueUrl=queue_url,
                 MaxNumberOfMessages=1,
-                WaitTimeSeconds=20
+                WaitTimeSeconds=20  # 使用长轮询减少请求次数
             )
-            
+
             if messages := response.get('Messages'):
                 message = messages[0]
                 return {
@@ -94,40 +97,34 @@ class AmazonSQS:
                 }
             return None
         except Exception as e:
-            self.usego.sendlog(f"Failed to receive message: {e}")
-            return None
+            return self._handle_error("Failed to receive message", e)
 
     def deleteMSG(self, queue_url, receipt_handle=None):
         """删除指定消息或一条消息（如果未提供 receipt_handle）"""
-
         try:
+            # 删除指定消息
             if receipt_handle:
-                self.usego.sendlog(f"删除指定的单条消息")
-                # 删除指定的单条消息
+                self.usego.sendlog(f"Deleting specified message with ReceiptHandle: {receipt_handle}")
                 self.sqs.delete_message(
                     QueueUrl=queue_url,
                     ReceiptHandle=receipt_handle
                 )
+            # 删除一条消息（如果未提供 receipt_handle）
             else:
-                # 获取一条消息
-                self.usego.sendlog(f"删除一条信息")
+                self.usego.sendlog(f"Deleting one message from the queue")
                 messages = self.sqs.receive_message(
                     QueueUrl=queue_url,
-                    MaxNumberOfMessages=1  # 只获取一条消息
+                    MaxNumberOfMessages=1
                 ).get("Messages", [])
 
-                # 删除获取到的消息（如果存在）
                 if messages:
                     self.sqs.delete_message(
                         QueueUrl=queue_url,
                         ReceiptHandle=messages[0]["ReceiptHandle"]
                     )
-
             return True
-
         except Exception as e:
-            self.usego.sendlog(f"Failed to delete message: {e}")
-            return False
+            return self._handle_error("Failed to delete message", e, False)
 
     def has_messages(self, queue_url):
         """检查队列是否有消息"""
@@ -140,11 +137,13 @@ class AmazonSQS:
             )
             return 'Messages' in response
         except Exception as e:
-            self.usego.sendlog(f"Failed to check messages: {e}")
-            return False
+            return self._handle_error("Failed to check messages", e, False)
+
 
 if __name__ == '__main__':
     aws = AmazonSQS()
+
+    # List queues
     response = aws.list_queues()
     queues = response.get('QueueUrls', [])
     if queues:
@@ -152,18 +151,3 @@ if __name__ == '__main__':
     else:
         print("No queues found.")
 
-    # Example of initializing a queue
-    # response = aws.initialization("client_this_mac_1_not")
-    # queue_url = response['QueueUrl']
-    # print("queue_url", queue_url)
-
-    # Send a message to the queue
-    # task_data = {'command': 'test1', 'script': 'print("Hello World")'}
-    # msg_group = "test1"
-    # scriptname = "test1"
-    # response = aws.sendMSG(queue_url, msg_group, scriptname, task_data)
-    # print("Message sent:", response)
-
-    # Receive a message from the queue
-    # message = aws.takeMSG(queue_url)
-    # print("Received message:", message)
