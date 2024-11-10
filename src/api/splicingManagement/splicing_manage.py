@@ -187,28 +187,43 @@ class splicingManage():
                 else:
                     start = end
                     end = 200000 * (idx + 1)
-                task_data = {
-                    'pcname': client["name"],
-                    'queue_url': queue_url,
-                    'genre': genre,
-                    'platform': platform,
-                    'stacking_min': stacking_min,
-                    'stacking_max': stacking_max,
-                    'title_alt': title_alt,
-                    'alt_text': alt_text,
-                    'sort': sort,
-                    'isarts': isarts,
-                    'postingStyle': postingStyle,
-                    'group': group,
-                    'start': start,
-                    'end': end
+                query = {
+                    "genre": str(genre),
+                    "platform": str(platform),
+                    "sort": str(sort),
                 }
-                self.usego.sendlog(f' run_{platform}_selenium，任务信息:{task_data}')
+                sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", query, start=int(start),
+                                                                end=int(end))
+                if sql_data is not None:
+                    all_links = [data["url"] for data in sql_data] if sql_data else []
+                    if all_links !=[]:
+                        task_data = {
+                            'pcname': client["name"],
+                            'queue_url': queue_url,
+                            'genre': genre,
+                            'platform': platform,
+                            'stacking_min': stacking_min,
+                            'stacking_max': stacking_max,
+                            'title_alt': title_alt,
+                            'alt_text': alt_text,
+                            'sort': sort,
+                            'isarts': isarts,
+                            'postingStyle': postingStyle,
+                            'group': group,
+                            'all_links': all_links
+                        }
+                        self.usego.sendlog(f' run_{platform}_selenium，任务信息:{task_data}')
 
-                response = self.aws_sqs.sendMSG(queue_url, f"run_{platform}_group", f"run_{platform}_selenium", task_data)
-                result[f"{client}"] = response
-                results.append(result)
-                self.usego.sendlog(f' run_{platform}_selenium，任务发送结果:{response}')
+                        response = self.aws_sqs.sendMSG(queue_url, f"run_{platform}_group", f"run_{platform}_selenium", task_data)
+                        result[f"{client}"] = response
+                        results.append(result)
+                        self.usego.sendlog(f' run_{platform}_selenium，任务发送结果:{response}')
+                    else:
+                        self.usego.sendlog(f'all_links结果：{all_links}')
+                        continue
+                else:
+                    self.usego.sendlog(f'没有数据可以执行')
+                    continue
             else:
                 self.usego.sendlog(f'{client["name"]},设备下线了')
                 continue

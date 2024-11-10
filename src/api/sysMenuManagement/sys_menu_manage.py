@@ -115,7 +115,7 @@ class menuDeploy():
 
 
     ######################################## 调试 #####################################################################
-
+    #
     def sys_menu_routes(self):
         """
             @Datetime ： 2024/9/27 00:00
@@ -141,7 +141,7 @@ class menuDeploy():
                     "path": "hosts",
                     "component": "operations/hosts/index",
                     "redirect": "",
-                    "name": "operations",
+                    "name": "hosts",
                     "meta": {
                         "title": "\u4e3b\u673a\u7ba1\u7406",
                         "icon": "",
@@ -155,10 +155,10 @@ class menuDeploy():
                     ]
                 },
                 {
-                    "path": "tasks",
-                    "component": "operations/tasks/index",
+                    "path": "tasksControl",
+                    "component": "operations/tasksControl/index",
                     "redirect": "",
-                    "name": "operations",
+                    "name": "tasksControl",
                     "meta": {
                         "title": "\u4efb\u52a1\u8c03\u5ea6",
                         "icon": "",

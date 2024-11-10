@@ -98,13 +98,33 @@ class AmazonSQS:
             return None
 
     def deleteMSG(self, queue_url, receipt_handle=None):
-        """删除指定消息"""
+        """删除指定消息或一条消息（如果未提供 receipt_handle）"""
+
         try:
-            self.sqs.delete_message(
-                QueueUrl=queue_url,
-                ReceiptHandle=receipt_handle
-            )
+            if receipt_handle:
+                self.usego.sendlog(f"删除指定的单条消息")
+                # 删除指定的单条消息
+                self.sqs.delete_message(
+                    QueueUrl=queue_url,
+                    ReceiptHandle=receipt_handle
+                )
+            else:
+                # 获取一条消息
+                self.usego.sendlog(f"删除一条信息")
+                messages = self.sqs.receive_message(
+                    QueueUrl=queue_url,
+                    MaxNumberOfMessages=1  # 只获取一条消息
+                ).get("Messages", [])
+
+                # 删除获取到的消息（如果存在）
+                if messages:
+                    self.sqs.delete_message(
+                        QueueUrl=queue_url,
+                        ReceiptHandle=messages[0]["ReceiptHandle"]
+                    )
+
             return True
+
         except Exception as e:
             self.usego.sendlog(f"Failed to delete message: {e}")
             return False

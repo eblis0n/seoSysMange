@@ -33,9 +33,10 @@ class telegraSelenium:
         self.ads = adsDevice()
         self.mossql = mongo_sqlGO()
         self.ssql = basis_sqlGO()
+        self.aws_sqs = AmazonSQS()
 
 
-    def main(self, pcname, queue_url, genre, platform, stacking_min, stacking_max, title_alt, alt_text, sort, isarts,  postingStyle, group, start, end):
+    def main(self, pcname, queue_url, genre, platform, stacking_min, stacking_max, title_alt, alt_text, sort, isarts,  postingStyle, group, all_links):
 
         """
             @Datetime ： 2024/10/26 00:09
@@ -51,30 +52,39 @@ class telegraSelenium:
 
         adsUserlist = self.siphon_adsuser(eval(configCall.stacking_ads), eval(configCall.min_concurrent_user))
 
-        query = {
-            "genre": str(genre),
-            "platform": str(platform),
-            "sort": str(sort),
-        }
-        sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", query,  start=int(start), end=int(end))
-        aws_sqs = AmazonSQS()
+        # query = {
+        #     "genre": str(genre),
+        #     "platform": str(platform),
+        #     "sort": str(sort),
+        # }
+        # sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", query,  start=int(start), end=int(end))
 
-        if sql_data is not None:
-            all_links = [data["url"] for data in sql_data] if sql_data else []
 
-            if all_links:
-                alll_links_list = self.siphon_links(all_links, stacking_min, stacking_max)
+        # if sql_data is not None:
+        #     all_links = [data["url"] for data in sql_data] if sql_data else []
+        #
+        #     if all_links:
+        #         alll_links_list = self.siphon_links(all_links, stacking_min, stacking_max)
+        #
+        #         self.usego.sendlog(f"拆分为：{len(alll_links_list)} 组")
+        #
+        #         all_res = self.run(isarts, postingStyle, platform, genre, adsUserlist, alll_links_list, title_alt, alt_text)
+        #         sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
+        #         aws_sqs.deleteMSG(queue_url)
+        #
+        #         return all_res
+        # aws_sqs.deleteMSG(queue_url)
+        # sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
+        # return None
+        alll_links_list = self.siphon_links(all_links, stacking_min, stacking_max)
 
-                self.usego.sendlog(f"拆分为：{len(alll_links_list)} 组")
+        self.usego.sendlog(f"拆分为：{len(alll_links_list)} 组")
 
-                all_res = self.run(isarts, postingStyle, platform, genre, adsUserlist, alll_links_list, title_alt, alt_text)
-                sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
-                aws_sqs.deleteMSG(queue_url)
-
-                return all_res
-        aws_sqs.deleteMSG(queue_url)
+        all_res = self.run(isarts, postingStyle, platform, genre, adsUserlist, alll_links_list, title_alt, alt_text)
         sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
-        return None
+        self.aws_sqs.deleteMSG(queue_url)
+
+        return all_res
     
 
     def run (self, isarts, postingStyle, platform, genre, adsUserlist, alll_links_list, title_alt, alt_text):
