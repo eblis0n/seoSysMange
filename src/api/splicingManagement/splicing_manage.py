@@ -172,28 +172,20 @@ class splicingManage():
         self.usego.sendlog(f'第二步，向符合条件的PC 队列发消息')
 
         results = []
-
+        succes_tab = 0
         for idx, client in enumerate(resdatas):
-            self.usego.sendlog(f'{idx}，client_{client["name"]}，{type(client["state"])},{client["state"]}')
+            self.usego.sendlog(f'{idx}，name:client_{client["name"]}，state:{client["state"]}')
             if client["state"] != 2 and client["state"] != "2":
                 self.usego.sendlog(f'{idx}，client_{client["name"]} 这台设备可用！！')
                 result = {}
                 response = self.aws_sqs.initialization(f'client_{client["name"]}')
                 queue_url = response['QueueUrl']
-                self.usego.sendlog(f'{idx}，client_{client["name"]}，{client["state"]}，队列地址{queue_url}')
-                if idx == 0:
-                    start = 0
-                    end = 200000
+                self.usego.sendlog(f'{idx}，succes_tab:{succes_tab}, name:client_{client["name"]}，state:{client["state"]}，队列地址:{queue_url}')
+                if succes_tab == 0:
+                    sql_data = self.find_limit(idx, genre, platform, sort)
                 else:
-                    start = end
-                    end = 200000 * (idx + 1)
-                query = {
-                    "genre": str(genre),
-                    "platform": str(platform),
-                    "sort": str(sort),
-                }
-                sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", query, start=int(start),
-                                                                end=int(end))
+                    sql_data = self.find_limit(int(idx)-1, genre, platform, sort)
+
                 if sql_data is not None:
                     all_links = [data["url"] for data in sql_data] if sql_data else []
                     if all_links !=[]:
@@ -219,12 +211,15 @@ class splicingManage():
                         results.append(result)
                         self.usego.sendlog(f' run_{platform}_selenium，任务发送结果:{response}')
                     else:
+                        succes_tab = 1
                         self.usego.sendlog(f'all_links结果：{all_links}')
                         continue
                 else:
+                    succes_tab = 1
                     self.usego.sendlog(f'没有数据可以执行')
                     continue
             else:
+                succes_tab = 1
                 self.usego.sendlog(f'{client["name"]},设备下线了')
                 continue
 
@@ -255,6 +250,33 @@ class splicingManage():
         self.usego.sendlog(f'删除结果：{sql_data}')
         res = ResMsg(data=sql_data)
         return res.to_json()
+    
+    
+    def find_limit(self, idx,genre,platform,sort):
+        """
+            @Datetime ： 2024/11/10 21:00
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        end = 200000
+        if idx == 0:
+            start = 0
+            # end = 200000
+        else:
+            start = end
+            end = 200000 * (idx + 1)
+        query = {
+            "genre": str(genre),
+            "platform": str(platform),
+            "sort": str(sort),
+        }
+        try:
+            sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", query, start=int(start),
+                                                        end=int(end))
+        except:
+            sql_data = None
+        return sql_data
+    
 
 
 
