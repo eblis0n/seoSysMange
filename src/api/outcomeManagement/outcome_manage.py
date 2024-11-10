@@ -56,7 +56,7 @@ class outcomeManage():
             sql_data = self.mossql.splicing_interim_findAll("seo_result_301_links", query)
             resdatas = []
             # print("sql_data", sql_data)
-            if "sql 语句异常" not in str(sql_data):
+            if sql_data is not None:
                 try:
                     if len(sql_data) > 0:
                         for i in range(len(sql_data)):
@@ -100,8 +100,11 @@ class outcomeManage():
         platform = request.args.get('platform')
 
         if platform is not None:
+            query = {
+                "platform": platform
+            }
 
-            sql_data = self.mossql.splicing_interim_find_count("seo_result_301_links", platform=platform)
+            sql_data = self.mossql.splicing_interim_find_count("seo_result_301_links", query)
             self.usego.sendlog(f'查询结果：{sql_data}')
             datas = {
                 "total": sql_data,

@@ -73,11 +73,6 @@ class mongo_sqlGO():
             @Author ：eblis
             @Motto：查表总数
         """
-        # query = {}
-        # if genre is not None:
-        #     query['genre'] = genre
-        # if platform is not None:
-        #     query['platform'] = platform
 
         sql_datas = self.mosql.find_count(self.seo_interim, setname, query)
 
