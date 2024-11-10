@@ -139,7 +139,6 @@ class splicingManage():
 
         self.usego.sendlog(
             f"接收到的参数：{genre}, {platform}, {stacking_min}, {stacking_max}, {alt_text}, {sort}, {postingStyle}, {isarts}")
-        #
 
         self.usego.sendlog("第一步，先查数据库，查看是否存在符合条件的PC")
         # state=3 是 实际查询为 state !=2
@@ -175,7 +174,7 @@ class splicingManage():
             return res.to_json()
 
         self.usego.sendlog(f'有 {len(resdatas)} 设备符合')
-        self.usego.sendlog(f'第二步，看看有多少数量')
+
         results = []
         query = {
             "genre": str(genre),
@@ -183,12 +182,14 @@ class splicingManage():
             "sort": str(sort),
         }
         total = self.mossql.splicing_interim_find_count("seo_external_links_post", query)
+        self.usego.sendlog(f'第二步，本次任务一共需要执行{total} 连接')
         if total == 0:
             self.usego.sendlog(f'没有符合执行条件的数据')
             res = ResMsg(code='B0001', msg=f'没有符合执行条件的数据')
             return res.to_json()
 
         if len(resdatas) > 1 and total > 200000:
+            self.usego.sendlog(f' 数据量很大，不能浪费设备')
             for idx, client in enumerate(resdatas):
                 result = {}
                 # 生成 队列
@@ -220,6 +221,7 @@ class splicingManage():
                 self.usego.sendlog(f' run_{platform}_selenium，任务发送结果:{response}')
         else:
             # 不满足条件，执行一次任务而不是循环
+            self.usego.sendlog(f'小case ，一台设备就够玩了')
             client = resdatas[0]  # 只处理一个客户端
             result = {}
             response = self.aws_sqs.initialization(f'client_{client["name"]}')

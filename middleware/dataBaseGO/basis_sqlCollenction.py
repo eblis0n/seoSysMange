@@ -250,6 +250,7 @@ class basis_sqlGO():
             @Author ：eblis
             @Motto：查询 PC 设置
         """
+        # print(platform, state)
 
         # 根据参数构建 SQL 查询的条件列表
         conditions = []
@@ -258,22 +259,26 @@ class basis_sqlGO():
         if platform:
             conditions.append(f"`platform` = '{platform}'")
 
-        # 如果 state 不是 3，则添加 state 的条件
-        if state != 3 and state is not None:
-            conditions.append(f"`state` = {state}")
-
-        # 如果 state = 3，则添加 `state != 2` 条件
-        if state == 3:
-            conditions.append("`state` != 2")
+        # 如果 state 不为 None，则添加 state 条件
+        if state is not None:
+            # 如果 state == 3，添加 `state != 2` 条件
+            if state == 3:
+                conditions.append("`state` != 2")
+            else:
+                # 如果 state 不是 3，直接添加 `state = {state}` 条件
+                conditions.append(f"`state` = {state}")
 
         # 构建最终的 SQL 查询
         if conditions:
-            sqlgo = f"SELECT /*+ NOCACHE */ * FROM pro_pc_settings WHERE {' AND '.join(conditions)} ORDER BY state ;"
+            sqlgo = f"SELECT /*+ NOCACHE */ * FROM pro_pc_settings WHERE {' AND '.join(conditions)} ORDER BY state;"
         else:
             # 如果没有其他条件，默认查询所有记录
-            sqlgo = "SELECT /*+ NOCACHE */ * FROM pro_pc_settings ORDER BY state ;"
+            sqlgo = "SELECT /*+ NOCACHE */ * FROM pro_pc_settings ORDER BY state;"
 
-        return sqlgo
+        # print("sqlgo:", sqlgo)
+        sql_data = self.ssql.mysql_select('basis', sqlgo)
+        return sql_data
+
 
     ############################################# blogger #####################################################
 
