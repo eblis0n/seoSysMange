@@ -67,17 +67,17 @@ class mongo_sqlGO():
 
         return sql_datas
 
-    def splicing_interim_find_count(self, setname, genre=None, platform=None):
+    def splicing_interim_find_count(self, setname, query):
         """
             @Datetime ： 2024/10/28 17:10
             @Author ：eblis
             @Motto：查表总数
         """
-        query = {}
-        if genre is not None:
-            query['genre'] = genre
-        if platform is not None:
-            query['platform'] = platform
+        # query = {}
+        # if genre is not None:
+        #     query['genre'] = genre
+        # if platform is not None:
+        #     query['platform'] = platform
 
         sql_datas = self.mosql.find_count(self.seo_interim, setname, query)
 

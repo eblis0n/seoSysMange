@@ -250,25 +250,30 @@ class basis_sqlGO():
             @Author ：eblis
             @Motto：查询 PC 设置
         """
-        # print("pcSettings_select, locals():", locals())
 
-        # 构建参数字典，过滤掉 None 和空字符串
-        params = {k: v for k, v in locals().items() if k in ['platform','state'] and v not in [None, ""]}
-        print("非 None 的参数名：", list(params.keys()))
+        # 根据参数构建 SQL 查询的条件列表
+        conditions = []
 
-        # 根据参数构建 SQL 查询
-        if params:
-            conditions = [f"`{k}` = '{v}'" for k, v in params.items()]
+        # 如果传入了 platform 参数，则添加对应的条件
+        if platform:
+            conditions.append(f"`platform` = '{platform}'")
+
+        # 如果 state 不是 3，则添加 state 的条件
+        if state != 3 and state is not None:
+            conditions.append(f"`state` = {state}")
+
+        # 如果 state = 3，则添加 `state != 2` 条件
+        if state == 3:
+            conditions.append("`state` != 2")
+
+        # 构建最终的 SQL 查询
+        if conditions:
             sqlgo = f"SELECT /*+ NOCACHE */ * FROM pro_pc_settings WHERE {' AND '.join(conditions)} ORDER BY state ;"
         else:
+            # 如果没有其他条件，默认查询所有记录
             sqlgo = "SELECT /*+ NOCACHE */ * FROM pro_pc_settings ORDER BY state ;"
 
-        # print("生成的 SQL 查询:", sqlgo)
-
-        # 执行查询
-        sql_data = self.ssql.mysql_select('basis', sqlgo)
-        return sql_data
-
+        return sqlgo
 
     ############################################# blogger #####################################################
 

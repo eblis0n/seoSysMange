@@ -120,6 +120,11 @@ class splicingManage():
         return responseData
 
     def splicing_submit_push(self):
+        """
+                    @Datetime ： 2024/10/21 00:28
+                    @Author ：eblis
+                    @Motto：Amazon SQS 不能接收 过长 消息，大量执行，查数据库 放在脚本上，不能从队列传送
+                """
         data_request = request.json
         title_alt = data_request['title_alt']
         alt_text = data_request['alt_text']
@@ -137,8 +142,9 @@ class splicingManage():
         #
 
         self.usego.sendlog("第一步，先查数据库，查看是否存在符合条件的PC")
+        # state=3 是 实际查询为 state !=2
 
-        sql_data = self.ssql.pcSettings_select_sql(platform=platform)
+        sql_data = self.ssql.pcSettings_select_sql(platform=platform, state=3)
 
         if "sql 语句异常" in str(sql_data):
             self.usego.sendlog(f'没有可用的客户端：{sql_data}')
@@ -169,59 +175,82 @@ class splicingManage():
             return res.to_json()
 
         self.usego.sendlog(f'有 {len(resdatas)} 设备符合')
-        self.usego.sendlog(f'第二步，向符合条件的PC 队列发消息')
-
+        self.usego.sendlog(f'第二步，看看有多少数量')
         results = []
-        succes_tab = 0
-        for idx, client in enumerate(resdatas):
-            self.usego.sendlog(f'{idx}，name:client_{client["name"]}，state:{client["state"]}')
-            if client["state"] != 2 and client["state"] != "2":
-                self.usego.sendlog(f'{idx}，client_{client["name"]} 这台设备可用！！')
+        query = {
+            "genre": str(genre),
+            "platform": str(platform),
+            "sort": str(sort),
+        }
+        total = self.mossql.splicing_interim_find_count("seo_external_links_post", query)
+        if total == 0:
+            self.usego.sendlog(f'没有符合执行条件的数据')
+            res = ResMsg(code='B0001', msg=f'没有符合执行条件的数据')
+            return res.to_json()
+
+        if len(resdatas) > 1 and total > 200000:
+            for idx, client in enumerate(resdatas):
                 result = {}
+                # 生成 队列
                 response = self.aws_sqs.initialization(f'client_{client["name"]}')
                 queue_url = response['QueueUrl']
-                self.usego.sendlog(f'{idx}，succes_tab:{succes_tab}, name:client_{client["name"]}，state:{client["state"]}，队列地址:{queue_url}')
-                if succes_tab == 0:
-                    sql_data = self.find_limit(idx, genre, platform, sort)
-                else:
-                    sql_data = self.find_limit(int(idx)-1, genre, platform, sort)
+                self.usego.sendlog(f'{idx}, name:client_{client["name"]}，state:{client["state"]}，队列地址:{queue_url}')
+                start, end = self.find_limit(idx)
+                task_data = {
+                    'pcname': client["name"],
+                    'queue_url': queue_url,
+                    'genre': genre,
+                    'platform': platform,
+                    'stacking_min': stacking_min,
+                    'stacking_max': stacking_max,
+                    'title_alt': title_alt,
+                    'alt_text': alt_text,
+                    'sort': sort,
+                    'isarts': isarts,
+                    'postingStyle': postingStyle,
+                    'group': group,
+                    'start': start,
+                    'end': end
+                }
+                self.usego.sendlog(f' run_{platform}_selenium，任务信息:{task_data}')
+                response = self.aws_sqs.sendMSG(queue_url, f"run_{platform}_group", f"run_{platform}_selenium",
+                                                task_data)
+                result[f"{client}"] = response
+                results.append(result)
+                self.usego.sendlog(f' run_{platform}_selenium，任务发送结果:{response}')
+        else:
+            # 不满足条件，执行一次任务而不是循环
+            client = resdatas[0]  # 只处理一个客户端
+            result = {}
+            response = self.aws_sqs.initialization(f'client_{client["name"]}')
+            queue_url = response['QueueUrl']
+            self.usego.sendlog(f'只处理一次，name:client_{client["name"]}，state:{client["state"]}，队列地址:{queue_url}')
+            start, end = self.find_limit(0)  # 这里只处理第一个客户端，索引为0
+            task_data = {
+                'pcname': client["name"],
+                'queue_url': queue_url,
+                'genre': genre,
+                'platform': platform,
+                'stacking_min': stacking_min,
+                'stacking_max': stacking_max,
+                'title_alt': title_alt,
+                'alt_text': alt_text,
+                'sort': sort,
+                'isarts': isarts,
+                'postingStyle': postingStyle,
+                'group': group,
+                'start': start,
+                'end': end
+            }
+            self.usego.sendlog(f' run_{platform}_selenium，任务信息:{task_data}')
+            response = self.aws_sqs.sendMSG(queue_url, f"run_{platform}_group", f"run_{platform}_selenium", task_data)
+            # 将 执行pc 状态 修改
+            sql_data = self.ssql.pcSettings_update_state_sql(client["name"], state=1)
+            self.usego.sendlog(f"pc执行结果{sql_data}")
 
-                if sql_data is not None:
-                    all_links = [data["url"] for data in sql_data] if sql_data else []
-                    if all_links !=[]:
-                        task_data = {
-                            'pcname': client["name"],
-                            'queue_url': queue_url,
-                            'genre': genre,
-                            'platform': platform,
-                            'stacking_min': stacking_min,
-                            'stacking_max': stacking_max,
-                            'title_alt': title_alt,
-                            'alt_text': alt_text,
-                            'sort': sort,
-                            'isarts': isarts,
-                            'postingStyle': postingStyle,
-                            'group': group,
-                            'all_links': all_links
-                        }
-                        self.usego.sendlog(f' run_{platform}_selenium，任务信息:{task_data}')
-
-                        response = self.aws_sqs.sendMSG(queue_url, f"run_{platform}_group", f"run_{platform}_selenium", task_data)
-                        result[f"{client}"] = response
-                        results.append(result)
-                        self.usego.sendlog(f' run_{platform}_selenium，任务发送结果:{response}')
-                    else:
-                        succes_tab = 1
-                        self.usego.sendlog(f'all_links结果：{all_links}')
-                        continue
-                else:
-                    succes_tab = 1
-                    self.usego.sendlog(f'没有数据可以执行')
-                    continue
-            else:
-                succes_tab = 1
-                self.usego.sendlog(f'{client["name"]},设备下线了')
-                continue
+            result[f"{client}"] = response
+            results.append(result)
+            self.usego.sendlog(f' run_{platform}_selenium，任务发送结果:{response}')
 
 
         res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
@@ -236,7 +265,8 @@ class splicingManage():
             @Author ：eblis
             @Motto：简单描述用途
         """
-        sql_data = self.mossql.splicing_interim_find_count("seo_external_links_post")
+        query = {}
+        sql_data = self.mossql.splicing_interim_find_count("seo_external_links_post", query)
         self.usego.sendlog(f'查询结果：{sql_data}')
         datas = {
             "total": sql_data,
@@ -252,7 +282,7 @@ class splicingManage():
         return res.to_json()
     
     
-    def find_limit(self, idx,genre,platform,sort):
+    def find_limit(self, idx):
         """
             @Datetime ： 2024/11/10 21:00
             @Author ：eblis
@@ -265,17 +295,8 @@ class splicingManage():
         else:
             start = end
             end = 200000 * (idx + 1)
-        query = {
-            "genre": str(genre),
-            "platform": str(platform),
-            "sort": str(sort),
-        }
-        try:
-            sql_data = self.mossql.splicing_interim_findAll("seo_external_links_post", query, start=int(start),
-                                                        end=int(end))
-        except:
-            sql_data = None
-        return sql_data
+
+        return start, end
     
 
 
