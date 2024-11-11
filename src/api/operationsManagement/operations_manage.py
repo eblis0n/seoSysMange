@@ -161,12 +161,18 @@ class operationsManage():
         # content = data_request["script_content"]
         # if isinstance(content, dict):
         #     content = json.dumps(content)
+        created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         query = {
             "task_id": self.generate_task_id(),
             "host_ip": data_request["host_ip"],
             "script_name": data_request["script_name"],
             "script_content": str(data_request["script_content"]),
-            "task_type": data_request["task_type"]
+            "task_type": data_request["task_type"],
+            "status": "Pending",
+            "result": "",
+            "created_at": created_at,
+            "completed_at": "",
+            "last_update": ""
         }
         sql_data = self.mossql.operations_tasks_insert("seo_operations_tasks", query)
 
@@ -231,8 +237,8 @@ class operationsManage():
 
         data_request = request.json
 
-        task_id = data_request['task_id']
-        query = {"task_id": task_id}
+
+        query = {"task_id": data_request['task_id']}
 
 
         sql_data = self.mossql.operations_tasks_logs_find("seo_operations_logs", query)
@@ -243,29 +249,29 @@ class operationsManage():
                 if len(sql_data) > 0:
                     for i in range(len(sql_data)):
                         thisdata = {
-                            "log_id": sql_data[i]["log_id"],
-                            "task_id": sql_data[i]["host_id"],
+                            "id": str(sql_data[i]["_id"]),
+                            "task_id": sql_data[i]["task_id"],
+                            "task_type": sql_data[i]["task_type"],
                             "log_content": sql_data[i]["log_content"],
-                            "log_time": sql_data[i]["log_time"],
-                            "script_content": sql_data[i]["script_content"],
+                            "log_time": self.usego.turn_isoformat(sql_data[i]["log_time"]),
                             "status": sql_data[i]["status"]
                         }
                         resdatas.append(thisdata)
 
-                    self.usego.sendlog(f'list结果：{len(resdatas)}')
+                    self.usego.sendlog(f'logs结果：{len(resdatas)}')
                     res = ResMsg(data=resdatas)
                     responseData = res.to_json()
                 else:
-                    self.usego.sendlog(f'list结果：{len(resdatas)}')
+                    self.usego.sendlog(f'logs结果：{len(resdatas)}')
                     res = ResMsg(data=resdatas)
                     responseData = res.to_json()
             except Exception as e:
-                self.usego.sendlog(f'list查询失败：{e}')
-                res = ResMsg(code='B0001', msg=f'list查询失败')
+                self.usego.sendlog(f'logs查询失败：{e}')
+                res = ResMsg(code='B0001', msg=f'logs查询失败')
                 responseData = res.to_json()
         else:
-            self.usego.sendlog(f'list查询失败：{sql_data}')
-            res = ResMsg(code='B0001', msg=f'list查询失败')
+            self.usego.sendlog(f'logs查询失败：{sql_data}')
+            res = ResMsg(code='B0001', msg=f'logs查询失败')
             responseData = res.to_json()
 
         return responseData
