@@ -34,6 +34,7 @@ class bloggerSelenium:
         self.ads = adsDevice()
         self.mossql = mongo_sqlGO()
         self.ssql = basis_sqlGO()
+        self.aws_sqs = AmazonSQS()
 
     def main(self, pcname, queue_url, genre, platform, stacking_min, stacking_max, title_alt,  alt_text, sort, isarts, postingStyle, group, start, end):
         """
@@ -43,8 +44,7 @@ class bloggerSelenium:
         """
 
         self.usego.sendlog(f"接收到的参数：genre{genre}, platform{platform}, stacking_min{stacking_min}, stacking_max{stacking_max},alt_text {alt_text},sort {sort}, postingStyle{postingStyle}, isarts{isarts}")
-
-
+        sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=1)
         adsUserlist = self.siphon_adsuser(group, eval(configCall.min_concurrent_user))
 
         if adsUserlist != []:
@@ -70,8 +70,10 @@ class bloggerSelenium:
                     self.aws_sqs.deleteMSG(queue_url)
                     return all_res
 
-        aws_sqs.deleteMSG(queue_url)
+
         sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
+        self.aws_sqs.deleteMSG(queue_url)
+
         return None
 
 

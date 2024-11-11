@@ -50,45 +50,45 @@ class outcomeManage():
         # print("platform", platform)
 
         if platform is not None:
-            query = {
-                "platform": str(platform),
-            }
-            sql_data = self.mossql.splicing_interim_findAll("seo_result_301_links", query)
+            try:
+                query = {
+                    "platform": str(platform),
+                }
+                sql_data = self.mossql.splicing_interim_findAll("seo_result_301_links", query)
+            except Exception as e:
+                self.usego.sendlog(f'list查询失败：{e}')
+                sql_data = None
+
+
             resdatas = []
             # print("sql_data", sql_data)
             if sql_data is not None:
-                try:
-                    if len(sql_data) > 0:
-                        for i in range(len(sql_data)):
-                            thisdata = {
-                                "id": i,
-                                "url": sql_data[i]["url"],
-                                "platform": sql_data[i]["platform"],
-                                "genre": sql_data[i]["genre"],
-                                "created_at": self.usego.turn_isoformat(sql_data[i]["created_at"])
-                            }
-                            resdatas.append(thisdata)
+                if len(sql_data) > 0:
+                    for i in range(len(sql_data)):
+                        thisdata = {
+                            "id": i,
+                            "url": sql_data[i]["url"],
+                            "platform": sql_data[i]["platform"],
+                            "genre": sql_data[i]["genre"],
+                            "created_at": self.usego.turn_isoformat(sql_data[i]["created_at"])
+                        }
+                        resdatas.append(thisdata)
 
-                        self.usego.sendlog(f'list结果：{len(resdatas)}')
-                        res = ResMsg(data=resdatas)
+                    self.usego.sendlog(f'list结果：{len(resdatas)}')
+                    res = ResMsg(data=resdatas)
 
-                    else:
-                        self.usego.sendlog(f'list结果：{len(resdatas)}')
-                        res = ResMsg(data=resdatas)
-
-                except Exception as e:
-                    self.usego.sendlog(f'list查询失败：{e}')
-                    res = ResMsg(code='B0001', msg=f'list查询失败')
+                else:
+                    self.usego.sendlog(f'list结果：{len(resdatas)}')
+                    res = ResMsg(data=resdatas)
 
             else:
                 self.usego.sendlog(f'list查询失败：{sql_data}')
                 res = ResMsg(code='B0001', msg=f'list查询失败')
 
-
             return res.to_json()
         else:
             self.usego.sendlog(f'缺少 platform 参数')
-            return ResMsg(code=400, msg="缺少 platform  参数").to_json()
+            return ResMsg(code='B0001', msg="缺少 platform  参数").to_json()
 
 
     def outcome_total(self):
@@ -100,12 +100,16 @@ class outcomeManage():
         platform = request.args.get('platform')
 
         if platform is not None:
-            query = {
-                "platform": platform
-            }
+            try:
+                query = {
+                    "platform": platform
+                }
+                sql_data = self.mossql.splicing_interim_find_count("seo_result_301_links", query)
+                self.usego.sendlog(f'查询结果：{sql_data}')
+            except Exception as e:
+                self.usego.sendlog(f'list查询失败：{e}')
+                sql_data = 0
 
-            sql_data = self.mossql.splicing_interim_find_count("seo_result_301_links", query)
-            self.usego.sendlog(f'查询结果：{sql_data}')
             datas = {
                 "total": sql_data,
             }

@@ -45,7 +45,7 @@ class telegraSelenium:
         """
         self.usego.sendlog(f"接收到的参数：pcname:{pcname},genre:{genre}, platform:{platform}, stacking_min:{stacking_min}, stacking_max:{stacking_max},alt_text:{alt_text},sort:{sort}, postingStyle:{postingStyle}, isarts:{isarts}")
 
-
+        self.ssql.pcSettings_update_state_sql(pcname, state=1)
         adsUserlist = self.siphon_adsuser(eval(configCall.stacking_ads), eval(configCall.min_concurrent_user))
 
         query = {

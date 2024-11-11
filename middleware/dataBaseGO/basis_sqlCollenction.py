@@ -196,7 +196,7 @@ class basis_sqlGO():
 
     def pcSettings_list_sql(self):
         # noinspection SqlNoDataSourceInspection
-        sqlgo = f"""SELECT /*+ NOCACHE */*  FROM pro_pc_settings;"""
+        sqlgo = f"""SELECT /*+ NOCACHE */*  FROM pro_pc_settings ORDER BY create_at DESC;"""
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_select('basis', sqlgo)
         return sql_data
@@ -285,7 +285,7 @@ class basis_sqlGO():
 
     def blogger_info_list_sql(self):
         # noinspection SqlNoDataSourceInspection
-        sqlgo = f"""SELECT /*+ NOCACHE */*  FROM seo_blogger_info;"""
+        sqlgo = f"""SELECT /*+ NOCACHE */*  FROM seo_blogger_info ORDER BY create_at DESC;"""
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_select('basis', sqlgo)
         return sql_data
