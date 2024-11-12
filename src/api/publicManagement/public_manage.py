@@ -30,10 +30,6 @@ class publicManage():
 
         platforms = [
             {
-                "label": "调试",
-                "value": "debug",
-            },
-            {
                 "label": "telegra",
                 "value": "telegra",
             },

@@ -258,30 +258,40 @@ class splicingManage():
         res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
         return res.to_json()
 
-
-
-
     def splicing_total(self):
         """
-            @Datetime ： 2024/10/28 16:50
-            @Author ：eblis
-            @Motto：简单描述用途
+        @Datetime ： 2024/10/28 16:50
+        @Author ：eblis
+        @Motto：根据默认平台查询总数
         """
-        try:
-            query = {}
 
-            sql_data = self.mossql.splicing_interim_find_count("seo_external_links_post", query)
-        except Exception as e:
-            self.usego.sendlog(f'list查询失败：{e}')
-            sql_data = 0
+        def get_platform_data(platform):
+            """根据平台名称查询数据"""
+            query = {"platform": platform}
+            try:
+                return self.mossql.splicing_interim_find_count("seo_external_links_post", query)
+            except Exception as e:
+                self.usego.sendlog(f"查询 {platform} 数据失败：{e}")
+                return 0
+
+        # 默认平台列表
+        platforms = ["blogger", "telegra"]
+
+        # 查询每个平台的数据
+        results = {}
+        for platform in platforms:
+            results[f"{platform}_total"] = get_platform_data(platform)
+
+        # datas = [results]
 
 
-        self.usego.sendlog(f'查询结果：{sql_data}')
-        datas = {
-            "total": sql_data,
-        }
-        res = ResMsg(data=datas)
+        # 输出日志
+        self.usego.sendlog(f"查询结果：{results}")
+
+        # 构建返回数据
+        res = ResMsg(data=results)
         return res.to_json()
+
 
 
     def splicing_delete_all(self):
