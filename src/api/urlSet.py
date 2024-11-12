@@ -82,3 +82,12 @@ class MyEnum():
     TASKS_INSERT = "/tasks/insert/"
     TASK_IMPLEMENT_LOGS = "/task/logs/"
 
+
+    # scriptTemplate
+    SCRIPT_TEMPLATE_INSERT = "/add/"
+    SCRIPT_TEMPLATE_DELETE = "/delete/"
+    SCRIPT_TEMPLATE_LIST = "/list/"
+    SCRIPT_TEMPLATE_UPDATE = "/update/"
+
+
+

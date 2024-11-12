@@ -346,3 +346,42 @@ class basis_sqlGO():
         sql_data = self.ssql.mysql_select('basis', sqlgo)
         return sql_data
 
+ # ############################################# 脚本模板管理 #####################################################
+
+
+    def script_template_list_sql(self):
+        # noinspection SqlNoDataSourceInspection
+        sqlgo = f"""SELECT /*+ NOCACHE */*  FROM seo_script_template ORDER BY create_at DESC;"""
+        # 执行 SQL 查询语句
+        sql_data = self.ssql.mysql_select('basis', sqlgo)
+        return sql_data
+
+
+    def script_template_insert_sql(self, script_name, script_type, script_content, create_at):
+        # noinspection SqlNoDataSourceInspection
+        sqlgo = f"""INSERT INTO seo_script_template (`script_name`,`script_type`,`script_content`, `create_at`) VALUES ('{script_name}','{script_type}','{script_content}', '{create_at}');"""
+        # 执行 SQL 查询语句
+        sql_data = self.ssql.mysql_commit('basis', sqlgo)
+        return sql_data
+
+
+    def script_template_delete_sql(self, id):
+        # noinspection SqlNoDataSourceInspection
+        sqlgo = f"""DELETE FROM seo_script_template WHERE `id` = '{id}';"""
+        # 执行 SQL 查询语句
+        sql_data = self.ssql.mysql_commit('basis', sqlgo)
+        return sql_data
+
+
+    def script_template_update_sql(self, script_name, script_type, script_content, id):
+        """
+            更新 PC 设置的状态、名称和地址
+        """
+
+        sqlgo = f"""
+                         UPDATE seo_blogger_info 
+                         SET `script_name` = '{script_name}', `script_type` = '{script_type}', `script_content` = '{script_content}' WHERE `id` = {id};
+                     """
+        # 执行 SQL 更新查询
+        sql_data = self.ssql.mysql_commit('basis', sqlgo)
+        return sql_data

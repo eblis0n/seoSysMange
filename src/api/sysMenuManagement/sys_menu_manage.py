@@ -160,7 +160,24 @@ class menuDeploy():
                     "redirect": "",
                     "name": "tasksControl",
                     "meta": {
-                        "title": "\u4efb\u52a1\u8c03\u5ea6",
+                        "title": "\u4efb\u52a1\u7ba1\u7406",
+                        "icon": "",
+                        "hidden": False,
+                        "keepAlive": True,
+                        "alwaysShow": False,
+                        "params": ""
+                    },
+                    "children": [
+
+                    ]
+                },
+                {
+                    "path": "scriptTemplate",
+                    "component": "operations/scriptTemplate/index",
+                    "redirect": "",
+                    "name": "scriptTemplate",
+                    "meta": {
+                        "title": "\u6a21\u677f\u7ba1\u7406",
                         "icon": "",
                         "hidden": False,
                         "keepAlive": True,
@@ -537,12 +554,12 @@ class menuDeploy():
             },
             "children": [
                 {
-                    "path": "googleRecord",
-                    "component": "reportsManage/googleRecord/index",
+                    "path": "spider",
+                    "component": "reportsManage/spider/index",
                     "redirect": "",
                     "name": "",
                     "meta": {
-                        "title": " Google\u6536\u5f55",
+                        "title": "\u8718\u86db",
                         "icon": "",
                         "hidden": False,
                         "keepAlive": True,
@@ -554,12 +571,12 @@ class menuDeploy():
                     ]
                 },
                 {
-                    "path": "spider",
-                    "component": "reportsManage/spider/index",
+                    "path": "googleRecord",
+                    "component": "reportsManage/googleRecord/index",
                     "redirect": "",
                     "name": "",
                     "meta": {
-                        "title": "\u8718\u86db",
+                        "title": " Google\u6536\u5f55",
                         "icon": "",
                         "hidden": False,
                         "keepAlive": True,

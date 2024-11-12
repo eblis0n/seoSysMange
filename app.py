@@ -28,6 +28,7 @@ from src.api.splicingManagement.splicing_manage import splicingManage
 from src.api.sysMenuManagement.sys_menu_manage import menuDeploy
 from src.api.sysUserManagement.sys_user_manage import userService
 from src.api.uploadFileManagement.upload_file_manage import uploadFileManage
+from src.api.scriptTemplateManagement.script_template_manage import scriptTemplateManage
 
 def create_app():
     """
@@ -101,7 +102,8 @@ def _register_blueprints(app):
         amazonManage().bp,
         outcomeManage().bp,
         bloggerManage().bp,
-        operationsManage().bp
+        operationsManage().bp,
+        scriptTemplateManage().bp,
     ]
     
     for blueprint in blueprints:

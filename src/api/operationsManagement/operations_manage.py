@@ -44,44 +44,44 @@ class operationsManage():
         self.bp.route(self.Myenum.TASK_IMPLEMENT_LOGS, methods=['POST'])(self.task_implement_logs)
         self.bp.route(self.Myenum.TASKS_INSERT, methods=['POST'])(self.tasks_insert)
 
-    # def hosts_list(self):
-    #     """
-    #         @Datetime ： 2024/11/3 15:42
-    #         @Author ：eblis
-    #         @Motto：简单描述用途
-    #     """
-    #     sql_data = self.mossql.operations_hosts_find("seo_operations_hosts")
-    #     resdatas = []
-    #     current_time = datetime.now()
-    #
-    #     if not sql_data:  # 如果sql_data为空或None，直接返回
-    #         self.usego.sendlog(f'list查询失败：{sql_data}')
-    #         return ResMsg(code='B0001', msg='list查询失败').to_json()
-    #
-    #     for record in sql_data:
-    #         # 提取数据
-    #         thisdata = {
-    #             "id": str(record["_id"]),  # 转换 ObjectId 为字符串
-    #             "host_ip": record["host_ip"],
-    #             "is_disabled": str(record["is_disabled"]),
-    #             "host_group": record["host_group"],
-    #             "remark": record["remark"],
-    #             "ping_time": record["ping_time"],
-    #             "online": "1"  # 默认离线
-    #         }
-    #
-    #         # 获取ping时间并判断是否在线
-    #         ping_time = self.parse_ping_time(thisdata["ping_time"])
-    #         if ping_time:
-    #             # 如果ping时间在5分钟内，视为在线
-    #             minutes_ago = current_time - timedelta(seconds=int(configCall.refreshTiming))
-    #             if ping_time > minutes_ago:
-    #                 thisdata["online"] = "0"  # 视为在线
-    #
-    #         resdatas.append(thisdata)
-    #
-    #     self.usego.sendlog(f'list结果：{len(resdatas)}')
-    #     return ResMsg(data=resdatas).to_json()
+    def hosts_list(self):
+        """
+            @Datetime ： 2024/11/3 15:42
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        sql_data = self.mossql.operations_hosts_find("seo_operations_hosts")
+        resdatas = []
+        current_time = datetime.now()
+
+        if not sql_data:  # 如果sql_data为空或None，直接返回
+            self.usego.sendlog(f'list查询失败：{sql_data}')
+            return ResMsg(code='B0001', msg='list查询失败').to_json()
+
+        for record in sql_data:
+            # 提取数据
+            thisdata = {
+                "id": str(record["_id"]),  # 转换 ObjectId 为字符串
+                "host_ip": record["host_ip"],
+                "is_disabled": str(record["is_disabled"]),
+                "host_group": record["host_group"],
+                "remark": record["remark"],
+                "ping_time": record["ping_time"],
+                "online": "1"  # 默认离线
+            }
+
+            # 获取ping时间并判断是否在线
+            ping_time = self.parse_ping_time(thisdata["ping_time"])
+            if ping_time:
+                # 如果ping时间在5分钟内，视为在线
+                minutes_ago = current_time - timedelta(seconds=int(configCall.refreshTiming))
+                if ping_time > minutes_ago:
+                    thisdata["online"] = "0"  # 视为在线
+
+            resdatas.append(thisdata)
+
+        self.usego.sendlog(f'list结果：{len(resdatas)}')
+        return ResMsg(data=resdatas).to_json()
 
 
 
@@ -300,33 +300,33 @@ class operationsManage():
 ################################################################# 调试 #########################################
 
 
-    def hosts_list(self):
-        """
-            @Datetime ： 2024/11/3 15:42
-            @Author ：eblis
-            @Motto：简单描述用途
-        """
-
-        resdatas = [
-            {
-                "id": "671b2ed492d279da1e511080",
-                "host_ip": "140.240.16.154",
-                "is_disabled": "1",
-                "host_group": "hugo",
-                "remark": "测试",
-                "ping_time": "2024-10-27 15:16:06",
-                "online": "1"
-            },
-            {
-                "id": "671cfa6292d279da1e511081",
-                "host_ip": "8.217.41.149",
-                "is_disabled": "0",
-                "host_group": "hugo",
-                "remark": "测试",
-                "ping_time": "2024-11-06 17:09:06",
-                "online": "0"
-            }
-        ]
-
-        self.usego.sendlog(f'list结果：{len(resdatas)}')
-        return ResMsg(data=resdatas).to_json()
+    # def hosts_list(self):
+    #     """
+    #         @Datetime ： 2024/11/3 15:42
+    #         @Author ：eblis
+    #         @Motto：简单描述用途
+    #     """
+    #
+    #     resdatas = [
+    #         {
+    #             "id": "671b2ed492d279da1e511080",
+    #             "host_ip": "140.240.16.154",
+    #             "is_disabled": "1",
+    #             "host_group": "hugo",
+    #             "remark": "测试",
+    #             "ping_time": "2024-10-27 15:16:06",
+    #             "online": "1"
+    #         },
+    #         {
+    #             "id": "671cfa6292d279da1e511081",
+    #             "host_ip": "8.217.41.149",
+    #             "is_disabled": "0",
+    #             "host_group": "hugo",
+    #             "remark": "测试",
+    #             "ping_time": "2024-11-06 17:09:06",
+    #             "online": "0"
+    #         }
+    #     ]
+    #
+    #     self.usego.sendlog(f'list结果：{len(resdatas)}')
+    #     return ResMsg(data=resdatas).to_json()
