@@ -18,11 +18,13 @@ import subprocess
 from middleware.public.commonUse import otherUse
 from middleware.dataBaseGO.basis_sqlCollenction import basis_sqlGO
 import middleware.public.configurationCall as configCall
+from backendServices.src.awsMQ.amazonSQS import AmazonSQS
 
 class getCookie():
     def __init__(self):
         self.usego = otherUse()
         self.ssql = basis_sqlGO()
+        self.aws_sqs = AmazonSQS()
 
     def run(self, pcname, queue_url, adsIDlist):
         """
@@ -41,6 +43,7 @@ class getCookie():
             print("cookiedict", cookiedict)
             sql_data = self.ssql.note_users_info_update_cookie(cookie=cookiedict["cookie"], adsID=cookiedict["user_id"])
             self.ssql.pcSettings_update_state_sql(pcname, state=0)
+            self.aws_sqs.deleteMSG(queue_url)
             if "sql 语句异常" not in str(sql_data):
 
                 print(f'{cookiedict["user_id"]},入库成功！！！')
