@@ -98,4 +98,5 @@ class getCookie():
 if __name__ == '__main__':
     getGO = getCookie()
     adsIDlist = ["klak6h9"]
-    getGO.run(adsIDlist)
+    queue_url = "/"
+    getGO.run(configCall.client_id, queue_url, adsIDlist)
