@@ -61,18 +61,11 @@ class getCookie():
             @Motto：简单描述用途
         """
         print(f"来把～ {adsID},开始获取cookie")
+        print(f"js地址：{configCall.note_get_cookie_js}")
+        print(f"adsServer:{configCall.adsServer}")
 
-        result = subprocess.run(
-            [
-                "node",  # Node.js 命令
-                configCall.note_get_cookie_js,  # Node.js 脚本路径
-                configCall.adsServer,  # adsServer 参数
-                adsID # adsID 参数
-                # filepath  # filepath 参数
-            ],
-            capture_output=True,  # 捕获输出
-            text=True  # 以文本格式处理输出
-        )
+        result = subprocess.run(["node", f"{configCall.note_get_cookie_js}",  configCall.adsServer, adsID], capture_output=True, text=True)
+
 
         # 打印 Node.js 脚本的标准输出
         print(f"Node.js 脚本的标准输出:{result.stdout}")
