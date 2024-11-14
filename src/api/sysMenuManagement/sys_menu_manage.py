@@ -53,9 +53,6 @@ class menuDeploy():
     #         except:
     #             self.usego.sendlog(f'查无此数据：{sql_data}')
     #             res = ResMsg(code='B0001', msg=f'查无此用户，请查正后再重试')
-    #             responseData = res.to_json()
-    #
-    #             return responseData
     #         else:
     #             self.usego.sendlog(f'router_code：{router_code}')
     #             time.sleep(5)
@@ -69,25 +66,27 @@ class menuDeploy():
     #                 except:
     #                     self.usego.sendlog(f'菜单查询失败：{sql_data}')
     #                     res = ResMsg(code='B0001', msg=f'查无此用户，请查正后再重试')
-    #                     responseData = res.to_json()
     #
-    #                     return responseData
     #                 else:
     #                     # print("resdatas",resdatas)
     #                     tree_data = self.usego.build_tree(resdatas)
     #
     #                     self.usego.sendlog(f'用户菜单结果：{tree_data}')
     #                     res = ResMsg(data=tree_data)
-    #                     responseData = res.to_json()
     #
-    #                     return responseData
+    #
+    #                 return res.to_json()
+    #             else:
+    #                 self.usego.sendlog(f'菜单查询失败：{sql_data}')
+    #                 res = ResMsg(code='B0001', msg=f'查无此用户，请查正后再重试')
+    #
+    #         return res.to_json()
     #
     #     else:
     #         self.usego.sendlog(f'非法查询：{sql_data}')
     #         res = ResMsg(code='B0001', msg=f'查无此用户，请查正后再重试')
-    #         responseData = res.to_json()
     #
-    #         return responseData
+    #         return res.to_json()
 
 
     def sys_menu_list(self):
@@ -356,7 +355,7 @@ class menuDeploy():
                             "redirect": "",
                             "name": "ads",
                             "meta": {
-                                "title": "ads\u76f8\u5173",
+                                "title": "ads",
                                 "icon": "",
                                 "hidden": False,
                                 "keepAlive": False,
@@ -386,7 +385,7 @@ class menuDeploy():
                         },
                         {
                             "path": "note",
-                            "component": "basisManage/NoteUserInfo/noteUserInfo",
+                            "component": "basisManage/Note/index",
                             "redirect": "",
                             "name": "Note",
                             "meta": {
@@ -909,6 +908,7 @@ class menuDeploy():
             ]
         }
     ]
+
         res = ResMsg(data=tree_data)
         responseData = res.to_json()
 

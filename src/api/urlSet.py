@@ -72,6 +72,12 @@ class MyEnum():
     BLOGGER_INFO_UPDATE = "/update/"
     BLOGGER_INFO_DELETE = "/delete/"
 
+    # note
+    NOTE_INFO_LIST = "/list/"
+    NOTE_INFO_INSERT = "/add/"
+    NOTE_INFO_UPDATE = "/update/"
+    NOTE_INFO_DELETE = "/delete/"
+
 
 
     # operations

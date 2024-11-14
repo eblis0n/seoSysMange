@@ -127,6 +127,12 @@ splicing_articie_path = conf.get("splicing", "splicing_articie_path")
 ahrefs_api_token = conf.get("ahrefs", "ahrefs_api_token")
 ahrefs_base_url = conf.get("ahrefs", "ahrefs_base_url")
 
+
+###################################### note ######################################
+
+note_path = conf.get("note", "note_path")
+note_get_cookie_js = conf.get("note", "note_get_cookie_js")
+
 ###################################### proxy ######################################
 
 proxy_add = conf.get("proxy", "proxy_add")

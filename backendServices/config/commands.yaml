@@ -19,6 +19,8 @@ commands:
       - group
       - start
       - end
+
+
   - name: run_blogger_selenium
     module: backendServices.src.socialPlatforms.bloggerGO.bloggerSelenium
     class: bloggerSelenium
@@ -38,6 +40,14 @@ commands:
       - group
       - start
       - end
+  - name: getCookie
+    module: backendServices.src.socialPlatforms.nodeGO.getCookie
+    class: getCookie
+    method: run
+    params:
+      - pcname
+      - queue_url
+      - adsIDlist
 
   - name: test1  # 另一个命令的名称
     module: backendServices.examples.test1  # 模块路径

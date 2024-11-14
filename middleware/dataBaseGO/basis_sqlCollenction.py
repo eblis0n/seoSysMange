@@ -385,3 +385,93 @@ class basis_sqlGO():
         # 执行 SQL 更新查询
         sql_data = self.ssql.mysql_commit('basis', sqlgo)
         return sql_data
+
+ # ############################################# note #####################################################
+
+    def note_users_info_list_sql(self):
+        """
+            @Datetime ： 2024/8/21 19:53
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        sqlgo = f"""
+                            SELECT /*+ NOCACHE */* FROM note_users_info ORDER BY create_at desc;
+                        """
+        # print("sqlgo", sqlgo)
+        sql_data = self.ssql.mysql_select('basis', sqlgo)
+
+
+        return sql_data
+
+
+    def note_users_info_select_sql(self, group):
+        """
+            @Datetime ： 2024/8/21 19:53
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        sqlgo = f"""
+                        SELECT /*+ NOCACHE */* FROM note_users_info where `group` = '{group}';
+                        """
+        # print("sqlgo", sqlgo)
+        sql_data = self.ssql.mysql_select('basis', sqlgo)
+
+        return sql_data
+
+
+    def note_user_info_del(self, id):
+        """
+            @Datetime ： 2024/8/20 14:13
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        sqlgo = f"""DELETE FROM note_users_info WHERE `id` = '{id}';"""
+        sql_data = self.ssql.mysql_commit('basis', sqlgo)
+
+
+        return sql_data
+
+
+    def note_users_info_insert(self, group, adsNumber, adsID, username, email, password, proxies, cookie, create_at):
+        """
+            @Datetime ： 2024/8/20 14:13
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        datas = (group, adsNumber, adsID, username, email, password, proxies, cookie, create_at)
+        sqlgo = f"""
+                    INSERT INTO note_users_info (`group`, `adsNumber`,`adsID`,`username`, `email`, `password`,`proxies`, `cookie`, `create_at`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+                    """
+        # print("sqlgo", sqlgo)
+        sql_data = self.ssql.mysql_commit_tuple('basis', sqlgo, datas)
+
+
+        return sql_data
+
+    def note_users_info_update(self, group, adsNumber, adsID, username, email, password, proxies, cookie, id):
+        """
+            @Datetime ： 2024/8/20 14:13
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        sqlgo = f""" UPDATE note_users_info SET `group`='{group}', `adsNumber`='{adsNumber}', `adsID`='{adsID}', `username`='{username}', `email`='{email}', `password`='{password}', `proxies`='{proxies}', `cookie`='{cookie}' WHERE `id` = '{id}';"""
+        sql_data = self.ssql.mysql_commit('basis', sqlgo)
+
+
+        return sql_data
+
+
+    def note_users_info_update_cookie(self, cookie, id=None, adsID=None):
+        """
+            @Datetime ： 2024/8/20 14:13
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        if id is not None:
+            sqlgo = f""" UPDATE note_users_info SET  `cookie`='{cookie}' WHERE `id` = '{id}';"""
+        else:
+            sqlgo = f""" UPDATE note_users_info SET  `cookie`='{cookie}' WHERE `adsID` = '{adsID}';"""
+
+        sql_data = self.ssql.mysql_commit('basis', sqlgo)
+
+        return sql_data

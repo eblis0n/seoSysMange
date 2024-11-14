@@ -24,8 +24,9 @@ from middleware.public.commonUse import otherUse
 class bloggerManage():
     def __init__(self):
         self.bp = Blueprint("blogger", __name__, url_prefix="/blog")
-        self.ssql = basis_sqlGO()
         self.Myenum = MyEnum()
+
+        self.ssql = basis_sqlGO()
         self.usego = otherUse()
 
         # 将路由和视图函数绑定到蓝图
@@ -52,13 +53,11 @@ class bloggerManage():
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'添加成功：{sql_data}')
             res = ResMsg(data=sql_data)
-            responseData = res.to_json()
-
         else:
             self.usego.sendlog(f'添加失败：{sql_data}')
             res = ResMsg(code='B0001', msg=f'添加失败：{sql_data}')
-            responseData = res.to_json()
-        return responseData
+
+        return res.to_json()
 
 
 
@@ -66,20 +65,18 @@ class bloggerManage():
 
         data_request = request.json
         id = data_request['id']
-        # print("id",id)
 
 
         sql_data = self.ssql.blogger_info_delete_sql(id)
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'成功删除：{id}')
             res = ResMsg(data=sql_data)
-            responseData = res.to_json()
 
         else:
             self.usego.sendlog(f'删除失败：{sql_data}')
             res = ResMsg(code='B0001', msg=f'删除失败：{sql_data}')
-            responseData = res.to_json()
-        return responseData
+
+        return res.to_json()
 
 
     def blogger_info_update(self):
@@ -94,19 +91,18 @@ class bloggerManage():
 
 
 
-
         sql_data = self.ssql.blogger_info_update_sql(group, adsNumber, adsID, proxy, bloggerID, id)
 
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'更新成功：{sql_data}')
             res = ResMsg(data=sql_data)
-            responseData = res.to_json()
+
 
         else:
             self.usego.sendlog(f'更新失败：{sql_data}')
             res = ResMsg(code='B0001', msg=f'更新失败：{sql_data}')
-            responseData = res.to_json()
-        return responseData
+
+        return res.to_json()
 
     def blogger_info_list(self):
         sql_data = self.ssql.blogger_info_list_sql()
@@ -123,16 +119,15 @@ class bloggerManage():
             except:
                 self.usego.sendlog(f'list没数据：{sql_data}')
                 res = ResMsg(code='B0001', msg=f'list没数据：{sql_data}')
-                responseData = res.to_json()
+
             else:
                 self.usego.sendlog(f'list结果：{resdatas}')
                 res = ResMsg(data=resdatas)
-                responseData = res.to_json()
+
 
         else:
             self.usego.sendlog(f'list查询失败：{sql_data}')
             res = ResMsg(code='B0001', msg=f'list查询失败：{sql_data}')
-            responseData = res.to_json()
 
-        return responseData
+        return res.to_json()
 
