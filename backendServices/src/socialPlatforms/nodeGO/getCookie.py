@@ -24,13 +24,13 @@ class getCookie():
         self.usego = otherUse()
         self.ssql = basis_sqlGO()
 
-    def run(self, adsIDlist):
+    def run(self, pcname, queue_url, adsIDlist):
         """
             @Datetime ： 2024/8/27 13:33
             @Author ：eblis
             @Motto：简单描述用途
         """
-
+        print(f"{queue_url} 执行")
         response_cookie = []
         for adsID in adsIDlist:
             self.get_cookie(adsID, response_cookie)
@@ -40,7 +40,9 @@ class getCookie():
             cookiedict = self.usego.changeDict(cookiedata)
             print("cookiedict", cookiedict)
             sql_data = self.ssql.note_users_info_update_cookie(cookie=cookiedict["cookie"], adsID=cookiedict["user_id"])
+            self.ssql.pcSettings_update_state_sql(pcname, state=0)
             if "sql 语句异常" not in str(sql_data):
+
                 print(f'{cookiedict["user_id"]},入库成功！！！')
                 return True
             else:
