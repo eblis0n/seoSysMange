@@ -8,16 +8,16 @@ const user_id = process.argv[3];
 // const filepath = process.argv[4];
 
 // 等待的辅助函数
-function wait(ms) {
-    return new Promise(resolve => setTimeout(() => resolve(), ms));
-};
+// function wait(ms) {
+//     return new Promise(resolve => setTimeout(() => resolve(), ms));
+// };
 
 // 文件写入函数
-const writeOutput = (file, data) => {
-    fs.appendFile(file, data, function (err) {
-        if (err) throw err;
-    });
-}
+// const writeOutput = (file, data) => {
+//     fs.appendFile(file, data, function (err) {
+//         if (err) throw err;
+//     });
+// }
 
 const main = async () => {
     let res = await axios.get(`${ads_api}/api/v1/browser/start?user_id=${user_id}`);
@@ -57,21 +57,10 @@ const main = async () => {
         });
 
         await page.goto(`https://editor.note.com/new`, { waitUntil: 'networkidle0' });
-        await page.close();
-        await browser.close();
+        // await page.close();
+        // await browser.close();
     } catch (e) {
         console.error(e);
-    } finally {
-        try {
-            await page.close();
-        } catch (error) {
-            console.error('Error closing page:', error);
-        }
-        try {
-            await browser.close();
-        } catch (error) {
-            console.error('Error closing browser:', error);
-        }
     }
 }
 

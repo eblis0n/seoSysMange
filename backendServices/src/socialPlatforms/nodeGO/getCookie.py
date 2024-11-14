@@ -41,7 +41,10 @@ class getCookie():
         for cookiedata in response_cookie:
             cookiedict = self.usego.changeDict(cookiedata)
             print("cookiedict", cookiedict)
-            sql_data = self.ssql.note_users_info_update_cookie(cookie=cookiedict["cookie"], adsID=cookiedict["user_id"])
+            try:
+                sql_data = self.ssql.note_users_info_update_cookie(cookie=cookiedict["cookie"], adsID=cookiedict["user_id"])
+            except:
+                sql_data = "sql 语句异常"
             self.ssql.pcSettings_update_state_sql(pcname, state=0)
             self.aws_sqs.deleteMSG(queue_url)
             if "sql 语句异常" not in str(sql_data):
@@ -73,9 +76,9 @@ class getCookie():
         response_cookie.append(result.stdout)
 
         # 打印 Node.js 脚本的标准错误
-        # if result.stderr:
-        #     print("Node.js 脚本的标准错误:")
-        #     print(result.stderr)
+        if result.stderr:
+            print("Node.js 脚本的标准错误:")
+            print(result.stderr)
 
         # 检查 Node.js 脚本是否执行成功
         if result.returncode == 0:
@@ -90,6 +93,6 @@ class getCookie():
 
 if __name__ == '__main__':
     getGO = getCookie()
-    adsIDlist = ["klak6h9"]
+    adsIDlist = ["klak6mm"]
     queue_url = "/"
     getGO.run(configCall.client_id, queue_url, adsIDlist)
