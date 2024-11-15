@@ -17,19 +17,19 @@ from middleware.public.logs import log_config
 from middleware.control.amazonRun import amazonRun
 
 # API 蓝图导入
-from src.api.amazonManagement.amazon_management import amazonManage
-from src.api.bloggerManagement.blogger_management import bloggerManage
-from src.api.operationsManagement.operations_manage import operationsManage
+from src.api.basis.amazonManagement.amazon_management import amazonManage
+from src.api.basis.bloggerManagement.blogger_management import bloggerManage
+from src.api.basis.operationsManagement.operations_manage import operationsManage
 
-from src.api.outcomeManagement.outcome_manage import outcomeManage
-from src.api.pcSettingsManagement.pc_settings_manage import pcManage
-from src.api.publicManagement.public_manage import publicManage
-from src.api.splicingManagement.splicing_manage import splicingManage
-from src.api.sysMenuManagement.sys_menu_manage import menuDeploy
-from src.api.sysUserManagement.sys_user_manage import userService
-from src.api.uploadFileManagement.upload_file_manage import uploadFileManage
-from src.api.scriptTemplateManagement.script_template_manage import scriptTemplateManage
-from src.api.noteManagement.note_info_manegement import noteInfoManage
+from src.api.basis.outcomeManagement.outcome_manage import outcomeManage
+from src.api.basis.pcSettingsManagement.pc_settings_manage import pcManage
+from src.api.basis.publicManagement.public_manage import publicManage
+from src.api.basis.splicingManagement.splicing_manage import splicingManage
+from src.api.basis.sysMenuManagement.sys_menu_manage import menuDeploy
+from src.api.basis.sysUserManagement.sys_user_manage import userService
+from src.api.basis.uploadFileManagement.upload_file_manage import uploadFileManage
+from src.api.basis.scriptTemplateManagement.script_template_manage import scriptTemplateManage
+from src.api.basis.noteManagement.note_info_manegement import noteInfoManage
 
 def create_app():
     """

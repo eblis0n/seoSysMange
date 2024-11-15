@@ -41,8 +41,8 @@ class noteInfoManage():
         self.bp.route(self.Myenum.NOTE_INFO_UPDATE, methods=['POST'])(self.note_info_update)
         self.bp.route(self.Myenum.NOTE_INFO_DELETE, methods=['POST'])(self.note_info_del)
         # self.bp.route(self.Myenum.NOTE_USER_POST, methods=['POST'])(self.note_user_post)
-        # self.bp.route(self.Myenum.NOTE_USER_BATCH_POST, methods=['POST'])(self.note_user_batch_post)
-        # self.bp.route(self.Myenum.NOTE_USER_BATCH_GET_COOKIE, methods=['POST'])(self.note_user_batch_get_cookie)
+        # self.bp.route(self.Myenum.NOTE_BATCH_PUSH_ARTICLE, methods=['POST'])(self.NOTE_USER_BATCH_PUSH_ARTICLE)
+        self.bp.route(self.Myenum.NOTE_BATCH_GET_COOKIE, methods=['POST'])(self.note_batch_get_cookie)
         # self.bp.route(self.Myenum.NOTE_USER_GET_COOKIE, methods=['POST'])(self.note_user_get_cookie)
 
     def note_info_list(self):
@@ -264,45 +264,41 @@ class noteInfoManage():
     #     responseData = res.to_dict()
     #     return responseData
     #
-    # def note_user_batch_get_cookie(self):
-    #
-    #     form_data = request.json
-    #     group = form_data['group']
-    #
-    #     if group == "None":
-    #         print("把所有用户都重新获取cookie")
-    #         sql_data = self.ssql.note_users_info_list_sql()
-    #
-    #         if "sql 语句异常" not in str(sql_data):
-    #             resdatas = [item[3] for item in sql_data]
-    #         else:
-    #             self.usego.sendlog(f'{sql_data}查数据库失败')
-    #             res = ResMsg(code=10001, msg=f'{sql_data}查数据库失败')
-    #             responseData = res.to_json()
-    #             return responseData
-    #     else:
-    #         sql_data = self.ssql.note_users_info_select_sql(group)
-    #
-    #         if "sql 语句异常" not in str(sql_data):
-    #             resdatas = [item[3] for item in sql_data]
-    #         else:
-    #             self.usego.sendlog(f'{sql_data}查数据库失败')
-    #             res = ResMsg(code=10001, msg=f'{sql_data}查数据库失败')
-    #             responseData = res.to_json()
-    #             return responseData
-    #
-    #     tasks_args = []
-    #     print("resdatas",resdatas)
-    #
-    #     tasks_args.append((self.getGO.run, (resdatas, )))
-    #
-    #
-    #     self.mul.pro_task_go(self.mul.note_get_cookie_pool_go, (1, tasks_args))
-    #
-    #     self.usego.sendlog(f'{group}正在触发 批量更新cookie 脚本发帖')
-    #     res = ResMsg(data=f'{group}正在触发 批量更新cookie 脚本发帖')
-    #     responseData = res.to_dict()
-    #     return responseData
-    #
-    #
-    #
+    def note_batch_get_cookie(self):
+
+        form_data = request.json
+        group = form_data['group']
+
+        if group == "All" or group == "":
+            print("把所有用户都重新获取cookie")
+            sql_data = self.ssql.note_users_info_list_sql()
+
+            if "sql 语句异常" not in str(sql_data):
+                resdatas = [item[3] for item in sql_data]
+
+            else:
+                self.usego.sendlog(f'{sql_data}查数据库失败')
+                res = ResMsg(code='B0001', msg=f'{sql_data}查数据库失败')
+                return res.to_json()
+        else:
+            sql_data = self.ssql.note_users_info_select_sql(group)
+
+            if "sql 语句异常" not in str(sql_data):
+                resdatas = [item[3] for item in sql_data]
+            else:
+                self.usego.sendlog(f'{sql_data}查数据库失败')
+                res = ResMsg(code='B0001', msg=f'{sql_data}查数据库失败')
+                return res.to_json()
+
+        datasDict = {
+            "platform": "blogger",
+            "adsIDlist": resdatas
+        }
+        self.usego.sendlog(f"接收到的参数：{datasDict}")
+        results = self.task.run("cookies", datasDict["platform"], datasDict)
+
+        res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
+        return res.to_json()
+
+
+

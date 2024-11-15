@@ -77,6 +77,8 @@ class MyEnum():
     NOTE_INFO_INSERT = "/add/"
     NOTE_INFO_UPDATE = "/update/"
     NOTE_INFO_DELETE = "/delete/"
+    NOTE_BATCH_GET_COOKIE = "/batch/cookie/"
+    NOTE_BATCH_PUSH_ARTICLE = "/batch/article/"
 
 
 

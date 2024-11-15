@@ -14,7 +14,9 @@ bae_idr = base_dr.replace('\\', '/')
 sys.path.append(bae_idr)
 
 import subprocess
-
+import threading
+from concurrent.futures import ThreadPoolExecutor
+import time
 from middleware.public.commonUse import otherUse
 from middleware.dataBaseGO.basis_sqlCollenction import basis_sqlGO
 import middleware.public.configurationCall as configCall
@@ -26,6 +28,7 @@ class getCookie():
         self.ssql = basis_sqlGO()
         self.aws_sqs = AmazonSQS()
 
+
     def run(self, pcname, queue_url, adsIDlist):
         """
             @Datetime ： 2024/8/27 13:33
@@ -33,28 +36,68 @@ class getCookie():
             @Motto：简单描述用途
         """
         print(f"{queue_url} 执行")
-        response_cookie = []
-        for adsID in adsIDlist:
-            self.get_cookie(adsID, response_cookie)
-        print("get_cookie执行完了，可以下一步")
-        # time.sleep(3)
-        for cookiedata in response_cookie:
-            cookiedict = self.usego.changeDict(cookiedata)
-            print("cookiedict", cookiedict)
-            try:
-                sql_data = self.ssql.note_users_info_update_cookie(cookie=cookiedict["cookie"], adsID=cookiedict["user_id"])
-            except:
-                sql_data = "sql 语句异常"
-            self.ssql.pcSettings_update_state_sql(pcname, state=0)
-            self.aws_sqs.deleteMSG(queue_url)
-            if "sql 语句异常" not in str(sql_data):
 
-                print(f'{cookiedict["user_id"]},入库成功！！！')
-                return True
-            else:
-                print(f'{cookiedict["user_id"]}入库失败')
-                return False
+        # response_cookie = []  # 用于存储获取到的 cookie
+        batch_size = 10  # 每个批次处理 10 个 adsID
 
+        # 用于存储每个批次的失败数据
+        failed_data = []
+
+        # 线程池处理每个批次的函数
+        def process_ads_batch(batch_adsID):
+            batch_response_cookie = []
+            for adsID in batch_adsID:
+                self.get_cookie(adsID, batch_response_cookie)
+            print(f"Batch processed: {batch_adsID}")
+
+            # 每个批次完成后将数据插入数据库，并将入库失败的数据记录
+            batch_failed_data = []
+            for cookiedata in batch_response_cookie:
+                cookiedict = self.usego.changeDict(cookiedata)
+
+                try:
+                    sql_data = self.ssql.note_users_info_update_cookie(cookie=cookiedict["cookie"],
+                                                                       adsID=cookiedict["user_id"])
+                    if "sql 语句异常" in str(sql_data):
+                        batch_failed_data.append(cookiedict)  # 失败的数据保留
+                    else:
+                        print(f'{cookiedict["user_id"]},入库成功！！！')
+                except Exception as e:
+                    print(f"Error inserting {cookiedict['user_id']}: {e}")
+                    batch_failed_data.append(cookiedict)  # 失败的数据保留
+
+            # 将每个批次失败的数据保留到 `failed_data`
+            failed_data.extend(batch_failed_data)
+
+        # 将 adsIDlist 分割成多个批次
+        batches = [adsIDlist[i:i + batch_size] for i in range(0, len(adsIDlist), batch_size)]
+
+        # 使用 ThreadPoolExecutor 执行每个批次
+        with ThreadPoolExecutor(max_workers=batch_size) as executor:
+            executor.map(process_ads_batch, batches)
+
+
+        # 如果有失败的数据（数据库插入失败的记录），返回失败
+        if failed_data:
+            print(f"以下数据入库失败：{failed_data}")
+            for cookiedata in failed_data:
+                cookiedict = self.usego.changeDict(cookiedata)
+                try:
+                    sql_data = self.ssql.note_users_info_update_cookie(cookie=cookiedict["cookie"],
+                                                                       adsID=cookiedict["user_id"])
+                    if "sql 语句异常" in str(sql_data):
+                        print(f"没救了，二次入库失败{cookiedict}")
+                    else:
+                        print(f'{cookiedict["user_id"]},入库成功！！！')
+                except Exception as e:
+                    print(f"没救了，二次入库失败{cookiedict}")
+
+        print("所有批次的 get_cookie 执行完毕，可以执行后续操作")
+
+        # 处理完成所有批次后的操作：更新状态和删除队列消息
+        self.ssql.pcSettings_update_state_sql(pcname, state=0)
+        self.aws_sqs.deleteMSG(queue_url)
+        return True
 
 
     def get_cookie(self, adsID, response_cookie):
@@ -93,6 +136,6 @@ class getCookie():
 
 if __name__ == '__main__':
     getGO = getCookie()
-    adsIDlist = ["klak6mm"]
+    adsIDlist = ["klak6jp"]
     queue_url = "/"
     getGO.run(configCall.client_id, queue_url, adsIDlist)
