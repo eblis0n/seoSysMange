@@ -56,7 +56,7 @@ class getCookie():
                 cookiedict = self.usego.changeDict(cookiedata)
 
                 try:
-                    sql_data = self.ssql.note_users_info_update_cookie(cookie=cookiedict["cookie"],
+                    sql_data = self.ssql.note_users_info_update_cookie(useragent=cookiedict["useragent"], cookie=cookiedict["cookie"],
                                                                        adsID=cookiedict["user_id"])
                     if "sql 语句异常" in str(sql_data):
                         batch_failed_data.append(cookiedict)  # 失败的数据保留
@@ -83,7 +83,7 @@ class getCookie():
             for cookiedata in failed_data:
                 cookiedict = self.usego.changeDict(cookiedata)
                 try:
-                    sql_data = self.ssql.note_users_info_update_cookie(cookie=cookiedict["cookie"],
+                    sql_data = self.ssql.note_users_info_update_cookie(useragent=cookiedict["useragent"], cookie=cookiedict["cookie"],
                                                                        adsID=cookiedict["user_id"])
                     if "sql 语句异常" in str(sql_data):
                         print(f"没救了，二次入库失败{cookiedict}")

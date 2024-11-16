@@ -40,6 +40,27 @@ commands:
       - group
       - start
       - end
+
+  - name: note_post_text
+    module: backendServices.src.socialPlatforms.nodeGO.notePostText
+    class: notePostText
+    method: main
+    params:
+      - pcname
+      - queue_url
+      - genre
+      - platform
+      - stacking_min
+      - stacking_max
+      - title_alt
+      - alt_text
+      - sort
+      - isarts
+      - postingStyle
+      - group
+      - start
+      - end
+
   - name: getCookie
     module: backendServices.src.socialPlatforms.nodeGO.getCookie
     class: getCookie

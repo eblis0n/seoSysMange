@@ -117,47 +117,47 @@ class notesTextPost():
                 self.usego.sendlog(f"{response.status_code}, {response.text}")
                 return False
 
-    # def post_imgage(self, id, cookie, filepath, filenanme, proxies):
-    #     """
-    #         @Datetime ： 2024/8/22 13:58
-    #         @Author ：eblis
-    #         @Motto：文章顶图
-    #     """
-    #     # 替换为你的文件路径
-    #     # filepath = '/path/to/your/file.jpg'
-    #     # 替换为你的接口URL
-    #     url = "https://note.com/api/v1/image_upload/note_eyecatch"
-    #     #
-    #     headers = {
-    #                 'cookie': f"{cookie}",
-    #                 'referer': 'https://editor.note.com/',
-    #                 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
-    #                 'x-requested-with': 'XMLHttpRequest'
-    #                }  # 设置 HTTP 头部为 JSON
-    #
-    #     # 打开文件
-    #     with open(f"{filepath}/{filenanme}", 'rb') as f:
-    #         # 创建一个名为'file'的文件对象
-    #         # print(f.read())
-    #         files = {'file': f}
-    #         # 创建一个包含其他字段的字典
-    #         data = {'note_id': id, 'width': 1920, 'height': 1005}
-    #         # 发送post请求
-    #         if proxies is None:
-    #             response = requests.post(url, headers=headers, files=files, data=data)
-    #         else:
-    #             try:
-    #                 response = requests.post(url, headers=headers, files=files, data=data, proxies=proxies)
-    #                 self.usego.sendlog("成功使用代理")
-    #             except:
-    #                 response = requests.post(url, headers=headers, files=files, data=data)
-    #
-    #
-    #     if response.status_code == 201:
-    #         return response.json()
-    #     else:
-    #         self.usego.sendlog(f"{response.status_code}, {response.text}")
-    #         return False
+    def post_imgage(self, id, cookie, filepath, filenanme, proxies):
+        """
+            @Datetime ： 2024/8/22 13:58
+            @Author ：eblis
+            @Motto：文章顶图
+        """
+        # 替换为你的文件路径
+        # filepath = '/path/to/your/file.jpg'
+        # 替换为你的接口URL
+        url = "https://note.com/api/v1/image_upload/note_eyecatch"
+        #
+        headers = {
+                    'cookie': f"{cookie}",
+                    'referer': 'https://editor.note.com/',
+                    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
+                    'x-requested-with': 'XMLHttpRequest'
+                   }  # 设置 HTTP 头部为 JSON
+
+        # 打开文件
+        with open(f"{filepath}/{filenanme}", 'rb') as f:
+            # 创建一个名为'file'的文件对象
+            # print(f.read())
+            files = {'file': f}
+            # 创建一个包含其他字段的字典
+            data = {'note_id': id, 'width': 1920, 'height': 1005}
+            # 发送post请求
+            if proxies is None:
+                response = requests.post(url, headers=headers, files=files, data=data)
+            else:
+                try:
+                    response = requests.post(url, headers=headers, files=files, data=data, proxies=proxies)
+                    self.usego.sendlog("成功使用代理")
+                except:
+                    response = requests.post(url, headers=headers, files=files, data=data)
+
+
+        if response.status_code == 201:
+            return response.json()
+        else:
+            self.usego.sendlog(f"{response.status_code}, {response.text}")
+            return False
 
     def post_text_go(self, id, headers, proxies, slug, bodydata, body_length, title):
         """

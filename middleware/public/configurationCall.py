@@ -132,6 +132,7 @@ ahrefs_base_url = conf.get("ahrefs", "ahrefs_base_url")
 
 note_path = conf.get("note", "note_path")
 note_get_cookie_js = conf.get("note", "note_get_cookie_js")
+note_upload_image_js = conf.get("note", "note_upload_image_js")
 
 ###################################### proxy ######################################
 

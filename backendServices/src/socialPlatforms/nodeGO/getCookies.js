@@ -1,6 +1,6 @@
 const axios = require('axios');
 const puppeteer = require('puppeteer-core');
-const fs = require('fs');
+// const fs = require('fs');
 
 // 获取命令行参数
 const ads_api = process.argv[2];
@@ -40,7 +40,7 @@ const main = async () => {
             const url = interceptedRequest.url();
             if (url.includes('https://note.com/api/v2/current_user')) {
                 const headers = interceptedRequest.headers();
-                // console.log('Request Headers:', headers); // 打印请求头
+                console.log('Request Headers:', headers); // 打印请求头
 
                 if (headers['cookie']) {
                     const cookiedata = {
