@@ -47,7 +47,9 @@ class getCookie():
         def process_ads_batch(batch_adsID):
             batch_response_cookie = []
             for adsID in batch_adsID:
-                self.get_cookie(adsID, batch_response_cookie)
+                jsresponse = self.get_cookie(adsID)
+                if jsresponse is not None:
+                    batch_response_cookie.append(jsresponse)
             print(f"Batch processed: {batch_adsID}")
 
             # 每个批次完成后将数据插入数据库，并将入库失败的数据记录
@@ -56,7 +58,7 @@ class getCookie():
                 cookiedict = self.usego.changeDict(cookiedata)
 
                 try:
-                    sql_data = self.ssql.note_users_info_update_cookie(useragent=cookiedict["useragent"], cookie=cookiedict["cookie"],
+                    sql_data = self.ssql.note_users_info_update_cookie(useragent=cookiedict["user-agent"], cookie=cookiedict["cookie"],
                                                                        adsID=cookiedict["user_id"])
                     if "sql 语句异常" in str(sql_data):
                         batch_failed_data.append(cookiedict)  # 失败的数据保留
@@ -100,7 +102,7 @@ class getCookie():
         return True
 
 
-    def get_cookie(self, adsID, response_cookie):
+    def get_cookie(self, adsID):
         """
             @Datetime ： 2024/8/27 00:04
             @Author ：eblis
@@ -116,7 +118,6 @@ class getCookie():
         # 打印 Node.js 脚本的标准输出
         print(f"Node.js 脚本的标准输出:{result.stdout}")
 
-        response_cookie.append(result.stdout)
 
         # 打印 Node.js 脚本的标准错误
         if result.stderr:
@@ -126,8 +127,10 @@ class getCookie():
         # 检查 Node.js 脚本是否执行成功
         if result.returncode == 0:
             print("Node.js 脚本执行成功")
+            return result.stdout
         else:
             print(f"Node.js 脚本执行失败，错误码: {result.returncode}")
+            return None
 
 
 
@@ -136,6 +139,6 @@ class getCookie():
 
 if __name__ == '__main__':
     getGO = getCookie()
-    adsIDlist = ["klak6jp"]
+    adsIDlist = ["klak6jl"]
     queue_url = "/"
     getGO.run(configCall.client_id, queue_url, adsIDlist)

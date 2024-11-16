@@ -21,7 +21,7 @@ const user_id = process.argv[3];
 
 const main = async () => {
     let res = await axios.get(`${ads_api}/api/v1/browser/start?user_id=${user_id}`);
-    // console.log('Response:', res.data); // 打印响应信息
+    console.log('Response:', res.data); // 打印响应信息
 
     if (!(res.data.code === 0 && res.data.data.ws && res.data.data.ws.puppeteer)) {
         return false;
@@ -40,12 +40,13 @@ const main = async () => {
             const url = interceptedRequest.url();
             if (url.includes('https://note.com/api/v2/current_user')) {
                 const headers = interceptedRequest.headers();
-                console.log('Request Headers:', headers); // 打印请求头
+                // console.log('Request Headers:', headers); // 打印请求头
 
                 if (headers['cookie']) {
                     const cookiedata = {
                         "user_id": `${user_id}`,
-                        "cookie": headers['cookie']
+                        "cookie": headers['cookie'],
+                        "user-agent": headers['user-agent']
                     };
                     // writeOutput(filepath, JSON.stringify(cookiedata) + '\n');
                     console.log(JSON.stringify(cookiedata)); // 打印请求头
@@ -56,11 +57,15 @@ const main = async () => {
             }
         });
 
-        await page.goto(`https://editor.note.com/new`, { waitUntil: 'networkidle0' });
-        // await page.close();
-        // await browser.close();
+        // await page.goto(`https://editor.note.com/new`, { waitUntil: 'networkidle0' });
+        await page.goto(`https://editor.note.com/new`, { waitUntil: 'networkidle0', timeout: 100000 });
+        await page.close();
+        await browser.close();
     } catch (e) {
         console.error(e);
+    }finally {
+        console.log('Exiting script...');
+        process.exit(0); // 确保退出程序，0 表示正常退出
     }
 }
 
