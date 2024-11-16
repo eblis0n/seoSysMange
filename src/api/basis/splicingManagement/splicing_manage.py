@@ -164,7 +164,7 @@ class splicingManage():
                 return 0
 
         # 默认平台列表
-        platforms = ["blogger", "telegra"]
+        platforms = ["blogger", "telegra", "note"]
 
         # 查询每个平台的数据
         results = {}

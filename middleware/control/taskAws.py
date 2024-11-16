@@ -48,6 +48,7 @@ class taskAws():
             resdatas = self.witchClient(platform)
             if resdatas != []:
                 self.iscookie(results, resdatas, datasDict)
+                return results
 
             else:
                 self.usego.sendlog(f'有 {len(resdatas)} 设备符合')
