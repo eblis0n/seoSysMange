@@ -75,8 +75,12 @@ youtube_developer_key = youtube_developer_key
 youtube_local_address = .../ProFileSys/docsFile/youtube_some
 
 
+
 [note]
-note_path = .../ProFileSys/docsFile/note_some
+note_path = .../seoSysMange/docsFile/note_some
+note_get_cookie_js = .../seoSysMange/backendServices/src/socialPlatforms/nodeGO/getCookies.js
+note_upload_image_js = .../seoSysMange/backendServices/src/socialPlatforms/nodeGO/uploadImage.js
+
 
 [ads]
 adsServer = http://local.adspower.net:50332
