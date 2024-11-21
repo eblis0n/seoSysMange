@@ -32,6 +32,7 @@ from src.api.basis.scriptTemplateManagement.script_template_manage import script
 from src.api.basis.noteManagement.note_info_manegement import noteInfoManage
 from src.api.article.aiPromptManagement.aiPrompt_management import aiPromptManage
 from src.api.article.articleManagement.article_management import articleManage
+from src.api.article.categoryManagement.category_management import categoryManage
 
 
 def create_app():
@@ -112,6 +113,7 @@ def _register_blueprints(app):
         ########### 文章############
         aiPromptManage().bp,
         articleManage().bp,
+        categoryManage().bp,
 
     ]
     
