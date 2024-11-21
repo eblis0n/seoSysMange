@@ -111,5 +111,12 @@ class MyEnum():
     ARTICLE_UPDATE = "/update/"
     ARTICLE_DELETE = "/delete/"
 
+    # category
+    CATEGORY_LIST = "/list/"
+    CATEGORY_INSERT = "/insert/"
+    CATEGORY_UPDATE = "/update/"
+    CATEGORY_DELETE = "/delete/"
+
+
 
 
