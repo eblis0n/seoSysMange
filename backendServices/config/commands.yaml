@@ -70,11 +70,25 @@ commands:
       - queue_url
       - adsIDlist
 
-  - name: test1  # 另一个命令的名称
-    module: backendServices.examples.test1  # 模块路径
-    class: test  # 类名
-    method: run  # 方法名
-    params: []  # 无参数
+  - name: generate_article
+    module: backendServices.src.generateArticle.generate_article
+    class: generateArticle
+    method: run
+    params:
+      - pcname
+      - queue_url
+      - isopenAI
+      - type
+      - max_length
+      - promptID
+      - sortID
+      - user
+      - theme
+      - Keywords
+      - ATag
+      - link
+      - language
+
 
 # 可以继续添加更多命令
 # 每个命令都应包含以下字段:

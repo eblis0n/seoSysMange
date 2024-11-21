@@ -270,7 +270,7 @@ class noteInfoManage():
         form_data = request.json
         group = form_data['group']
 
-        if group == "All" or group == "":
+        if group == "all" or group == "":
             print("把所有用户都重新获取cookie")
             sql_data = self.ssql.note_users_info_list_sql()
 

@@ -49,10 +49,11 @@ class taskAws():
             if resdatas != []:
                 self.iscookie(results, resdatas, datasDict)
                 return results
-
-            else:
-                self.usego.sendlog(f'有 {len(resdatas)} 设备符合')
-                return False
+        elif type == "article":
+            resdatas = self.witchClient(platform)
+            if resdatas != []:
+                self.isarticle(results, resdatas, datasDict)
+                return results
         else:
             self.usego.sendlog("啥也不是！！")
             return False
@@ -126,7 +127,7 @@ class taskAws():
         """
             @Datetime ： 2024/11/14 17:16
             @Author ：eblis
-            @Motto：简单描述用途
+            @Motto：发拼接， 搭配find_limit一起使用
         """
 
         query = {
@@ -234,6 +235,51 @@ class taskAws():
             end = 200000 * (idx + 1)
 
         return start, end
+
+
+
+
+    def isarticle(self, results, resdatas, datasDict):
+        """
+            @Datetime ： 2024/11/14 19:58
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+
+        for idx, client in enumerate(resdatas):
+            result = {}
+            # 生成 队列
+            response = self.aws_sqs.initialization(f'client_{client["name"]}')
+            queue_url = response['QueueUrl']
+            self.usego.sendlog(f'{idx}, name:client_{client["name"]}，state:{client["state"]}，队列地址:{queue_url}')
+            task_data = {
+                'pcname': client["name"],
+                'queue_url': queue_url,
+                'max_length': datasDict["max_length"],
+                "isopenAI": datasDict["isopenAI"],
+                "type": datasDict["type"],
+                "promptID":  datasDict["promptID"],
+                "sortID":  datasDict["sortID"],
+                "user": datasDict["user"],
+                "theme": datasDict["theme"],
+                "Keywords": datasDict["Keywords"],
+                "ATag": datasDict["ATag"],
+                "link": datasDict["link"],
+                "language": datasDict["language"],
+
+            }
+            self.usego.sendlog(f' getCookie，任务信息:{task_data}')
+            response = self.aws_sqs.sendMSG(queue_url, f'run_generate_article_group',
+                                            f'generate_article',
+                                            task_data)
+            result[f"{client}"] = response
+            results.append(result)
+            self.usego.sendlog(f' run_{datasDict["platform"]}_selenium，任务发送结果:{response}')
+
+            # 将 执行pc 状态 修改
+            sql_data = self.ssql.pcSettings_update_state_sql(client["name"], state=1)
+            self.usego.sendlog(f"pc执行结果{sql_data}")
+            break
 
 
 

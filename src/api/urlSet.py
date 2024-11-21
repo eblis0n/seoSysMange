@@ -98,4 +98,18 @@ class MyEnum():
     SCRIPT_TEMPLATE_UPDATE = "/update/"
 
 
+####################################### 文章库 #########################################################################
+    # aiprompt
+    AI_PROMPT_LIST = "/list/"
+    AI_PROMPT_INSERT = "/add/"
+    AI_PROMPT_UPDATE = "/update/"
+    AI_PROMPT_DELETE = "/delete/"
+
+    # article
+    ARTICLE_LIST = "/list/"
+    ARTICLE_INSERT = "/add/"
+    ARTICLE_UPDATE = "/update/"
+    ARTICLE_DELETE = "/delete/"
+
+
 

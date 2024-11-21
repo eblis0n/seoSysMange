@@ -30,6 +30,8 @@ from src.api.basis.sysUserManagement.sys_user_manage import userService
 from src.api.basis.uploadFileManagement.upload_file_manage import uploadFileManage
 from src.api.basis.scriptTemplateManagement.script_template_manage import scriptTemplateManage
 from src.api.basis.noteManagement.note_info_manegement import noteInfoManage
+from src.api.article.aiPromptManagement.aiPrompt_management import aiPromptManage
+from src.api.article.articleManagement.article_management import articleManage
 
 def create_app():
     """
@@ -106,6 +108,9 @@ def _register_blueprints(app):
         operationsManage().bp,
         scriptTemplateManage().bp,
         noteInfoManage().bp,
+        ########### 文章############
+        aiPromptManage().bp,
+        articleManage().bp,
     ]
     
     for blueprint in blueprints:
