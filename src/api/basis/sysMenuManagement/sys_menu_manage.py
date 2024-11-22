@@ -524,7 +524,7 @@ class menuDeploy():
                 },
                 {
                     "path": "article",
-                    "component": "articleManage/article/aiArticle",
+                    "component": "articleManage/article/index",
                     "redirect": "",
                     "name": "article",
                     "meta": {

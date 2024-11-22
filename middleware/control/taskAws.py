@@ -256,7 +256,7 @@ class taskAws():
                 'pcname': client["name"],
                 'queue_url': queue_url,
                 'max_length': datasDict["max_length"],
-                "isopenAI": datasDict["isopenAI"],
+                "source": datasDict["source"],
                 "type": datasDict["type"],
                 "promptID":  datasDict["promptID"],
                 "sortID":  datasDict["sortID"],

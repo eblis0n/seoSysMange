@@ -77,7 +77,7 @@ commands:
     params:
       - pcname
       - queue_url
-      - isopenAI
+      - source
       - type
       - max_length
       - promptID
