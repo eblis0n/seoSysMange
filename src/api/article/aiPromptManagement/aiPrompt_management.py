@@ -41,14 +41,14 @@ class aiPromptManage():
         data_request = request.json
         salesman = data_request['salesman']
         sort = data_request['sort']
+        name = data_request['name']
         pronoun = data_request['pronoun']
         prompt = data_request['prompt']
         create_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        # converted_prompt = prompt.replace("'", '"')
-        print("prompt",prompt)
-        # print("pronoun", pronoun)
-        # print("sort",sort)
-        sql_data = self.ssql.ai_prompt_insert_sql(salesman, sort, pronoun, prompt, create_at)
+
+        # print("prompt",prompt)
+
+        sql_data = self.ssql.ai_prompt_insert_sql(salesman, sort, name, pronoun, prompt, create_at)
 
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'添加成功：{sql_data}')
@@ -85,12 +85,13 @@ class aiPromptManage():
         id = data_request['id']
         salesman = data_request['salesman']
         sort = data_request['sort']
+        name = data_request['name']
         pronoun = data_request['pronoun']
         prompt = data_request['prompt']
 
 
 
-        sql_data = self.ssql.ai_prompt_update_sql(salesman, sort, pronoun, prompt, id)
+        sql_data = self.ssql.ai_prompt_update_sql(salesman, sort, name, pronoun, prompt, id)
 
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'更新成功：{sql_data}')
@@ -109,7 +110,7 @@ class aiPromptManage():
 
         if "sql 语句异常" not in str(sql_data):
             try:
-                resdatas = [{'id': item[0], 'salesman': item[1], 'sort': item[2], 'pronoun': item[3], 'prompt': item[4], 'create_at': self.usego.turn_isoformat(item[5]), 'update_at': self.usego.turn_isoformat(item[6])} for item in sql_data]
+                resdatas = [{'id': item[0], 'salesman': item[1], 'sort': item[2], 'name': item[3], 'pronoun': item[4], 'prompt': item[5], 'create_at': self.usego.turn_isoformat(item[6]), 'update_at': self.usego.turn_isoformat(item[7])} for item in sql_data]
 
             except:
                 self.usego.sendlog(f'list没数据：{sql_data}')

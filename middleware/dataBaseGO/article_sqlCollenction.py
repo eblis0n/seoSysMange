@@ -48,9 +48,9 @@ class article_sqlGO():
         sql_data = self.ssql.mysql_select('article', sqlgo)
         return sql_data
 
-    def ai_prompt_insert_sql(self, salesman, sort, pronoun, prompt, create_at):
+    def ai_prompt_insert_sql(self, salesman, sort, name, pronoun, prompt, create_at):
         # noinspection SqlNoDataSourceInspection
-        sqlgo = f"""INSERT INTO seo_ai_prompt (`salesman`,`sort`, `pronoun`,`prompt`,  `create_at`) VALUES ('{salesman}', '{sort}', '{pronoun}','{prompt}', '{create_at}');"""
+        sqlgo = f"""INSERT INTO seo_ai_prompt (`salesman`,`sort`, `name`, `pronoun`,`prompt`,  `create_at`) VALUES ('{salesman}', '{sort}', '{name}', '{pronoun}','{prompt}', '{create_at}');"""
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_commit('article', sqlgo)
         return sql_data
@@ -62,14 +62,14 @@ class article_sqlGO():
         sql_data = self.ssql.mysql_commit('article', sqlgo)
         return sql_data
 
-    def ai_prompt_update_sql(self, salesman, sort, pronoun, prompt, id):
+    def ai_prompt_update_sql(self, salesman, sort, name, pronoun, prompt, id):
         """
             更新 PC 设置的状态、名称和地址
         """
 
         sqlgo = f"""
                         UPDATE seo_ai_prompt 
-                        SET `salesman` = '{salesman}', `sort` = '{sort}', `pronoun` = '{pronoun}', `prompt` = '{prompt}'
+                        SET `salesman` = '{salesman}', `sort` = '{sort}', `name` = '{name}',`pronoun` = '{pronoun}', `prompt` = '{prompt}'
                         WHERE `id` = {id};
                     """
         # 执行 SQL 更新查询
@@ -87,7 +87,15 @@ class article_sqlGO():
         sql_data = self.ssql.mysql_select('article', sqlgo)
         return sql_data
 
-    def article_insert_sql(self, promptID, sortID, source, title, content, type, user, commission, create_at):
+    def article_insert_sql(self,  sortID, source, title, content, type, user, commission, create_at):
+        # noinspection SqlNoDataSourceInspection
+        sqlgo = f"""INSERT INTO seo_article (`sortID`, `source`,`title`, `content`, `type`, `user`, `commission`,  `create_at`) VALUES ('{sortID}', '{source}','{title}',"{content}",'{type}','{user}','{commission}', '{create_at}');"""
+        # 执行 SQL 查询语句
+        sql_data = self.ssql.mysql_commit('article', sqlgo)
+        return sql_data
+
+
+    def ai_article_insert_sql(self, promptID, sortID, source, title, content, type, user, commission, create_at):
         # noinspection SqlNoDataSourceInspection
         sqlgo = f"""INSERT INTO seo_article (`promptID`,`sortID`, `source`,`title`, `content`, `type`, `user`, `commission`,  `create_at`) VALUES ('{promptID}', '{sortID}', '{source}','{title}',"{content}",'{type}','{user}','{commission}', '{create_at}');"""
         # 执行 SQL 查询语句

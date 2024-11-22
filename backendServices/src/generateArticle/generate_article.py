@@ -30,7 +30,7 @@ class generateArticle():
         self.usego = otherUse()
         self.aws_sqs = AmazonSQS()
 
-    def run(self, pcname, queue_url, max_length, isopenAI, type, promptID, sortID,  theme, Keywords, ATag, link, language, user):
+    def run(self, pcname, queue_url, max_length, source, type, promptID, sortID,  theme, Keywords, ATag, link, language, user):
         """
             @Datetime ： 2024/11/18 22:19
             @Author ：eblis
@@ -44,7 +44,7 @@ class generateArticle():
             # # 第二步 根据 prompt 的初始化
             promptList = self.disassembly(promptDD, max_length, theme, Keywords, ATag, link, language, user)
 
-            self.lesGO(isopenAI, type, promptID, sortID, promptList, user)
+            self.lesGO(source, type, promptID, sortID, promptList, user)
             time.sleep(5)
             sql_data = self.basql.pcSettings_update_state_sql(pcname, state=0)
             self.aws_sqs.deleteMSG(queue_url)
@@ -53,7 +53,7 @@ class generateArticle():
             return False
         
         
-    def lesGO(self, isopenAI, type, promptID, sortID, promptList, user):
+    def lesGO(self, source, type, promptID, sortID, promptList, user):
         """
             @Datetime ： 2024/11/19 17:19
             @Author ：eblis
@@ -76,7 +76,7 @@ class generateArticle():
 
             for j in range(len(thisArticle)):
                 if thisArticle[j]["type"] == "0" or thisArticle[j]["type"] == 0:
-                    if int(isopenAI) == 0:
+                    if source == "openAI":
                         print(f"openAI 很高兴 为你服务")
 
                         print(f"哟！好样的，需要生成{len(promptList)} 这么多篇文章啊！")
@@ -90,6 +90,10 @@ class generateArticle():
                             print(f"当前标题：{article_title} ")
 
                         Epilogue += f"\n\n {generated_text}\n\n"
+                    elif source == "OllamaAI":
+                        print(f"OllamaAI 还没对接，敬请期待")
+
+                        return False
                     else:
                         print(f"来了老弟")
                         print("还没对接")
@@ -99,7 +103,7 @@ class generateArticle():
                     Epilogue += f'\n\n {thisArticle[j]["promptdata"] }\n\n'
 
             print(f"第{i} 篇文章生成完比，剩余{len(promptList) - 1}:{Epilogue}")
-            self.conversionType(api_key, article_title, Epilogue, type, promptID, sortID,  user)
+            self.conversionType(api_key, source, article_title, Epilogue, type, promptID, sortID,  user)
 
         return True
 
@@ -116,7 +120,7 @@ class generateArticle():
 
         return markdown_output
     
-    def conversionType(self, api_key, article_title, Epilogue, type, promptID, sortID,  user):
+    def conversionType(self, api_key, source, article_title, Epilogue, type, promptID, sortID,  user):
         """
             @Datetime ： 2024/11/20 14:55
             @Author ：eblis
@@ -136,7 +140,7 @@ class generateArticle():
         else:
             title_text = Epilogue
 
-        sql_data = self.save_sql(isopenAI, promptID, sortID, article_title, title_text, type, user)
+        sql_data = self.save_sql(source, promptID, sortID, article_title, title_text, type, user)
         if "sql 语句异常" not in str(sql_data):
             print("入库成功")
         else:
@@ -144,7 +148,7 @@ class generateArticle():
     
 
 
-    def save_sql(self, isopenAI, promptID, sortID, title, content, type, user):
+    def save_sql(self, source, promptID, sortID, title, content, type, user):
         """
             @Datetime ： 2024/11/19 22:14
             @Author ：eblis
@@ -152,10 +156,10 @@ class generateArticle():
         """
 
         create_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        if int(isopenAI) == 0:
-            source = "openAI"
-        else:
-            source = "OllamaAI"
+        # if int(isopenAI) == 0:
+        #     source = "openAI"
+        # else:
+        #     source = "OllamaAI"
 
         if user == []:
             print(f"生成通用文章")
@@ -165,7 +169,7 @@ class generateArticle():
             print(f"要生成专属文章哦")
             user = user[0]
             commission = 0
-        self.ssql.article_insert_sql(promptID, sortID, source, title, content, type, user, commission, create_at)
+        self.ssql.ai_article_insert_sql(promptID, sortID, source, title, content, type, user, commission, create_at)
 
 
     def generate_article(self, trainingPhrases, api_key, max_retries=5, timeout=60, wait_time=10):
@@ -293,7 +297,7 @@ if __name__ == '__main__':
     pcname = "this_mac_1_not"
     queue_url = "/"
     max_length = 2
-    isopenAI = 0
+    source = "openAI"
     promptID = 1
     sortID = 1
     theme = ["爱情", "爱情"]
@@ -304,7 +308,7 @@ if __name__ == '__main__':
     user = []
     type = "Markdown"
 
-    Art.run(pcname, queue_url, max_length, isopenAI, type, promptID, sortID, theme, Keywords, ATag, link, language, user)
+    Art.run(pcname, queue_url, max_length, source, type, promptID, sortID, theme, Keywords, ATag, link, language, user)
 
 
 
