@@ -87,7 +87,7 @@ class article_sqlGO():
         sql_data = self.ssql.mysql_select('article', sqlgo)
         return sql_data
 
-    def article_insert_sql(self,  sortID, source, title, content, type, user, commission, create_at):
+    def article_insert_sql(self, sortID, source, title, content, type, user, commission, create_at):
         # noinspection SqlNoDataSourceInspection
         sqlgo = f"""INSERT INTO seo_article (`sortID`, `source`,`title`, `content`, `type`, `user`, `commission`,  `create_at`) VALUES ('{sortID}', '{source}','{title}',"{content}",'{type}','{user}','{commission}', '{create_at}');"""
         # 执行 SQL 查询语句
@@ -124,4 +124,42 @@ class article_sqlGO():
     #     return sql_data
     #
 
+
+
+############################################# category #####################################################
+
+    def category_list_sql(self):
+        # noinspection SqlNoDataSourceInspection
+        sqlgo = f"""SELECT /*+ NOCACHE */*  FROM seo_sort ORDER BY create_at DESC;"""
+        # 执行 SQL 查询语句
+        sql_data = self.ssql.mysql_select('article', sqlgo)
+        return sql_data
+
+    def category_insert_sql(self, name, level, create_at):
+        # noinspection SqlNoDataSourceInspection
+        sqlgo = f"""INSERT INTO seo_sort (`name`,`level`, `create_at`) VALUES ('{name}','{level}','{create_at}');"""
+        # 执行 SQL 查询语句
+        sql_data = self.ssql.mysql_commit('article', sqlgo)
+        return sql_data
+
+    def category_delete_sql(self, id):
+        # noinspection SqlNoDataSourceInspection
+        sqlgo = f"""DELETE FROM seo_sort WHERE `id` = '{id}';"""
+        # 执行 SQL 查询语句
+        sql_data = self.ssql.mysql_commit('article', sqlgo)
+        return sql_data
+
+    def category_update_sql(self, name, level, id):
+        """
+            更新 PC 设置的状态、名称和地址
+        """
+
+        sqlgo = f"""
+                           UPDATE seo_sort 
+                           SET  `name` = '{name}', `level` = '{level}'
+                           WHERE `id` = '{id}';
+                       """
+        # 执行 SQL 更新查询
+        sql_data = self.ssql.mysql_commit('article', sqlgo)
+        return sql_data
 

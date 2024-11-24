@@ -12,17 +12,16 @@ import sys
 base_dr = str(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 bae_idr = base_dr.replace('\\', '/')
 sys.path.append(bae_idr)
-import publicFunctions.configuration as config
-from publicFunctions.commonUse import commonUse
+import middleware.public.configurationCall as configCall
+
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 
 class googleOnlineInsert():
     def __init__(self):
-        self.comm = commonUse()
 
         # self.jiao_sql = jiao_sqlCollectionGO()
-        self.credentials = service_account.Credentials.from_service_account_file(config.service_account_file,
+        self.credentials = service_account.Credentials.from_service_account_file(configCall.service_account_file,
                                                                                  scopes=[
                                                                                      'https://www.googleapis.com/auth/spreadsheets',
                                                                                      'https://www.googleapis.com/auth/drive'])

@@ -123,14 +123,13 @@ class articleManage():
             title = data_request['title']
             content = data_request['content']
 
-            self.ssql.article_insert_sql(sortID, source, title, content, type, user, commission, create_at)
-
-
-
-
-
-
-
+            sql_data = self.ssql.article_insert_sql(sortID, source, title, content, type, user, commission, create_at)
+            if "sql 语句异常" not in str(sql_data):
+                self.usego.sendlog(f'添加成功：{sql_data}')
+                res = ResMsg(data=sql_data)
+            else:
+                self.usego.sendlog(f'添加失败：{sql_data}')
+                res = ResMsg(code='B0001', msg=f'添加失败：{sql_data}')
 
         return res.to_json()
 
@@ -161,7 +160,7 @@ class articleManage():
 
         if "sql 语句异常" not in str(sql_data):
             try:
-                resdatas = [{'id': item[0], 'salesman': item[1], 'sort': item[2], 'pronoun': item[3], 'prompt': item[4], 'create_at': self.usego.turn_isoformat(item[5]), 'update_at': self.usego.turn_isoformat(item[6])} for item in sql_data]
+                resdatas = [{'id': item[0], 'isAI': item[1],'promptID': item[2],  'sortID': item[3], 'source': item[4], 'title': item[5], 'content': item[6], 'type': item[7], 'user': item[8], 'commission': item[9], 'create_at': self.usego.turn_isoformat(item[10]), 'update_at': self.usego.turn_isoformat(item[11])} for item in sql_data]
 
             except:
                 self.usego.sendlog(f'list没数据：{sql_data}')

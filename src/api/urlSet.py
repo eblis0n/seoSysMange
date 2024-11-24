@@ -53,6 +53,7 @@ class MyEnum():
 
     # public
     PLATFORMS = "/platforms/"
+    GOOGLEEXCEL = "/excle/"
 
     # amazon
     AMAZONSQS_LIST = "/list/"
@@ -108,12 +109,11 @@ class MyEnum():
     # article
     ARTICLE_LIST = "/list/"
     ARTICLE_INSERT = "/add/"
-    ARTICLE_UPDATE = "/update/"
     ARTICLE_DELETE = "/delete/"
 
     # category
     CATEGORY_LIST = "/list/"
-    CATEGORY_INSERT = "/insert/"
+    CATEGORY_INSERT = "/add/"
     CATEGORY_UPDATE = "/update/"
     CATEGORY_DELETE = "/delete/"
 

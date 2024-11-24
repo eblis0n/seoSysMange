@@ -15,18 +15,18 @@ sys.path.append(bae_idr)
 from datetime import datetime
 from middleware.public.returnMsg import ResMsg
 
-from flask import Blueprint,request
+from flask import Blueprint, request
 from src.api.urlSet import MyEnum
-from middleware.dataBaseGO.basis_sqlCollenction import basis_sqlGO
+from middleware.dataBaseGO.article_sqlCollenction import article_sqlGO
 from middleware.public.commonUse import otherUse
 
 
 class categoryManage():
     def __init__(self):
-        self.bp = Blueprint("category", __name__, url_prefix="/blog")
+        self.bp = Blueprint("category", __name__, url_prefix="/category")
         self.Myenum = MyEnum()
 
-        self.ssql = basis_sqlGO()
+        self.ssql = article_sqlGO()
         self.usego = otherUse()
 
         # 将路由和视图函数绑定到蓝图
@@ -37,14 +37,15 @@ class categoryManage():
 
     def category_insert(self):
 
-        data_request = request.get_json
-        Name = data_request['Name']
-        level = data_request.get['level', None]
+        data_request = request.json
+        name = data_request['name']
+        level = data_request['level']
         create_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        sql_data = self.ssql.blogger_info_insert_sql(Name,level, create_at)
+        sql_data = self.ssql.category_insert_sql(name, level, create_at)
 
-        if "sql 语句异常" not in sql_data:
+
+        if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'添加成功：{sql_data}')
             res = ResMsg(data=sql_data)
         else:
@@ -55,10 +56,10 @@ class categoryManage():
 
     def category_delete(self):
 
-        data_request = request.get_json
+        data_request = request.json
         id = data_request['id']
 
-        sql_data = self.ssql.blogger_info_delete_sql(id)
+        sql_data = self.ssql.category_delete_sql(id)
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'成功删除:{id}')
             res = ResMsg(data=sql_data)
@@ -71,13 +72,13 @@ class categoryManage():
 
     def category_update(self):
 
-        data_request = request.get_json
+        data_request = request.json
         id = data_request['id']
-        Name = data_request['Name']
-        level = data_request.get('level',None)
-        create_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        name = data_request['name']
+        level = data_request('level')
 
-        sql_data = self.ssql.blogger_info_update_sql(id, Name, level, create_at)
+
+        sql_data = self.ssql.category_update_sql(name, level, id)
 
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'更新成功: {sql_data}')
@@ -90,12 +91,13 @@ class categoryManage():
         return res.to_json()
 
     def category_list(self):
+
         sql_data = self.ssql.category_list_sql()
 
         if "sql 语句异常" not in str(sql_data):
             try:
                 resdatas = [
-                    {'id': item[0], 'Name': item[1], 'level': item[2], 'create_at': self.usego.turn_isoformat(item[3]),
+                    {'id': item[0], 'name': item[1], 'level': item[2], 'create_at': self.usego.turn_isoformat(item[3]),
                     'update_at': self.usego.turn_isoformat(item[4])}for item in sql_data]
 
             except:

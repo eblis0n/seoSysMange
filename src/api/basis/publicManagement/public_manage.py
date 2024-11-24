@@ -16,15 +16,19 @@ from middleware.public.returnMsg import ResMsg
 
 from flask import Blueprint, request
 from src.api.urlSet import MyEnum
-
+import middleware.public.configurationCall as configCall
+from backendServices.src.googleOnline.google_online_excel_public import googleOnlinePublic
 class publicManage():
     def __init__(self):
         self.bp = Blueprint("public", __name__, url_prefix="/public")
 
         self.Myenum = MyEnum()
 
+        self.googlePublic = googleOnlinePublic()
+
 
         self.bp.route(self.Myenum.PLATFORMS, methods=['GET'])(self.platforms)
+        self.bp.route(self.Myenum.GOOGLEEXCEL, methods=['GET'])(self.googleExcel)
 
     def platforms(self):
 
@@ -46,3 +50,17 @@ class publicManage():
         responseData = res.to_json()
 
         return responseData
+
+
+    def googleExcel(self):
+
+        shareURL = {}
+
+        shareURL["url"] = configCall.google_docs_url.replace("edit?gid=0#gid=0", "preview")
+
+        res = ResMsg(data=[shareURL])
+        responseData = res.to_json()
+
+        return responseData
+
+

@@ -30,6 +30,9 @@ from src.api.basis.sysUserManagement.sys_user_manage import userService
 from src.api.basis.uploadFileManagement.upload_file_manage import uploadFileManage
 from src.api.basis.scriptTemplateManagement.script_template_manage import scriptTemplateManage
 from src.api.basis.noteManagement.note_info_manegement import noteInfoManage
+
+################################# 文章 #######################################################################
+
 from src.api.article.aiPromptManagement.aiPrompt_management import aiPromptManage
 from src.api.article.articleManagement.article_management import articleManage
 from src.api.article.categoryManagement.category_management import categoryManage

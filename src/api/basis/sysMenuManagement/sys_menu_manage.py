@@ -506,10 +506,10 @@ class menuDeploy():
                     ]
                 },
                 {
-                    "path": "articleSort",
-                    "component": "articleManage/sort/index",
+                    "path": "category",
+                    "component": "articleManage/category/index",
                     "redirect": "",
-                    "name": "sort",
+                    "name": "category",
                     "meta": {
                         "title": "\u884c\u4e1a\u5206\u7c7b",
                         "icon": "el-icon-StarFilled",
@@ -573,12 +573,12 @@ class menuDeploy():
                     ]
                 },
                 {
-                    "path": "googleRecord",
-                    "component": "reportsManage/googleRecord/index",
+                    "path": "googleExcel",
+                    "component": "reportsManage/googleExcel/index",
                     "redirect": "",
                     "name": "",
                     "meta": {
-                        "title": " Google\u6536\u5f55",
+                        "title": "  Google Excel",
                         "icon": "",
                         "hidden": False,
                         "keepAlive": True,

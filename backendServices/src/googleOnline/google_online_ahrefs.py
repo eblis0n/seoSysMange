@@ -14,17 +14,16 @@ base_dr = str(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 bae_idr = base_dr.replace('\\', '/')
 sys.path.append(bae_idr)
 
-from backstage.src.googleOnline.google_online_excel_public import googleOnlinePublic
-import publicFunctions.configuration as config
-from publicFunctions.commonUse import commonUse
-from backstage.src.statistics.ahrefs_api import ahrefsAPI
+from backendServices.src.googleOnline.google_online_excel_public import googleOnlinePublic
+import middleware.public.configurationCall as configCall
+from backendServices.src.statistics.ahrefs_api import ahrefsAPI
 
 
 class googleOnlineAhrefs():
 
     def __init__(self):
-        self.comm = commonUse()
-        self.public = googleOnlinePublic()
+
+        self.googlePublic = googleOnlinePublic()
         self.ahrefs = ahrefsAPI()
 
 
@@ -37,7 +36,7 @@ class googleOnlineAhrefs():
             @Motto：遍历指定表格
         """
 
-        workbook = self.public.google_online_excel_workbook(target_url)
+        workbook = self.googlePublic.google_online_excel_workbook(target_url)
         # sheets = workbook.worksheets
         # print("sheets",sheets)
 
@@ -61,8 +60,8 @@ class googleOnlineAhrefs():
             print(f"第 {nn} 次 重试，{new_bad_domain}")
             for i in range(len(new_bad_domain)):
                 try:
-                    result = self.ahrefs.query_ahrefs_api(config.ahrefs_base_url, new_bad_domain[i]["domain"],
-                                                          config.ahrefs_api_token)  # 获取域名的 log 数据
+                    result = self.ahrefs.query_ahrefs_api(configCall.ahrefs_base_url, new_bad_domain[i]["domain"],
+                                                          configCall.ahrefs_api_token)  # 获取域名的 log 数据
                     print(f"重试{i}结果:{result}")
                 except Exception as e:
                     print(f"出现异常，跳过: {e}")
@@ -96,14 +95,14 @@ class googleOnlineAhrefs():
         """
 
         # 获取当前日期
-        today = self.public.weekday()
+        today = self.googlePublic.weekday()
 
 
         # 如果是星期一，清理旧文件和数据
         if today == "星期一":
             print("今天是星期一")
-            self.public.del_old_file()  # 删除旧文件
-            self.public.del_old_data(sheet)  # 删除旧数据
+            self.googlePublic.del_old_file()  # 删除旧文件
+            self.googlePublic.del_old_data(sheet)  # 删除旧数据
 
         # 查找当前日期所在的列
         cell = sheet.find(today)
@@ -115,7 +114,7 @@ class googleOnlineAhrefs():
 
         # 获取表格的所有行
         rows = sheet.get_all_values()
-        keywords_column, traffic_column = self.public.get_today_columns()
+        keywords_column, traffic_column = self.googlePublic.get_today_columns()
 
         # 批量更新的数据缓存
         updates = []
@@ -147,7 +146,7 @@ class googleOnlineAhrefs():
             # print("cleaned_domain",cleaned_domain)
             print(f"Row number: {i},{cleaned_domain}")
             try:
-                result = self.ahrefs.query_ahrefs_api(config.ahrefs_base_url,  cleaned_domain, config.ahrefs_api_token) # 获取域名的 log 数据
+                result = self.ahrefs.query_ahrefs_api(configCall.ahrefs_base_url,  cleaned_domain, configCall.ahrefs_api_token) # 获取域名的 log 数据
             except Exception as e:
                 print(f"处理域名 {cleaned_domain} 时出现异常，跳过。错误信息: {str(e)}")
                 domain_data['keywords'] = f'{keywords_column}{i}'
@@ -174,18 +173,18 @@ class googleOnlineAhrefs():
                         'values': [[result['organic_traffic']]]
                     })
 
-        if int(config.site_retry) > 0 and bad_domain != []:
-            self.retry(int(config.site_retry), bad_domain, updates)
+        if int(configCall.site_retry) > 0 and bad_domain != []:
+            self.retry(int(configCall.site_retry), bad_domain, updates)
 
         print(f"跑完了，待更新数据:{updates}")
         # 批量更新所有需要更新的单元格
         if updates:
-            self.public.update_date(sheet, updates)
+            self.googlePublic.update_date(sheet, updates)
         else:
             print("没有需要更新的数据")
 
 
 if __name__ == '__main__':
    excel = googleOnlineAhrefs()
-   excel.run_vertical(config.google_docs_url, config.sheetTab_ahrefs, eval(config.sheetGroupName))
+   excel.run_vertical(configCall.google_docs_url, configCall.sheetTab_ahrefs, eval(configCall.sheetGroupName))
 

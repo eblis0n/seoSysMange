@@ -14,14 +14,15 @@ bae_idr = base_dr.replace('\\', '/')
 sys.path.append(bae_idr)
 import gspread
 from google.oauth2 import service_account
-import publicFunctions.configuration as config
+import middleware.public.configurationCall as configCall
+
 import glob
 import datetime
+
 class googleOnlinePublic():
     def __init__(self):
 
-        # self.jiao_sql = jiao_sqlCollectionGO()
-        self.credentials = service_account.Credentials.from_service_account_file(config.service_account_file,
+        self.credentials = service_account.Credentials.from_service_account_file(configCall.service_account_file,
                                                                             scopes=[
                                                                                 'https://www.googleapis.com/auth/spreadsheets',
                                                                                 'https://www.googleapis.com/auth/drive'])
@@ -136,7 +137,7 @@ class googleOnlinePublic():
         """
 
         # 查找该目录下所有的 .txt 文件
-        txt_files = glob.glob(config.google_file + "/*.txt")
+        txt_files = glob.glob(configCall.google_file + "/*.txt")
         # 遍历所有的 .txt 文件并删除
         for txt_file in txt_files:
             os.remove(txt_file)

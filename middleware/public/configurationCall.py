@@ -138,6 +138,17 @@ note_upload_image_js = conf.get("note", "note_upload_image_js")
 
 proxy_add = conf.get("proxy", "proxy_add")
 
+###################################### googleExcel 信息 ######################################
+googlebot_keywords = conf.get("googleExcel", "googlebot_keywords")
+google_file = conf.get("googleExcel", "google_file")
+service_account_file = conf.get("googleExcel", "service_account_file")
+site_retry = conf.get("googleExcel", "site_retry")
+sheetTab_site = conf.get("googleExcel", "sheetTab_site")
+sheetTab_spiders = conf.get("googleExcel", "sheetTab_spiders")
+sheetTab_ahrefs = conf.get("googleExcel", "sheetTab_ahrefs")
+sheetGroupName = conf.get("googleExcel", "sheetGroupName")
+google_docs_url = conf.get("googleExcel", "google_docs_url")
+
 ###################################### other ######################################
 
 temp_file_path = conf.get("other", "temp_file_path")

@@ -14,16 +14,14 @@ bae_idr = base_dr.replace('\\', '/')
 sys.path.append(bae_idr)
 
 from gspread.utils import rowcol_to_a1
-import publicFunctions.configuration as config
-from publicFunctions.commonUse import commonUse
-from backstage.src.statistics.siteGO import sitego
-from backstage.src.googleOnline.google_online_excel_public import googleOnlinePublic
+import middleware.public.configurationCall as configCall
+from backendServices.src.statistics.siteGO import sitego
+from backendServices.src.googleOnline.google_online_excel_public import googleOnlinePublic
 
 
 class googleOnlineSite():
     def __init__(self):
-        self.comm = commonUse()
-        self.public = googleOnlinePublic()
+        self.googlePublic = googleOnlinePublic()
         self.site = sitego()
 
     def run_vertical(self, target_url, sheetTab, groupName):
@@ -33,7 +31,7 @@ class googleOnlineSite():
             @Motto：遍历指定表格
         """
 
-        workbook = self.public.google_online_excel_workbook(target_url)
+        workbook = self.googlePublic.google_online_excel_workbook(target_url)
         # sheets = workbook.worksheets
         # print("sheets",sheets)
 
@@ -49,7 +47,7 @@ class googleOnlineSite():
             @Author ：eblis
             @Motto：遍历所有表格
         """
-        workbook = self.public.google_online_excel_workbook(target_url)
+        workbook = self.googlePublic.google_online_excel_workbook(target_url)
         # 获取所有的工作表
         all_sheets = workbook.worksheets()
 
@@ -68,10 +66,10 @@ class googleOnlineSite():
         @Author ：eblis
         @Motto：简单描述用途
         """
-        today = self.public.weekday()
+        today = self.googlePublic.weekday()
         print(f"今天是{today}")
         if today == "星期一":
-            self.public.del_old_data(sheet)
+            self.googlePublic.del_old_data(sheet)
 
         cell = sheet.find(today)
         print("cell", cell)
@@ -121,13 +119,13 @@ class googleOnlineSite():
                         'range': f'{rowcol_to_a1(i, cell.col)}',  # 要更新的单元格范围
                         'values': [[val]]  # logdata 的第一个值
                     })
-        if int(config.site_retry) > 0 and bad_domain != []:
-            self.retry(int(config.site_retry), bad_domain, updates)
+        if int(configCall.site_retry) > 0 and bad_domain != []:
+            self.retry(int(configCall.site_retry), bad_domain, updates)
 
         print(f"跑完了，待更新数据:{updates}")
 
         if updates:
-            self.public.update_date(sheet, updates)
+            self.googlePublic.update_date(sheet, updates)
         else:
             print("没有需要更新的数据")
 
@@ -170,4 +168,4 @@ class googleOnlineSite():
 
 if __name__ == '__main__':
    excel = googleOnlineSite()
-   excel.run_vertical(config.google_docs_url, config.sheetTab_site, eval(config.sheetGroupName))
+   excel.run_vertical(configCall.google_docs_url, configCall.sheetTab_site, eval(configCall.sheetGroupName))
