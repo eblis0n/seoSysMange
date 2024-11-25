@@ -1,49 +1,8 @@
 # 命令配置列表
 commands:
-  - name: run_telegra_selenium
-    module: backendServices.src.socialPlatforms.telegraGO.telegraSelenium
-    class: telegraSelenium
-    method: main
-    params:
-      - pcname
-      - queue_url
-      - genre
-      - platform
-      - stacking_min
-      - stacking_max
-      - title_alt
-      - alt_text
-      - sort
-      - isarts
-      - postingStyle
-      - group
-      - start
-      - end
-
-
-  - name: run_blogger_selenium
-    module: backendServices.src.socialPlatforms.bloggerGO.bloggerSelenium
-    class: bloggerSelenium
-    method: main
-    params:
-      - pcname
-      - queue_url
-      - genre
-      - platform
-      - stacking_min
-      - stacking_max
-      - title_alt
-      - alt_text
-      - sort
-      - isarts
-      - postingStyle
-      - group
-      - start
-      - end
-
-  - name: note_post_text
-    module: backendServices.src.socialPlatforms.nodeGO.notePostText
-    class: notePostText
+  - name: run_post_spliceGo
+    module: backendServices.src.assistance.postSpliceGo
+    class: postSpliceGo
     method: main
     params:
       - pcname
@@ -62,7 +21,7 @@ commands:
       - end
 
   - name: getCookie
-    module: backendServices.src.socialPlatforms.nodeGO.getCookie
+    module: backendServices.src.socialPlatforms.noteGO.getCookie
     class: getCookie
     method: run
     params:
@@ -88,6 +47,25 @@ commands:
       - ATag
       - link
       - language
+
+  - name: postSqlArticle
+      module: backendServices.src.postArticle.post_sql_article
+      class: postSqlArticle
+      method: run
+      params:
+        - pcname
+        - queue_url
+        - source
+        - type
+        - max_length
+        - promptID
+        - sortID
+        - user
+        - theme
+        - Keywords
+        - ATag
+        - link
+        - language
 
 
 # 可以继续添加更多命令

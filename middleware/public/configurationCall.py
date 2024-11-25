@@ -152,6 +152,7 @@ google_docs_url = conf.get("googleExcel", "google_docs_url")
 ###################################### other ######################################
 
 temp_file_path = conf.get("other", "temp_file_path")
+menu_path = conf.get("other", "menu_path")
 
 
 

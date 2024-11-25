@@ -54,6 +54,11 @@ class taskAws():
             if resdatas != []:
                 self.isarticle(results, resdatas, datasDict)
                 return results
+        elif type == "postSqlArticle":
+            resdatas = self.witchClient(platform)
+            if resdatas != []:
+                self.isPostSqlArticle(results, resdatas, datasDict)
+                return results
         else:
             self.usego.sendlog("啥也不是！！")
             return False
@@ -69,7 +74,6 @@ class taskAws():
 
         self.usego.sendlog("第一步，先查数据库，查看是否存在符合条件的PC")
         # state=3 是 实际查询为 state !=2
-
         sql_data = self.ssql.pcSettings_select_sql(platform= platform, state=3)
 
         if "sql 语句异常" in str(sql_data):
@@ -166,12 +170,11 @@ class taskAws():
                     'start': start,
                     'end': end
                 }
-                self.usego.sendlog(f' run_{datasDict["platform"]}_selenium，任务信息:{task_data}')
-                response = self.aws_sqs.sendMSG(queue_url, f'run_{datasDict["platform"]}_group', f'run_{datasDict["platform"]}_selenium',
-                                                task_data)
+                self.usego.sendlog(f' run_post_spliceGo，任务信息:{task_data}')
+                response = self.aws_sqs.sendMSG(queue_url, f'run_post_spliceGo_group', f'run_post_spliceGo', task_data)
                 result[f"{client}"] = response
                 results.append(result)
-                self.usego.sendlog(f' run_{datasDict["platform"]}_selenium，任务发送结果:{response}')
+                self.usego.sendlog(f' run_post_spliceGo，执行的是{task_data["platform"]},任务发送结果:{response}')
 
                 # 将 执行pc 状态 修改
                 sql_data = self.ssql.pcSettings_update_state_sql(client["name"], state=1)
@@ -268,7 +271,7 @@ class taskAws():
                 "language": datasDict["language"],
 
             }
-            self.usego.sendlog(f' getCookie，任务信息:{task_data}')
+            self.usego.sendlog(f' get article，任务信息:{task_data}')
             response = self.aws_sqs.sendMSG(queue_url, f'run_generate_article_group',
                                             f'generate_article',
                                             task_data)
@@ -280,6 +283,45 @@ class taskAws():
             sql_data = self.ssql.pcSettings_update_state_sql(client["name"], state=1)
             self.usego.sendlog(f"pc执行结果{sql_data}")
             break
+            
+            
+    def isPostSqlArticle(self, results, resdatas, datasDict):
+        """
+            @Datetime ： 2024/11/25 19:47
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        for idx, client in enumerate(resdatas):
+            result = {}
+            # 生成 队列
+            response = self.aws_sqs.initialization(f'client_{client["name"]}')
+            queue_url = response['QueueUrl']
+            self.usego.sendlog(f'{idx}, name:client_{client["name"]}，state:{client["state"]}，队列地址:{queue_url}')
+            task_data = {
+                "platform": datasDict['platform'],
+                "group": datasDict['group'],
+                "post_max": datasDict['post_max'],
+                "sortID": datasDict['sortID'],
+                "type": datasDict['type'],
+                "source": datasDict['source'],
+                "commission": datasDict['commission'],
+                "isAI": datasDict['isAI'],
+                "user": datasDict['user']
+            }
+
+            self.usego.sendlog(f' PostSqlArticle，任务信息:{task_data}')
+            response = self.aws_sqs.sendMSG(queue_url, f'run_generate_article_group',
+                                            f'postSqlArticle',
+                                            task_data)
+            result[f"{client}"] = response
+            results.append(result)
+            self.usego.sendlog(f' run_{datasDict["platform"]}_selenium，任务发送结果:{response}')
+
+            # 将 执行pc 状态 修改
+            sql_data = self.ssql.pcSettings_update_state_sql(client["name"], state=1)
+            self.usego.sendlog(f"pc执行结果{sql_data}")
+            break
+    
 
 
 

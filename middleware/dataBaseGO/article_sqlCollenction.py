@@ -87,17 +87,17 @@ class article_sqlGO():
         sql_data = self.ssql.mysql_select('article', sqlgo)
         return sql_data
 
-    def article_insert_sql(self, sortID, source, title, content, type, user, commission, create_at):
+    def article_insert_sql(self, sortID, source, title, content, language, type, user, commission, create_at):
         # noinspection SqlNoDataSourceInspection
-        sqlgo = f"""INSERT INTO seo_article (`sortID`, `source`,`title`, `content`, `type`, `user`, `commission`,  `create_at`) VALUES ('{sortID}', '{source}','{title}',"{content}",'{type}','{user}','{commission}', '{create_at}');"""
+        sqlgo = f"""INSERT INTO seo_article (`sortID`, `source`,`title`, `content`, `language`, `type`, `user`, `commission`,  `create_at`) VALUES ('{sortID}', '{source}','{title}',"{content}",'{language}','{type}','{user}','{commission}', '{create_at}');"""
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_commit('article', sqlgo)
         return sql_data
 
 
-    def ai_article_insert_sql(self, promptID, sortID, source, title, content, type, user, commission, create_at):
+    def ai_article_insert_sql(self, promptID, sortID, source, title, content, language, type, user, commission, create_at):
         # noinspection SqlNoDataSourceInspection
-        sqlgo = f"""INSERT INTO seo_article (`promptID`,`sortID`, `source`,`title`, `content`, `type`, `user`, `commission`,  `create_at`) VALUES ('{promptID}', '{sortID}', '{source}','{title}',"{content}",'{type}','{user}','{commission}', '{create_at}');"""
+        sqlgo = f"""INSERT INTO seo_article (`promptID`,`sortID`, `source`,`title`, `content`, `language`,`type`, `user`, `commission`,  `create_at`) VALUES ('{promptID}', '{sortID}', '{source}','{title}',"{content}",'{language}','{type}','{user}','{commission}', '{create_at}');"""
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_commit('article', sqlgo)
         return sql_data

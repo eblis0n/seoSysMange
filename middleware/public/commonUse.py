@@ -20,14 +20,15 @@ sys.path.append(bae_idr)
 
 import random
 import string
-from flask import current_app
 import datetime
 import ast
-from cachetools import TTLCache
 import bcrypt
 import jwt
-import middleware.public.configurationCall as configCall
 import logging
+from collections import defaultdict
+from cachetools import TTLCache
+
+import middleware.public.configurationCall as configCall
 
 class verifyGO():
 
@@ -90,11 +91,20 @@ class otherUse():
         """初始化与Flask应用的连接"""
         self.app = app
 
-
     def build_tree(self, menu_items):
-        # Create a dictionary to hold the menu items by their ID
-        menu_dict = {
-            item['id']: {
+        """
+        构建菜单树
+        :param menu_items: 数据库提取的菜单项列表
+        :return: 菜单树
+        """
+        # 创建字典存储菜单项，以便快速访问
+        menu_dict = {}
+        # 初始化 children 默认值为空列表
+        children_map = defaultdict(list)
+
+        # 构造基本的菜单字典
+        for item in menu_items:
+            menu_dict[item['id']] = {
                 'path': item['route_path'],
                 'component': item['component'],
                 'redirect': item.get('redirect', ''),
@@ -102,32 +112,26 @@ class otherUse():
                 'meta': {
                     'title': item['name'],
                     'icon': item.get('icon', ''),
-                    'hidden': item.get('visible', 1) == 0,
-                    'keepAlive': item.get('keep_alive', 1) == 1,
+                    'hidden': item.get('visible', 0) == 0,
                     'alwaysShow': item.get('always_show', 0) == 1,
-                    'params': item.get('params', None)
+                    'keepAlive': item.get('keep_alive', 0) == 1,
                 },
-                'children': []
+                'children': []  # 初始化为空
             }
-            for item in menu_items
-        }
+            # 收集子菜单
+            children_map[item['parent_id']].append(item['id'])
 
-        # Initialize an empty list for the top-level items
-        tree = []
+        # 构建树形结构
+        for parent_id, children_ids in children_map.items():
+            if parent_id in menu_dict:  # 如果有对应的父节点
+                menu_dict[parent_id]['children'] = [menu_dict[child_id] for child_id in children_ids]
 
-        # Iterate over the menu items
-        for item in menu_items:
-            # If the item has a parent, add it to the parent's children
-            if item['parent_id'] in menu_dict:
-                menu_dict[item['parent_id']]['children'].append(menu_dict[item['id']])
-            else:
-                # If there's no parent, it's a top-level item
-                tree.append(menu_dict[item['id']])
-
+        # 返回顶级菜单（没有父级的菜单）
+        tree = [menu_dict[item_id] for item_id in children_map[0]]
         return tree
 
-    #
-    #
+
+
     def change_hashed(self, data):
         # 转换字符串为bytes类型，因为bcrypt只能处理bytes
         data = data.encode('utf-8')

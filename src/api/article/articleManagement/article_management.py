@@ -119,11 +119,12 @@ class articleManage():
             results = self.task.run("article", datasDict["platform"], datasDict)
             res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
         else:
+            language = data_request['spoken']
             create_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             title = data_request['title']
             content = data_request['content']
 
-            sql_data = self.ssql.article_insert_sql(sortID, source, title, content, type, user, commission, create_at)
+            sql_data = self.ssql.article_insert_sql(sortID, source, title, content, language,  type, user, commission, create_at)
             if "sql 语句异常" not in str(sql_data):
                 self.usego.sendlog(f'添加成功：{sql_data}')
                 res = ResMsg(data=sql_data)
@@ -160,7 +161,7 @@ class articleManage():
 
         if "sql 语句异常" not in str(sql_data):
             try:
-                resdatas = [{'id': item[0], 'isAI': item[1],'promptID': item[2],  'sortID': item[3], 'source': item[4], 'title': item[5], 'content': item[6], 'type': item[7], 'user': item[8], 'commission': item[9], 'create_at': self.usego.turn_isoformat(item[10]), 'update_at': self.usego.turn_isoformat(item[11])} for item in sql_data]
+                resdatas = [{'id': item[0], 'isAI': item[1], 'promptID': item[2],  'sortID': item[3], 'source': item[4], 'title': item[5], 'content': item[6], 'type': item[7], 'user': item[8], 'commission': item[9], 'language': item[10],'create_at': self.usego.turn_isoformat(item[11]), 'update_at': self.usego.turn_isoformat(item[12])} for item in sql_data]
 
             except:
                 self.usego.sendlog(f'list没数据：{sql_data}')
@@ -176,4 +177,50 @@ class articleManage():
             res = ResMsg(code='B0001', msg=f'list查询失败：{sql_data}')
 
         return res.to_json()
+
+
+
+    def post_in_sql(self):
+        """
+            @Datetime ： 2024/11/24 23:53
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        data_request = request.json
+        commission = data_request['commission']
+        if commission == 0 or commission == "0":
+            user = [data_request['user']]
+        else:
+            user = ""
+
+        datasDict = {
+            "platform": data_request['platform'],
+            "group": "all",
+            "post_max": 0,
+            "sortID": data_request['sortID'],
+            "type": data_request['type'],
+            "source": data_request['source'],
+            "commission": commission,
+            "isAI": data_request['isAI'],
+            "user": user
+        }
+        try:
+
+            datasDict["group"] = data_request['group']
+        except:
+            datasDict["post_max"] = int(data_request['post_max'])
+
+        if datasDict["platform"] == "note":
+            watchPC = "blogger"
+        else:
+            watchPC = datasDict["platform"]
+
+
+        self.usego.sendlog(f"接收到的参数：{datasDict}")
+        results = self.task.run("postSqlArticle", watchPC, datasDict)
+
+        res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
+        return res.to_json()
+
+
 

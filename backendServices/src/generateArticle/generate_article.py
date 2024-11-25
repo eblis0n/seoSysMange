@@ -75,6 +75,7 @@ class generateArticle():
             article_title = ''
 
             for j in range(len(thisArticle)):
+                language = thisArticle[j]["language"]
                 if thisArticle[j]["type"] == "0" or thisArticle[j]["type"] == 0:
                     if source == "openAI":
                         print(f"openAI 很高兴 为你服务")
@@ -103,7 +104,7 @@ class generateArticle():
                     Epilogue += f'\n\n {thisArticle[j]["promptdata"] }\n\n'
 
             print(f"第{i} 篇文章生成完比，剩余{len(promptList) - 1}:{Epilogue}")
-            self.conversionType(api_key, source, article_title, Epilogue, type, promptID, sortID,  user)
+            self.conversionType(api_key, source, article_title, Epilogue,language, type, promptID, sortID,  user)
 
         return True
 
@@ -120,7 +121,7 @@ class generateArticle():
 
         return markdown_output
     
-    def conversionType(self, api_key, source, article_title, Epilogue, type, promptID, sortID,  user):
+    def conversionType(self, api_key, source, article_title, Epilogue, language, type, promptID, sortID,  user):
         """
             @Datetime ： 2024/11/20 14:55
             @Author ：eblis
@@ -140,7 +141,7 @@ class generateArticle():
         else:
             title_text = Epilogue
 
-        sql_data = self.save_sql(source, promptID, sortID, article_title, title_text, type, user)
+        sql_data = self.save_sql(source, promptID, sortID, article_title, title_text,language, type, user)
         if "sql 语句异常" not in str(sql_data):
             print("入库成功")
         else:
@@ -148,7 +149,7 @@ class generateArticle():
     
 
 
-    def save_sql(self, source, promptID, sortID, title, content, type, user):
+    def save_sql(self, source, promptID, sortID, title, content,language, type, user):
         """
             @Datetime ： 2024/11/19 22:14
             @Author ：eblis
@@ -169,7 +170,7 @@ class generateArticle():
             print(f"要生成专属文章哦")
             user = user[0]
             commission = 0
-        self.ssql.ai_article_insert_sql(promptID, sortID, source, title, content, type, user, commission, create_at)
+        self.ssql.ai_article_insert_sql(promptID, sortID, source, title, content, language, type, user, commission, create_at)
 
 
     def generate_article(self, trainingPhrases, api_key, max_retries=5, timeout=60, wait_time=10):

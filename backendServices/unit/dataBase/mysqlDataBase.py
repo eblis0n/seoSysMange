@@ -134,7 +134,7 @@ class mysqlGO():
             cursor = conn.cursor()
             start_time = time.time()  # 记录开始时间
             cursor.execute(selectSQL)
-            print("selectSQL", selectSQL)
+            # print("selectSQL", selectSQL)
             result = cursor.fetchall()
             end_time = time.time()  # 记录结束时间
             print(f"Query executed in {end_time - start_time:.2f} seconds")  # 打印查询耗时
