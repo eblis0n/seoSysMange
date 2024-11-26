@@ -21,7 +21,7 @@ const user_id = process.argv[3];
 
 const main = async () => {
     let res = await axios.get(`${ads_api}/api/v1/browser/start?user_id=${user_id}`);
-    console.log('Response:', res.data); // 打印响应信息
+    // console.log('Response:', res.data); // 打印响应信息
 
     if (!(res.data.code === 0 && res.data.data.ws && res.data.data.ws.puppeteer)) {
         return false;
@@ -64,7 +64,7 @@ const main = async () => {
     } catch (e) {
         console.error(e);
     }finally {
-        console.log('Exiting script...');
+        // console.log('Exiting script...');
         process.exit(0); // 确保退出程序，0 表示正常退出
     }
 }
