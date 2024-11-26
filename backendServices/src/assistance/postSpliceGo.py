@@ -48,7 +48,7 @@ class postSpliceGo:
 
         elif platform == "note":
             adsUserList = self.siphon_ads(platform, group, eval(configCall.min_concurrent_user))
-        elif  platform == "telegra":
+        elif platform == "telegra":
             adsUserList = self.siphon_ads(platform, eval(configCall.stacking_ads), eval(configCall.min_concurrent_user))
         else:
             return False

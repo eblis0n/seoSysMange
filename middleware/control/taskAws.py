@@ -37,36 +37,35 @@ class taskAws():
         """
         results = []
         self.usego.sendlog(f"{type} 进来了")
-        if type == "splice":
-            resdatas = self.witchClient(platform)
-            if resdatas != []:
-                self.isSplice(results, resdatas, datasDict)
-                return results
-            else:
-                self.usego.sendlog(f'有 {len(resdatas)} 设备符合')
-                return False
-        elif type == "cookies":
-            resdatas = self.witchClient(platform)
-            if resdatas != []:
-                self.iscookie(results, resdatas, datasDict)
-                return results
-        elif type == "article":
-            resdatas = self.witchClient(platform)
-            if resdatas != []:
-                self.isarticle(results, resdatas, datasDict)
-                return results
-        elif type == "postSqlArticle":
-            resdatas = self.witchClient(platform)
-            if resdatas != []:
-                self.isPostSqlArticle(results, resdatas, datasDict)
-                return results
-        else:
-            self.usego.sendlog("啥也不是！！")
+        resdatas = self.witchClient()
+        if resdatas != []:
+            for resdata in resdatas:
+                self.usego.sendlog(f'这台设备{resdata},{resdata["platform"]},{type(resdata["platform"])}')
+                if platform in resdata["platform"]:
+                    if type == "splice":
+                        self.isSplice(results, resdatas, datasDict)
+                        return results
+                    elif type == "cookies":
+                        self.iscookie(results, resdatas, datasDict)
+                        return results
+                    elif type == "article":
+                        self.isarticle(results, resdatas, datasDict)
+                        return results
+                    elif type == "postSqlArticle":
+                        self.isPostSqlArticle(results, resdatas, datasDict)
+                        return results
+                    else:
+                        self.usego.sendlog("啥也不是！！")
+                        return False
+                else:
+                    continue
+
+            self.usego.sendlog(f'没有设备可用')
             return False
 
 
 
-    def witchClient(self, platform):
+    def witchClient(self):
         """
             @Datetime ： 2024/11/14 17:10
             @Author ：eblis
@@ -75,7 +74,7 @@ class taskAws():
 
         self.usego.sendlog("第一步，先查数据库，查看是否存在符合条件的PC")
         # state=3 是 实际查询为 state !=2
-        sql_data = self.ssql.pcSettings_select_sql(platform= platform, state=3)
+        sql_data = self.ssql.pcSettings_select_sql( state=3)
 
         if "sql 语句异常" in str(sql_data):
             return []

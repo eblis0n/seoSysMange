@@ -44,14 +44,12 @@ class pcManage():
         address = data_request['address']
         account = data_request['account']
         password = data_request['password']
-
-        remark = data_request['remark']
+        # platform = data_request['platform']
+        remark = data_request['remark'].replace("\n", ',')
         try:
             platform = json.dumps(data_request['platform'])
         except:
             platform = str(data_request['platform']).replace("'", '"').replace('"', "'")
-
-
 
 
         sql_data = self.ssql.pcSettings_insert_sql(group, name, address, account, password, platform, remark, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
@@ -97,8 +95,8 @@ class pcManage():
         address = data_request['address']
         account = data_request['account']
         password = data_request['password']
-        remark = data_request['remark']
-
+        remark = data_request['remark'].replace("\n", ',')
+        # platform = data_request['platform']
         try:
             platform = json.dumps(data_request['platform'])
         except:
