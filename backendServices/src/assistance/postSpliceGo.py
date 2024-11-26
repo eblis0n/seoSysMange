@@ -103,10 +103,9 @@ class postSpliceGo:
                     self.usego.sendlog(f"这组 使用的是{user},发布的是{this_links} 链接")
                     # 获取文章内容链接
                     content = self.get_links(arts, postingStyle, this_links, alt_text)
+                    self.usego.sendlog(f"本次使用的内容是：{content}")
                     if platform == "blogger":
-                        t = threading.Thread(target=self.post_to_blogger, args=(
-                        this_res_list, all_links_list_group, bad_run_list, user["bloggerID"], user["adsID"], title_alt,
-                        content))
+                        t = threading.Thread(target=self.post_to_blogger, args=(this_res_list, this_links, all_links_list_group, bad_run_list, user["bloggerID"], user["adsID"], title_alt, content))
                     elif platform == "note":
                         t = threading.Thread(target=self.post_to_note, args=(this_res_list, this_links, all_links_list_group, bad_run_list, user["cookie"], user["useragent"], user["proxies"], title_alt, content))
 
@@ -150,7 +149,6 @@ class postSpliceGo:
                 else:
                     self.usego.sendlog(f"初始化一下数据，跑空")
                     mm = 0
-
 
 
     def post_to_blogger(self,this_res_list, this_links, all_links_list_group, bad_run_list, bloggerID, adsUser, title_alt, content):
