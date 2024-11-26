@@ -222,7 +222,7 @@ class basis_sqlGO():
 
         sqlgo = f"""
                         UPDATE pro_pc_settings 
-                        SET `name` = '{name}', `address` = '{address}', `platform` = '{platform}', `state` = {state}, `group` = '{group}', `account` = '{account}', `password` = '{password}', `remark` = {remark}
+                        SET `name` = '{name}', `address` = '{address}', `platform` = '{platform}', `state` = {state}, `group` = '{group}', `account` = '{account}', `password` = '{password}', `remark` = '{remark}'
                         WHERE `id` = {id};
                     """
         # 执行 SQL 更新查询
