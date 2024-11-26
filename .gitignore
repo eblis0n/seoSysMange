@@ -209,3 +209,5 @@ flask_session/
 !docsFile/wp_some/article_custom.css
 !docsFile/wp_some/wp_default.png
 !docsFile/avatar/default.png
+!docsFile/splicing_article/*.txt
+!docsFile/sys_menu.json

@@ -1,0 +1,740 @@
+[
+    {
+        "path": "/operations",
+        "component": "Layout",
+        "redirect": "",
+        "name": null,
+        "meta": {
+            "title": "\u8fd0\u7ef4\u7ba1\u7406",
+            "icon": "cascader",
+            "hidden": false,
+            "alwaysShow": false,
+            "keepAlive": false
+        },
+        "children": [
+            {
+                "path": "hosts",
+                "component": "operations/hosts/index",
+                "redirect": null,
+                "name": "hosts",
+                "meta": {
+                    "title": "\u4e3b\u673a\u7ba1\u7406",
+                    "icon": "",
+                    "hidden": false,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            },
+            {
+                "path": "tasksControl",
+                "component": "operations/tasksControl/index",
+                "redirect": null,
+                "name": "tasksControl",
+                "meta": {
+                    "title": "\u4efb\u52a1\u7ba1\u7406",
+                    "icon": "",
+                    "hidden": false,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            },
+            {
+                "path": "scriptTemplate",
+                "component": "operations/scriptTemplate/index",
+                "redirect": null,
+                "name": "scriptTemplate",
+                "meta": {
+                    "title": "\u6a21\u677f\u7ba1\u7406",
+                    "icon": "",
+                    "hidden": false,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            }
+        ]
+    },
+    {
+        "path": "/outcome",
+        "component": "Layout",
+        "redirect": "",
+        "name": null,
+        "meta": {
+            "title": "\u7ed3\u679c\u5c55\u793a",
+            "icon": "cascader",
+            "hidden": false,
+            "alwaysShow": false,
+            "keepAlive": false
+        },
+        "children": [
+            {
+                "path": "teleUpshot",
+                "component": "outcome/telegraUpshot/index",
+                "redirect": null,
+                "name": "teleUpshot",
+                "meta": {
+                    "title": "telegra\u7ed3\u679c",
+                    "icon": "",
+                    "hidden": false,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            },
+            {
+                "path": "blogUpshot",
+                "component": "outcome/bloggerUpshot/index",
+                "redirect": null,
+                "name": "blogUpshot",
+                "meta": {
+                    "title": "blogger\u7ed3\u679c",
+                    "icon": "",
+                    "hidden": false,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            }
+        ]
+    },
+    {
+        "path": "/implement",
+        "component": "Layout",
+        "redirect": "",
+        "name": null,
+        "meta": {
+            "title": "\u6267\u884c\u7ba1\u7406",
+            "icon": "cascader",
+            "hidden": false,
+            "alwaysShow": false,
+            "keepAlive": false
+        },
+        "children": [
+            {
+                "path": "mission",
+                "component": "implement/index",
+                "redirect": "",
+                "name": null,
+                "meta": {
+                    "title": "\u4efb\u52a1\u7ba1\u7406",
+                    "icon": "",
+                    "hidden": false,
+                    "alwaysShow": true,
+                    "keepAlive": false
+                },
+                "children": [
+                    {
+                        "path": "Splicing",
+                        "component": "implement/Splicing/index",
+                        "redirect": null,
+                        "name": "Splicing",
+                        "meta": {
+                            "title": "\u62fc\u63a5",
+                            "icon": "",
+                            "hidden": false,
+                            "alwaysShow": false,
+                            "keepAlive": true
+                        },
+                        "children": [
+
+                        ]
+                    },
+                    {
+                        "path": "postArticle",
+                        "component": "implement/postArticle/index",
+                        "redirect": "",
+                        "name": "postArticle",
+                        "meta": {
+                            "title": "\u53d1\u6587\u7ae0",
+                            "icon": "",
+                            "hidden": false,
+                            "alwaysShow": false,
+                            "keepAlive": true
+                        },
+                        "children": [
+
+                        ]
+                    }
+                ]
+            },
+            {
+                "path": "queue",
+                "component": "implement/index",
+                "redirect": "",
+                "name": null,
+                "meta": {
+                    "title": "\u961f\u5217\u7ba1\u7406",
+                    "icon": "",
+                    "hidden": false,
+                    "alwaysShow": true,
+                    "keepAlive": false
+                },
+                "children": [
+                    {
+                        "path": "amazonsqs",
+                        "component": "implement/amazonsqs/index",
+                        "redirect": null,
+                        "name": "amazonsqs",
+                        "meta": {
+                            "title": "AmazonSQS",
+                            "icon": "",
+                            "hidden": false,
+                            "alwaysShow": false,
+                            "keepAlive": true
+                        },
+                        "children": [
+
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "path": "/basis",
+        "component": "Layout",
+        "redirect": "",
+        "name": null,
+        "meta": {
+            "title": "\u4fe1\u606f\u5e93",
+            "icon": "cascader",
+            "hidden": false,
+            "alwaysShow": false,
+            "keepAlive": false
+        },
+        "children": [
+            {
+                "path": "platform",
+                "component": "basisManage/index",
+                "redirect": "",
+                "name": null,
+                "meta": {
+                    "title": "\u5e73\u53f0\u4fe1\u606f",
+                    "icon": "",
+                    "hidden": false,
+                    "alwaysShow": true,
+                    "keepAlive": false
+                },
+                "children": [
+                    {
+                        "path": "ads",
+                        "component": "basisManage/AdsBasic/adsBasic",
+                        "redirect": null,
+                        "name": "ads",
+                        "meta": {
+                            "title": "ads",
+                            "icon": "",
+                            "hidden": true,
+                            "alwaysShow": false,
+                            "keepAlive": false
+                        },
+                        "children": [
+
+                        ]
+                    },
+                    {
+                        "path": "blogger",
+                        "component": "basisManage/Blogger/index",
+                        "redirect": null,
+                        "name": "Blogger",
+                        "meta": {
+                            "title": "Blogger",
+                            "icon": "",
+                            "hidden": false,
+                            "alwaysShow": false,
+                            "keepAlive": false
+                        },
+                        "children": [
+
+                        ]
+                    },
+                    {
+                        "path": "note",
+                        "component": "basisManage/Note/index",
+                        "redirect": null,
+                        "name": "Note",
+                        "meta": {
+                            "title": "Note",
+                            "icon": "",
+                            "hidden": false,
+                            "alwaysShow": false,
+                            "keepAlive": false
+                        },
+                        "children": [
+
+                        ]
+                    },
+                    {
+                        "path": "youtube",
+                        "component": "basisManage/YouTube/YouTubeChannelSubtitle",
+                        "redirect": null,
+                        "name": "YouTube",
+                        "meta": {
+                            "title": "YouTube",
+                            "icon": "",
+                            "hidden": true,
+                            "alwaysShow": false,
+                            "keepAlive": false
+                        },
+                        "children": [
+
+                        ]
+                    },
+                    {
+                        "path": "googleOauth",
+                        "component": "basisManage/GoogleOauth/googleOauth",
+                        "redirect": null,
+                        "name": "googleOauth",
+                        "meta": {
+                            "title": "googleOauth",
+                            "icon": "",
+                            "hidden": true,
+                            "alwaysShow": false,
+                            "keepAlive": false
+                        },
+                        "children": [
+
+                        ]
+                    }
+                ]
+            },
+            {
+                "path": "other",
+                "component": "basisManage/index",
+                "redirect": "",
+                "name": null,
+                "meta": {
+                    "title": "\u5176\u4ed6\u4fe1\u606f",
+                    "icon": "",
+                    "hidden": false,
+                    "alwaysShow": true,
+                    "keepAlive": false
+                },
+                "children": [
+                    {
+                        "path": "PCclient",
+                        "component": "basisManage/PCclient/index",
+                        "redirect": null,
+                        "name": "PCclient",
+                        "meta": {
+                            "title": "pc\u7ba1\u7406",
+                            "icon": "",
+                            "hidden": false,
+                            "alwaysShow": false,
+                            "keepAlive": true
+                        },
+                        "children": [
+
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "path": "/articleManage",
+        "component": "Layout",
+        "redirect": "https://juejin.cn/post/7228990409909108793",
+        "name": null,
+        "meta": {
+            "title": "\u6587\u7ae0\u5e93",
+            "icon": "document",
+            "hidden": false,
+            "alwaysShow": false,
+            "keepAlive": false
+        },
+        "children": [
+            {
+                "path": "aiPrompt",
+                "component": "articleManage/aiPrompt/index",
+                "redirect": null,
+                "name": "aiPrompt",
+                "meta": {
+                    "title": "AiPrompt",
+                    "icon": "el-icon-Star",
+                    "hidden": false,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            },
+            {
+                "path": "article",
+                "component": "articleManage/article/index",
+                "redirect": null,
+                "name": "article",
+                "meta": {
+                    "title": "\u6587\u7ae0",
+                    "icon": "el-icon-StarFilled",
+                    "hidden": false,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            },
+            {
+                "path": "category",
+                "component": "articleManage/category/index",
+                "redirect": null,
+                "name": "category",
+                "meta": {
+                    "title": "\u884c\u4e1a\u5206\u7c7b",
+                    "icon": "el-icon-StarFilled",
+                    "hidden": false,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            }
+        ]
+    },
+    {
+        "path": "/reports",
+        "component": "Layout",
+        "redirect": "",
+        "name": null,
+        "meta": {
+            "title": "\u62a5\u8868\u5e93",
+            "icon": "api",
+            "hidden": false,
+            "alwaysShow": true,
+            "keepAlive": false
+        },
+        "children": [
+            {
+                "path": "googleExcel",
+                "component": "reportsManage/googleExcel/index",
+                "redirect": "",
+                "name": null,
+                "meta": {
+                    "title": " Google Excel",
+                    "icon": "",
+                    "hidden": false,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            }
+        ]
+    },
+    {
+        "path": "/system",
+        "component": "Layout",
+        "redirect": "/system/user",
+        "name": "",
+        "meta": {
+            "title": "\u7cfb\u7edf\u7ba1\u7406",
+            "icon": "system",
+            "hidden": true,
+            "alwaysShow": false,
+            "keepAlive": false
+        },
+        "children": [
+            {
+                "path": "user",
+                "component": "system/user/index",
+                "redirect": null,
+                "name": "User",
+                "meta": {
+                    "title": "\u7528\u6237\u7ba1\u7406",
+                    "icon": "el-icon-User",
+                    "hidden": true,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            },
+            {
+                "path": "role",
+                "component": "system/role/index",
+                "redirect": null,
+                "name": "Role",
+                "meta": {
+                    "title": "\u89d2\u8272\u7ba1\u7406",
+                    "icon": "role",
+                    "hidden": true,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            },
+            {
+                "path": "menu",
+                "component": "system/menu/index",
+                "redirect": null,
+                "name": "Menu",
+                "meta": {
+                    "title": "\u83dc\u5355\u7ba1\u7406",
+                    "icon": "menu",
+                    "hidden": true,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            },
+            {
+                "path": "dept",
+                "component": "system/dept/index",
+                "redirect": null,
+                "name": "Dept",
+                "meta": {
+                    "title": "\u90e8\u95e8\u7ba1\u7406",
+                    "icon": "tree",
+                    "hidden": true,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            },
+            {
+                "path": "dict",
+                "component": "system/dict/index",
+                "redirect": null,
+                "name": "Dict",
+                "meta": {
+                    "title": "\u5b57\u5178\u7ba1\u7406",
+                    "icon": "dict",
+                    "hidden": true,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            },
+            {
+                "path": "log",
+                "component": "system/log/index",
+                "redirect": null,
+                "name": "Log",
+                "meta": {
+                    "title": "\u7cfb\u7edf\u65e5\u5fd7",
+                    "icon": "document",
+                    "hidden": true,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            }
+        ]
+    },
+    {
+        "path": "/component",
+        "component": "Layout",
+        "redirect": "",
+        "name": null,
+        "meta": {
+            "title": "\u7ec4\u4ef6\u5c01\u88c5",
+            "icon": "menu",
+            "hidden": true,
+            "alwaysShow": false,
+            "keepAlive": false
+        },
+        "children": [
+            {
+                "path": "curd",
+                "component": "demo/curd/index",
+                "redirect": "",
+                "name": null,
+                "meta": {
+                    "title": "\u589e\u5220\u6539\u67e5",
+                    "icon": "",
+                    "hidden": true,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            },
+            {
+                "path": "table-select",
+                "component": "demo/table-select/index",
+                "redirect": "",
+                "name": null,
+                "meta": {
+                    "title": "\u5217\u8868\u9009\u62e9\u5668",
+                    "icon": "",
+                    "hidden": true,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            },
+            {
+                "path": "wang-editor",
+                "component": "demo/wang-editor",
+                "redirect": "",
+                "name": null,
+                "meta": {
+                    "title": "\u5bcc\u6587\u672c\u7f16\u8f91\u5668",
+                    "icon": "",
+                    "hidden": true,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            },
+            {
+                "path": "upload",
+                "component": "demo/upload",
+                "redirect": "",
+                "name": null,
+                "meta": {
+                    "title": "\u56fe\u7247\u4e0a\u4f20",
+                    "icon": "",
+                    "hidden": true,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            },
+            {
+                "path": "dict-demo",
+                "component": "demo/dict",
+                "redirect": "",
+                "name": null,
+                "meta": {
+                    "title": "\u5b57\u5178\u7ec4\u4ef6",
+                    "icon": "",
+                    "hidden": true,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            },
+            {
+                "path": "icon-selector",
+                "component": "demo/icon-selector",
+                "redirect": "",
+                "name": null,
+                "meta": {
+                    "title": "\u56fe\u6807\u9009\u62e9\u5668",
+                    "icon": "",
+                    "hidden": true,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            }
+        ]
+    },
+    {
+        "path": "/api",
+        "component": "Layout",
+        "redirect": "",
+        "name": null,
+        "meta": {
+            "title": "\u63a5\u53e3\u6587\u6863",
+            "icon": "api",
+            "hidden": true,
+            "alwaysShow": true,
+            "keepAlive": false
+        },
+        "children": [
+            {
+                "path": "https://yescaptcha.atlassian.net/wiki/spaces/YESCAPTCHA/pages/164286",
+                "component": "",
+                "redirect": "",
+                "name": null,
+                "meta": {
+                    "title": "apidocs",
+                    "icon": "link",
+                    "hidden": true,
+                    "alwaysShow": false,
+                    "keepAlive": false
+                },
+                "children": [
+
+                ]
+            },
+            {
+                "path": "https://yescaptcha.atlassian.net/wiki/spaces/YESCAPTCHA/pages/164286",
+                "component": "",
+                "redirect": "",
+                "name": null,
+                "meta": {
+                    "title": "yescaptcha",
+                    "icon": "link",
+                    "hidden": true,
+                    "alwaysShow": false,
+                    "keepAlive": false
+                },
+                "children": [
+
+                ]
+            }
+        ]
+    },
+    {
+        "path": "/codegen",
+        "component": "Layout",
+        "redirect": null,
+        "name": null,
+        "meta": {
+            "title": "\u7cfb\u7edf\u5de5\u5177",
+            "icon": "menu",
+            "hidden": true,
+            "alwaysShow": false,
+            "keepAlive": true
+        },
+        "children": [
+            {
+                "path": "codegen",
+                "component": "codegen/index",
+                "redirect": null,
+                "name": "Codegen",
+                "meta": {
+                    "title": "\u4ee3\u7801\u751f\u6210",
+                    "icon": "code",
+                    "hidden": true,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
+            }
+        ]
+    }
+]

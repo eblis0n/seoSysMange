@@ -31,17 +31,9 @@ class bloggerSeleniumGO:
         self.usego = otherUse()
         self.ads = adsDevice()
 
-
-
-
     def run(self, bloggerID, adsUser, title_alt, content):
         try:
-            # 输出接收到的参数
-            # self.usego.sendlog(f"接收到的postingStyle: {type(postingStyle)},{postingStyle}")
-            # self.usego.sendlog(f"arts: {type(arts)},{arts}")
 
-            # 获取文章内容链接
-            # all_atab = self.get_links(arts, postingStyle, this_links, alt_text)
 
             # 获取浏览器驱动
             driver = self.ads.basicEncapsulation(adsUser, configCall.adsServer)
