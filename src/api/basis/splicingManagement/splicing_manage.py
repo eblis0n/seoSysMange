@@ -191,21 +191,7 @@ class splicingManage():
         return res.to_json()
     
     
-    # def find_limit(self, idx):
-    #     """
-    #         @Datetime ： 2024/11/10 21:00
-    #         @Author ：eblis
-    #         @Motto：简单描述用途
-    #     """
-    #     end = 200000
-    #     if idx == 0:
-    #         start = 0
-    #         # end = 200000
-    #     else:
-    #         start = end
-    #         end = 200000 * (idx + 1)
-    #
-    #     return start, end
+
     
 
 
