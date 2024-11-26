@@ -36,6 +36,7 @@ class taskAws():
             @Motto：简单描述用途
         """
         results = []
+        self.usego.sendlog(f"{type} 进来了")
         if type == "splice":
             resdatas = self.witchClient(platform)
             if resdatas != []:
@@ -134,6 +135,7 @@ class taskAws():
             @Motto：发拼接， 搭配find_limit一起使用
         """
 
+        self.usego.sendlog(f'发拼接')
         query = {
             "genre": str(datasDict["genre"]),
             "platform": str(datasDict["platform"]),
@@ -145,51 +147,16 @@ class taskAws():
 
             return False
 
-        if len(resdatas) > 1 and total > 200000:
-            self.usego.sendlog(f' 数据量很大，不能浪费设备')
-            for idx, client in enumerate(resdatas):
-                result = {}
-                # 生成 队列
-                response = self.aws_sqs.initialization(f'client_{client["name"]}')
-                queue_url = response['QueueUrl']
-                self.usego.sendlog(f'{idx}, name:client_{client["name"]}，state:{client["state"]}，队列地址:{queue_url}')
-                start, end = self.find_limit(idx)
-                task_data = {
-                    'pcname': client["name"],
-                    'queue_url': queue_url,
-                    'genre': datasDict["genre"],
-                    'platform': datasDict["platform"],
-                    'stacking_min': datasDict["stacking_min"],
-                    'stacking_max': datasDict["stacking_max"],
-                    'title_alt': datasDict["title_alt"],
-                    'alt_text': datasDict["alt_text"],
-                    'sort': datasDict["sort"],
-                    'isarts': datasDict["isarts"],
-                    'postingStyle': datasDict["postingStyle"],
-                    'group': datasDict["group"],
-                    'start': start,
-                    'end': end
-                }
-                self.usego.sendlog(f' run_post_spliceGo，任务信息:{task_data}')
-                response = self.aws_sqs.sendMSG(queue_url, f'run_post_spliceGo_group', f'run_post_spliceGo', task_data)
-                result[f"{client}"] = response
-                results.append(result)
-                self.usego.sendlog(f' run_post_spliceGo，执行的是{task_data["platform"]},任务发送结果:{response}')
-
-                # 将 执行pc 状态 修改
-                sql_data = self.ssql.pcSettings_update_state_sql(client["name"], state=1)
-                self.usego.sendlog(f"pc执行结果{sql_data}")
-
-
-        else:
-            # 不满足条件，执行一次任务而不是循环
-            self.usego.sendlog(f'小case ，一台设备就够玩了')
-            client = resdatas[0]  # 只处理一个客户端
+        idx = 0  # 初始化索引
+        while idx < len(resdatas):  # 条件控制循环
+            client = resdatas[idx]  # 获取当前索引对应的客户端数据
             result = {}
+
+            # 生成队列
             response = self.aws_sqs.initialization(f'client_{client["name"]}')
             queue_url = response['QueueUrl']
-            self.usego.sendlog(f'只处理一次，name:client_{client["name"]}，state:{client["state"]}，队列地址:{queue_url}')
-            start, end = self.find_limit(0)  # 这里只处理第一个客户端，索引为0
+            self.usego.sendlog(f'{idx}, name:client_{client["name"]}，state:{client["state"]}，队列地址:{queue_url}')
+            start, end = self.find_limit(idx)
             task_data = {
                 'pcname': client["name"],
                 'queue_url': queue_url,
@@ -206,22 +173,25 @@ class taskAws():
                 'start': start,
                 'end': end
             }
-
-
-            self.usego.sendlog(f' run_{datasDict["platform"]}_selenium，任务信息:{task_data}')
-            response = self.aws_sqs.sendMSG(queue_url, f'run_{datasDict["platform"]}_group',
-                                            f'run_{datasDict["platform"]}_selenium',
-                                            task_data)
+            self.usego.sendlog(f' run_post_spliceGo，任务信息:{task_data}')
+            response = self.aws_sqs.sendMSG(queue_url, f'run_post_spliceGo_group', f'run_post_spliceGo', task_data)
             result[f"{client}"] = response
             results.append(result)
-            self.usego.sendlog(f' run_{datasDict["platform"]}_selenium，任务发送结果:{response}')
+            self.usego.sendlog(f' run_post_spliceGo，执行的是{task_data["platform"]},任务发送结果:{response}')
 
-            # 将 执行pc 状态 修改
+            # 将执行PC状态修改
             sql_data = self.ssql.pcSettings_update_state_sql(client["name"], state=1)
             self.usego.sendlog(f"pc执行结果{sql_data}")
 
+            # 小任务特殊处理
+            if len(resdatas) == 1 and total <= 200000:
+                self.usego.sendlog(f'小case ，一台设备就够玩了')
+                break
 
+            # 手动增加索引
+            idx += 1
 
+        # 在退出条件时，直接清空或标记 resdatas 处理完成。
 
     def find_limit(self, idx):
         """
