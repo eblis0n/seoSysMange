@@ -50,9 +50,11 @@ class postSpliceGo:
             adsUserList = self.siphon_ads(platform, group, eval(configCall.min_concurrent_user))
         elif platform == "telegra":
             adsUserList = self.siphon_ads(platform, eval(configCall.stacking_ads), eval(configCall.min_concurrent_user))
+
         else:
             return False
 
+        self.usego.sendlog(f"adsUserList 结果：{adsUserList}")
         if adsUserList != []:
             # 第二步：拆分 拼接信息
             all_links_list_group = self.split_links(genre, platform, sort, start, end, stacking_min, stacking_max)
@@ -350,6 +352,7 @@ class postSpliceGo:
             else:
                 return []
         elif platform == "telegra":
+            self.usego.sendlog(f"进来的 group：{group}")
             return [group[i:i + group_size] for i in range(0, len(group), group_size)]
         else:
             return []
