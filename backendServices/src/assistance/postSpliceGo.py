@@ -162,7 +162,6 @@ class postSpliceGo:
         from backendServices.src.socialPlatforms.bloggerGO.bloggerSeleniumGO import bloggerSeleniumGO
         blog = bloggerSeleniumGO()
         with threading.Lock():
-
             result = blog.run(bloggerID, adsUser, title_alt, content)
             if result:
                 if "git.html" not in result:
@@ -207,7 +206,7 @@ class postSpliceGo:
         from backendServices.src.socialPlatforms.telegraGO.telegraSelenium import telegraSelenium
         telegra = telegraSelenium()
         with threading.Lock():
-            result = telegra.run(postingStyle, user, this_links, title_alt, alt_text, arts)
+            result = telegra.run(user,title_alt, postingStyle, this_links, alt_text, arts)
             if result:
                 this_res_list.append(result)
                 all_links_list_group.remove(this_links)
