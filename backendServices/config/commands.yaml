@@ -49,23 +49,23 @@ commands:
       - language
 
   - name: postSqlArticle
-      module: backendServices.src.postArticle.post_sql_article
-      class: postSqlArticle
-      method: run
-      params:
-        - pcname
-        - queue_url
-        - source
-        - type
-        - max_length
-        - promptID
-        - sortID
-        - user
-        - theme
-        - Keywords
-        - ATag
-        - link
-        - language
+    module: backendServices.src.postArticle.post_sql_article
+    class: postSqlArticle
+    method: run
+    params:
+      - pcname
+      - queue_url
+      - source
+      - type
+      - max_length
+      - promptID
+      - sortID
+      - user
+      - theme
+      - Keywords
+      - ATag
+      - link
+      - language
 
 
 # 可以继续添加更多命令
