@@ -210,7 +210,7 @@ class basis_sqlGO():
 
     def pcSettings_delete_sql(self, id):
         # noinspection SqlNoDataSourceInspection
-        sqlgo = f"""DELETE FROM pro_pc_settings WHERE id = {id};"""
+        sqlgo = f"""DELETE FROM pro_pc_settings WHERE `id` = '{id}';"""
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_commit('basis', sqlgo)
         return sql_data
@@ -223,7 +223,7 @@ class basis_sqlGO():
         sqlgo = f"""
                         UPDATE pro_pc_settings 
                         SET `name` = '{name}', `address` = '{address}', `platform` = '{platform}', `state` = {state}, `group` = '{group}', `account` = '{account}', `password` = '{password}', `remark` = '{remark}'
-                        WHERE `id` = {id};
+                        WHERE `id` = '{id}';
                     """
         # 执行 SQL 更新查询
         sql_data = self.ssql.mysql_commit('basis', sqlgo)
@@ -237,7 +237,7 @@ class basis_sqlGO():
 
         sqlgo = f"""
                         UPDATE pro_pc_settings 
-                        SET  `state` = {state}
+                        SET  `state` = '{state}'
                         WHERE `name` = '{name}' and `state` != 2;
                     """
         # 执行 SQL 更新查询
@@ -270,10 +270,10 @@ class basis_sqlGO():
 
         # 构建最终的 SQL 查询
         if conditions:
-            sqlgo = f"SELECT /*+ NOCACHE */ * FROM pro_pc_settings WHERE {' AND '.join(conditions)} ORDER BY state;"
+            sqlgo = f"SELECT /*+ NOCACHE */ * FROM pro_pc_settings WHERE {' AND '.join(conditions)} ORDER BY `state`;"
         else:
             # 如果没有其他条件，默认查询所有记录
-            sqlgo = "SELECT /*+ NOCACHE */ * FROM pro_pc_settings ORDER BY state;"
+            sqlgo = "SELECT /*+ NOCACHE */ * FROM pro_pc_settings ORDER BY `state`;"
 
         # print("sqlgo:", sqlgo)
         sql_data = self.ssql.mysql_select('basis', sqlgo)
@@ -285,7 +285,7 @@ class basis_sqlGO():
 
     def blogger_info_list_sql(self):
         # noinspection SqlNoDataSourceInspection
-        sqlgo = f"""SELECT /*+ NOCACHE */*  FROM seo_blogger_info ORDER BY create_at DESC;"""
+        sqlgo = f"""SELECT /*+ NOCACHE */*  FROM seo_blogger_info ORDER BY `create_at` DESC;"""
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_select('basis', sqlgo)
         return sql_data
@@ -314,7 +314,7 @@ class basis_sqlGO():
         sqlgo = f"""
                         UPDATE seo_blogger_info 
                         SET `group` = '{group}', `adsNumber` = '{adsNumber}', `adsID` = '{adsID}', `proxy` = '{proxy}', `bloggerID` = '{bloggerID}'
-                        WHERE `id` = {id};
+                        WHERE `id` = '{id}';
                     """
         # 执行 SQL 更新查询
         sql_data = self.ssql.mysql_commit('basis', sqlgo)
@@ -336,9 +336,9 @@ class basis_sqlGO():
         # 根据参数构建 SQL 查询
         if params:
             conditions = [f"`{k}` = '{v}'" for k, v in params.items()]
-            sqlgo = f"SELECT /*+ NOCACHE */ * FROM seo_blogger_info WHERE {' AND '.join(conditions)} ORDER BY create_at DESC;"
+            sqlgo = f"SELECT /*+ NOCACHE */ * FROM seo_blogger_info WHERE {' AND '.join(conditions)} ORDER BY `create_at` DESC;"
         else:
-            sqlgo = "SELECT /*+ NOCACHE */ * FROM seo_blogger_info ORDER BY create_at DESC;"
+            sqlgo = "SELECT /*+ NOCACHE */ * FROM seo_blogger_info ORDER BY `create_at` DESC;"
 
         # print("生成的 SQL 查询:", sqlgo)
 
@@ -351,7 +351,7 @@ class basis_sqlGO():
 
     def script_template_list_sql(self):
         # noinspection SqlNoDataSourceInspection
-        sqlgo = f"""SELECT /*+ NOCACHE */*  FROM seo_script_template ORDER BY create_at DESC;"""
+        sqlgo = f"""SELECT /*+ NOCACHE */*  FROM seo_script_template ORDER BY `create_at` DESC;"""
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_select('basis', sqlgo)
         return sql_data
