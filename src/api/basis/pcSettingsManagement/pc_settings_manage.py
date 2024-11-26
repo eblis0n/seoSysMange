@@ -6,6 +6,7 @@
 @IDE ：PyCharm
 @Motto：ABC(Always Be Coding)
 """
+import json
 import os
 import sys
 base_dr = str(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -43,8 +44,13 @@ class pcManage():
         address = data_request['address']
         account = data_request['account']
         password = data_request['password']
-        platform = data_request['platform']
+
         remark = data_request['remark']
+        try:
+            platform = json.dumps(data_request['platform'])
+        except:
+            platform = str(data_request['platform']).replace("'", '"').replace('"', "'")
+
 
 
 
@@ -91,8 +97,12 @@ class pcManage():
         address = data_request['address']
         account = data_request['account']
         password = data_request['password']
-        platform = data_request['platform']
         remark = data_request['remark']
+
+        try:
+            platform = json.dumps(data_request['platform'])
+        except:
+            platform = str(data_request['platform']).replace("'", '"').replace('"', "'")
 
 
         sql_data = self.ssql.pcSettings_update_sql(group, name, address, account, password, platform, remark, state, id)
