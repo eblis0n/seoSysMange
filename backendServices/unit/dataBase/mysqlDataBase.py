@@ -205,7 +205,6 @@ class mysqlGO():
             print(f"sql 语句异常:{e}")
             result = f"sql 语句异常:{e}"
         finally:
-
             self._close(conn, cursor)
 
         return result

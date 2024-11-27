@@ -110,8 +110,8 @@ class getCookie():
             @Motto：简单描述用途
         """
         self.usego.sendlog(f"来把～ {adsID},开始获取cookie")
-        # self.usego.sendlog(f"js地址：{configCall.note_get_cookie_js}")
-        # self.usego.sendlog(f"adsServer:{configCall.adsServer}")
+        self.usego.sendlog(f"js地址：{configCall.note_get_cookie_js}")
+        self.usego.sendlog(f"adsServer:{configCall.adsServer}")
 
         result = subprocess.run(["node", f"{configCall.note_get_cookie_js}",  configCall.adsServer, adsID], capture_output=True, text=True)
 
@@ -140,6 +140,6 @@ class getCookie():
 
 if __name__ == '__main__':
     getGO = getCookie()
-    adsIDlist = ["klak6jl"]
+    adsIDlist = ["klak6mp"]
     queue_url = "/"
     getGO.run(configCall.client_id, queue_url, adsIDlist)
