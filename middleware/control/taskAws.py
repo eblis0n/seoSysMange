@@ -161,14 +161,14 @@ class taskAws():
         total = self.mossql.splicing_interim_find_count("seo_external_links_post", query)
         self.usego.sendlog(f'第二步，本次任务一共需要执行{total} 连接')
         if total == 0:
-
             return False
 
+        sum = 0
         idx = 0  # 初始化索引
-        while idx < len(clientL):  # 条件控制循环
+        while idx < len(clientL) and sum > total:  # 条件控制循环
             client = clientL[idx]  # 获取当前索引对应的客户端数据
+            self.usego.sendlog(f"{client} get ready")
             result = {}
-
             # 生成队列
             response = self.aws_sqs.initialization(f'client_{client["name"]}')
             queue_url = response['QueueUrl']
@@ -200,26 +200,18 @@ class taskAws():
             sql_data = self.ssql.pcSettings_update_state_sql(client["name"], state=1)
             self.usego.sendlog(f"pc执行结果{sql_data}")
 
-            # 小任务特殊处理
-            if len(clientL) == 1 and total <= 200000:
-                self.usego.sendlog(f'小case ，一台设备就够玩了')
-                break
-
             # 手动增加索引
             idx += 1
+            sum += 200000
 
-        # 在退出条件时，直接清空或标记 resdatas 处理完成。
-
-
-
-
+        self.usego.sendlog(f"任务分派完成：一共使用:{len(clientL)}, 完成{total} 数据 执行")
 
 
     def isarticle(self, results, clientL, datasDict):
         """
             @Datetime ： 2024/11/14 19:58
             @Author ：eblis
-            @Motto：简单描述用途
+            @Motto：生成文章
         """
 
         for idx, client in enumerate(clientL):
@@ -262,7 +254,7 @@ class taskAws():
         """
             @Datetime ： 2024/11/25 19:47
             @Author ：eblis
-            @Motto：简单描述用途
+            @Motto：从数据库获取文章 发布
         """
         for idx, client in enumerate(clientL):
             result = {}
@@ -282,7 +274,7 @@ class taskAws():
                 "user": datasDict['user']
             }
 
-            self.usego.sendlog(f' PostSqlArticle，任务信息:{task_data}')
+            self.usego.sendlog(f'PostSqlArticle，任务信息:{task_data}')
             response = self.aws_sqs.sendMSG(queue_url, f'run_generate_article_group',
                                             f'postSqlArticle',
                                             task_data)

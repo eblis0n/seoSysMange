@@ -39,7 +39,7 @@ class AmazonSQS:
 
     def initialization(self, taskid):
         """初始化或获取现有队列"""
-        sanitized_name = re.sub(r'[^a-zA-Z0-9_-]', '-', taskid)
+        sanitized_name = re.sub(r'[^a-zA-Z0-9_-]', '_', taskid)
 
         queue_name = f'SQS-{sanitized_name}.fifo'
 
