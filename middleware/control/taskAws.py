@@ -165,7 +165,7 @@ class taskAws():
 
         sum = 0
         idx = 0  # 初始化索引
-        while idx < len(clientL) and sum > total:  # 条件控制循环
+        while idx < len(clientL) and sum < total:  # 条件控制循环
             client = clientL[idx]  # 获取当前索引对应的客户端数据
             self.usego.sendlog(f"{client} get ready")
             result = {}
@@ -204,7 +204,7 @@ class taskAws():
             idx += 1
             sum += 200000
 
-        self.usego.sendlog(f"任务分派完成：一共使用:{len(clientL)}, 完成{total} 数据 执行")
+        self.usego.sendlog(f"任务分派完成：一共使用:{idx}, 完成{sum} 数据 执行")
 
 
     def isarticle(self, results, clientL, datasDict):
