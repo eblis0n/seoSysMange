@@ -1,38 +1,35 @@
 const axios = require('axios');
 const puppeteer = require('puppeteer-core');
-// const fs = require('fs');
 
-// 获取命令行参数
 const ads_api = process.argv[2];
 const user_id = process.argv[3];
-// const filepath = process.argv[4];
-
-// 等待的辅助函数
-// function wait(ms) {
-//     return new Promise(resolve => setTimeout(() => resolve(), ms));
-// };
-
-// 文件写入函数
-// const writeOutput = (file, data) => {
-//     fs.appendFile(file, data, function (err) {
-//         if (err) throw err;
-//     });
-// }
 
 const main = async () => {
-    let res = await axios.get(`${ads_api}/api/v1/browser/start?user_id=${user_id}`);
-    // console.log('Response:', res.data); // 打印响应信息
-
-    if (!(res.data.code === 0 && res.data.data.ws && res.data.data.ws.puppeteer)) {
-        return false;
+    let res;
+    try {
+        res = await axios.get(`${ads_api}/api/v1/browser/start?user_id=${user_id}`);
+    } catch (error) {
+        console.error("Failed to fetch browser WS endpoint:", error);
+        process.exit(1);
     }
 
+    if (!(res.data.code === 0 && res.data.data.ws && res.data.data.ws.puppeteer)) {
+        console.error("Invalid response structure or missing WS endpoint.");
+        process.exit(1);
+    }
+
+    let browser;
     try {
-        const browser = await puppeteer.connect({
+        browser = await puppeteer.connect({
             browserWSEndpoint: res.data.data.ws.puppeteer,
             defaultViewport: null
         });
+    } catch (error) {
+        console.error("Failed to connect to Puppeteer browser:", error);
+        process.exit(1);
+    }
 
+    try {
         const page = await browser.newPage();
         await page.setRequestInterception(true);
 
@@ -40,33 +37,32 @@ const main = async () => {
             const url = interceptedRequest.url();
             if (url.includes('https://note.com/api/v2/current_user')) {
                 const headers = interceptedRequest.headers();
-                // console.log('Request Headers:', headers); // 打印请求头
-
                 if (headers['cookie']) {
                     const cookiedata = {
                         "user_id": `${user_id}`,
                         "cookie": headers['cookie'],
                         "user-agent": headers['user-agent']
                     };
-                    // writeOutput(filepath, JSON.stringify(cookiedata) + '\n');
-                    console.log(JSON.stringify(cookiedata)); // 打印请求头
+                    console.log(JSON.stringify(cookiedata));
                 }
-                interceptedRequest.continue();
-            } else {
-                interceptedRequest.continue();
             }
+            interceptedRequest.continue().catch(err => {
+                console.error("Request continuation failed:", err);
+            });
         });
 
-        // await page.goto(`https://editor.note.com/new`, { waitUntil: 'networkidle0' });
-        await page.goto(`https://editor.note.com/new`, { waitUntil: 'networkidle0', timeout: 100000 });
+        await page.goto(`https://editor.note.com/new`, { waitUntil: 'networkidle0', timeout: 30000 });
         await page.close();
-        await browser.close();
-    } catch (e) {
-        console.error(e);
-    }finally {
-        // console.log('Exiting script...');
-        process.exit(0); // 确保退出程序，0 表示正常退出
+    } catch (error) {
+        console.error("Error during Puppeteer operations:", error);
+    } finally {
+        if (browser) {
+            await browser.close().catch(err => {
+                console.error("Failed to close browser:", err);
+            });
+        }
+        // console.log("Exiting script...");
     }
-}
+};
 
 main();
