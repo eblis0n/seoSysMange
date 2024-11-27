@@ -40,7 +40,7 @@ class taskAws():
         resdatas = self.witchClient()
         if resdatas != []:
             for resdata in resdatas:
-                self.usego.sendlog(f'这台设备{resdata},{resdata["platform"]},{type(resdata["platform"])}')
+                self.usego.sendlog(f'这台设备{resdata},{resdata["platform"]}')
                 if platform in resdata["platform"]:
                     if type == "splice":
                         self.isSplice(results, resdatas, datasDict)
