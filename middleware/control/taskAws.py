@@ -37,45 +37,39 @@ class taskAws():
         """
         results = []
         self.usego.sendlog(f"{type} 进来了")
-        resdatas = self.witchClient()
-        if resdatas != []:
-            for resdata in resdatas:
-                self.usego.sendlog(f'这台设备{resdata},{resdata["platform"]}')
-                if platform in resdata["platform"]:
-                    if type == "splice":
-                        self.isSplice(results, resdatas, datasDict)
-                        return results
-                    elif type == "cookies":
-                        self.iscookie(results, resdatas, datasDict)
-                        return results
-                    elif type == "article":
-                        self.isarticle(results, resdatas, datasDict)
-                        return results
-                    elif type == "postSqlArticle":
-                        self.isPostSqlArticle(results, resdatas, datasDict)
-                        return results
-                    else:
-                        self.usego.sendlog("啥也不是！！")
-                        return False
-                else:
-                    continue
-
-            self.usego.sendlog(f'没有设备可用')
-            return False
+        clientL = self.witchClient(platform)
+        self.usego.sendlog(f"有{len(clientL)} 设备 符合 条件，准备执行 {type}")
+        if clientL != []:
+            if type == "splice":
+                self.isSplice(results, clientL, datasDict)
+                return results
+            elif type == "cookies":
+                self.iscookie(results, clientL, datasDict)
+                return results
+            elif type == "article":
+                self.isarticle(results, clientL, datasDict)
+                return results
+            elif type == "postSqlArticle":
+                self.isPostSqlArticle(results, clientL, datasDict)
+                return results
+            else:
+                self.usego.sendlog("啥也不是！！")
+                return False
 
 
 
-    def witchClient(self):
+
+    def witchClient(self, platform):
         """
             @Datetime ： 2024/11/14 17:10
             @Author ：eblis
             @Motto：简单描述用途
         """
 
-        self.usego.sendlog("第一步，先查数据库，查看是否存在符合条件的PC")
+        self.usego.sendlog(f"第一步，先查数据库，查看是否存在符合条件的PC")
         # state=3 是 实际查询为 state !=2
-        sql_data = self.ssql.pcSettings_select_sql( state=3)
-
+        sql_data = self.ssql.pcSettings_select_sql(state=3)
+        clientList = []
         if "sql 语句异常" in str(sql_data):
             return []
         else:
@@ -91,18 +85,40 @@ class taskAws():
                          'create_at': self.usego.turn_isoformat(item[9]),
                          'update_at': self.usego.turn_isoformat(item[10])
                          } for item in sql_data]
-        return resdatas
+            self.usego.sendlog(f"第2步，根据 {type(platform)},{platform} 返回 符合条件的设备")
+
+            for i in range(len(resdatas)):
+                self.usego.sendlog(f'第{i} 台设备{resdatas[i]}')
+                if platform in resdatas[i]["platform"]:
+                    clientList.append(resdatas[i])
 
 
+        return clientList
 
-    def iscookie(self, results, resdatas, datasDict):
+    def find_limit(self, idx):
+        """
+            @Datetime ： 2024/11/10 21:00
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        end = 200000
+        if idx == 0:
+            start = 0
+            # end = 200000
+        else:
+            start = end
+            end = 200000 * (idx + 1)
+
+        return start, end
+
+    def iscookie(self, results, clientL, datasDict):
         """
             @Datetime ： 2024/11/14 19:58
             @Author ：eblis
             @Motto：简单描述用途
         """
 
-        for idx, client in enumerate(resdatas):
+        for idx, client in enumerate(clientL):
             result = {}
             # 生成 队列
             response = self.aws_sqs.initialization(f'client_{client["name"]}')
@@ -129,7 +145,7 @@ class taskAws():
             break
 
     
-    def isSplice(self, results, resdatas, datasDict):
+    def isSplice(self, results, clientL, datasDict):
         """
             @Datetime ： 2024/11/14 17:16
             @Author ：eblis
@@ -149,8 +165,8 @@ class taskAws():
             return False
 
         idx = 0  # 初始化索引
-        while idx < len(resdatas):  # 条件控制循环
-            client = resdatas[idx]  # 获取当前索引对应的客户端数据
+        while idx < len(clientL):  # 条件控制循环
+            client = clientL[idx]  # 获取当前索引对应的客户端数据
             result = {}
 
             # 生成队列
@@ -185,7 +201,7 @@ class taskAws():
             self.usego.sendlog(f"pc执行结果{sql_data}")
 
             # 小任务特殊处理
-            if len(resdatas) == 1 and total <= 200000:
+            if len(clientL) == 1 and total <= 200000:
                 self.usego.sendlog(f'小case ，一台设备就够玩了')
                 break
 
@@ -194,33 +210,19 @@ class taskAws():
 
         # 在退出条件时，直接清空或标记 resdatas 处理完成。
 
-    def find_limit(self, idx):
-        """
-            @Datetime ： 2024/11/10 21:00
-            @Author ：eblis
-            @Motto：简单描述用途
-        """
-        end = 200000
-        if idx == 0:
-            start = 0
-            # end = 200000
-        else:
-            start = end
-            end = 200000 * (idx + 1)
-
-        return start, end
 
 
 
 
-    def isarticle(self, results, resdatas, datasDict):
+
+    def isarticle(self, results, clientL, datasDict):
         """
             @Datetime ： 2024/11/14 19:58
             @Author ：eblis
             @Motto：简单描述用途
         """
 
-        for idx, client in enumerate(resdatas):
+        for idx, client in enumerate(clientL):
             result = {}
             # 生成 队列
             response = self.aws_sqs.initialization(f'client_{client["name"]}')
@@ -256,13 +258,13 @@ class taskAws():
             break
             
             
-    def isPostSqlArticle(self, results, resdatas, datasDict):
+    def isPostSqlArticle(self, results, clientL, datasDict):
         """
             @Datetime ： 2024/11/25 19:47
             @Author ：eblis
             @Motto：简单描述用途
         """
-        for idx, client in enumerate(resdatas):
+        for idx, client in enumerate(clientL):
             result = {}
             # 生成 队列
             response = self.aws_sqs.initialization(f'client_{client["name"]}')

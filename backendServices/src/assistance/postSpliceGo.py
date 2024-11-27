@@ -63,6 +63,7 @@ class postSpliceGo:
             all_res = self.run(isarts, postingStyle, platform, genre, adsUserList, all_links_list_group, title_alt,
                                alt_text)
 
+
             sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
             self.aws_sqs.deleteMSG(queue_url)
             return all_res
@@ -211,6 +212,7 @@ class postSpliceGo:
                 this_res_list.append(result)
                 all_links_list_group.remove(this_links)
                 print(f"剩余：{len(all_links_list_group)}")
+                self.del_run_links(this_links)
             else:
                 self.usego.sendlog(f"执行失败了，{this_links} 这些需要回炉再造")
                 bad_run_list.append(this_links)
