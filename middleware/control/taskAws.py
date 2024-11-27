@@ -107,7 +107,7 @@ class taskAws():
             # 生成 队列
             response = self.aws_sqs.initialization(f'client_{client["name"]}')
             self.usego.sendlog(f'Amazon SQS队列 请求结果：{response}')
-            if
+
             queue_url = response['QueueUrl']
             self.usego.sendlog(f'{idx}, name:client_{client["name"]}，state:{client["state"]}，队列地址:{queue_url}')
             task_data = {
