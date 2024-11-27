@@ -1,4 +1,5 @@
 import json
+import re
 import time
 import boto3
 from botocore.exceptions import ClientError
@@ -38,7 +39,10 @@ class AmazonSQS:
 
     def initialization(self, taskid):
         """初始化或获取现有队列"""
-        queue_name = f'SQS-{taskid}.fifo'
+        sanitized_name = re.sub(r'[^a-zA-Z0-9_-]', '-', taskid)
+
+        queue_name = f'SQS-{sanitized_name}.fifo'
+
 
         # 检查现有队列
         response = self.list_queues(queue_name)
