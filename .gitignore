@@ -211,3 +211,5 @@ flask_session/
 !docsFile/avatar/default.png
 !docsFile/splicing_article/*.txt
 !docsFile/sys_menu.json
+!note_some/image/*.jpg
+!note_some/image/*.png
