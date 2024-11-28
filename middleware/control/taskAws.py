@@ -36,7 +36,7 @@ class taskAws():
             @Motto：简单描述用途
         """
         results = []
-        self.usego.sendlog(f"{type} 进来了")
+        self.usego.sendlog(f"{type} ,{platform}进来了")
         clientL = self.witchClient(platform)
         self.usego.sendlog(f"有{len(clientL)} 设备 符合 条件，准备执行 {type}")
         if clientL != []:
@@ -66,7 +66,7 @@ class taskAws():
             @Motto：简单描述用途
         """
 
-        self.usego.sendlog(f"第一步，先查数据库，查看是否存在符合条件的PC")
+        self.usego.sendlog(f"第一步，先查数据库，查看{platform}是否存在符合条件的PC")
         # state=3 是 实际查询为 state !=2
         sql_data = self.ssql.pcSettings_select_sql(state=3)
         clientList = []

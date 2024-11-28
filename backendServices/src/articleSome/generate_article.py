@@ -282,7 +282,8 @@ class generateArticle():
         print(f"提取promptID 得到具体prompt")
         sql_data = self.ssql.ai_prompt_select_sql(promptID)
         if "sql 语句异常" not in str(sql_data):
-            resdatas = [item[4] for item in sql_data]
+            resdatas = [item[5] for item in sql_data]
+            print("resdatas",resdatas)
             try:
                 resdatas_list = json.loads(resdatas[0])
                 return resdatas_list

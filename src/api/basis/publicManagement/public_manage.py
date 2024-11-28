@@ -45,6 +45,10 @@ class publicManage():
                 "label": "note",
                 "value": "note",
             },
+            {
+                "label": "article",
+                "value": "article",
+            },
         ]
         res = ResMsg(data=platforms)
         responseData = res.to_json()
