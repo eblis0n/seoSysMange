@@ -220,6 +220,7 @@ class taskAws():
             response = self.aws_sqs.initialization(f'client_{client["name"]}')
             queue_url = response['QueueUrl']
             self.usego.sendlog(f'{idx}, name:client_{client["name"]}，state:{client["state"]}，队列地址:{queue_url}')
+
             task_data = {
                 'pcname': client["name"],
                 'queue_url': queue_url,
@@ -228,12 +229,12 @@ class taskAws():
                 "type": datasDict["type"],
                 "promptID":  datasDict["promptID"],
                 "sortID":  datasDict["sortID"],
-                "user": datasDict["user"],
                 "theme": datasDict["theme"],
                 "Keywords": datasDict["Keywords"],
                 "ATag": datasDict["ATag"],
                 "link": datasDict["link"],
                 "language": datasDict["language"],
+                "user": datasDict["user"],
 
             }
             self.usego.sendlog(f' get article，任务信息:{task_data}')

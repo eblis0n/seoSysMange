@@ -84,14 +84,14 @@ class articleManage():
             datasDict = {
                 "platform": "article",
                 "max_length": 0,
-                "promptID": promptID,
-                "sortID": sortID,
                 "source": source,
                 "type": type,
+                "promptID": promptID,
+                "sortID": sortID,
                 "theme": theme_l,
                 "Keywords": Keywords_l,
-                "link": link_l,
                 "ATag": ATag_l,
+                "link": link_l,
                 "language": language_l,
                 "user": user_l,
             }

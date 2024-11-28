@@ -55,17 +55,18 @@ commands:
     params:
       - pcname
       - queue_url
+      - max_length
       - source
       - type
-      - max_length
       - promptID
       - sortID
-      - user
       - theme
       - Keywords
       - ATag
       - link
       - language
+      - user
+
 
 
 # 可以继续添加更多命令
