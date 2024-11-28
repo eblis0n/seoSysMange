@@ -38,12 +38,13 @@ class generateArticle():
         """
 
         # 第一步:根据promptID 拿到具体prompt信息
+        print(f"来活啦～{pcname}, {queue_url}, {max_length}, {source}, {type}, {promptID}, {sortID},  {theme}, {Keywords}, {ATag}, {link}, {language}, {user}")
 
         promptDD = self.witch_prompt(promptID)
         if promptDD is not None and len(promptDD) > 0:
-            # # 第二步 根据 prompt 的初始化
+            print("第二步 根据 prompt 的初始化")
             promptList = self.disassembly(promptDD, max_length, theme, Keywords, ATag, link, language, user)
-
+            # print("第3步 很关键，生成文章")
             self.lesGO(source, type, promptID, sortID, promptList, user)
             time.sleep(5)
             sql_data = self.basql.pcSettings_update_state_sql(pcname, state=0)
@@ -75,7 +76,11 @@ class generateArticle():
             article_title = ''
 
             for j in range(len(thisArticle)):
-                language = thisArticle[j]["language"]
+                try:
+                    language = thisArticle[j]["language"]
+                except:
+                    language = ""
+                    print("没有设置语言")
                 if thisArticle[j]["type"] == "0" or thisArticle[j]["type"] == 0:
                     if source == "openAI":
                         print(f"openAI 很高兴 为你服务")
@@ -104,6 +109,7 @@ class generateArticle():
                     Epilogue += f'\n\n {thisArticle[j]["promptdata"] }\n\n'
 
             print(f"第{i} 篇文章生成完比，剩余{len(promptList) - 1}:{Epilogue}")
+
             self.conversionType(api_key, source, article_title, Epilogue,language, type, promptID, sortID,  user)
 
         return True
@@ -283,7 +289,7 @@ class generateArticle():
         sql_data = self.ssql.ai_prompt_select_sql(promptID)
         if "sql 语句异常" not in str(sql_data):
             resdatas = [item[5] for item in sql_data]
-            print("resdatas",resdatas)
+            # print("resdatas",resdatas)
             try:
                 resdatas_list = json.loads(resdatas[0])
                 return resdatas_list
@@ -298,15 +304,15 @@ if __name__ == '__main__':
     Art = generateArticle()
     pcname = "this_mac_1_not"
     queue_url = "/"
-    max_length = 2
+    max_length = 1
     source = "openAI"
-    promptID = 1
+    promptID = 2
     sortID = 1
-    theme = ["爱情", "爱情"]
-    Keywords = ["浪漫", "忧伤"]
-    ATag = ['<a jsname="KI37ad" class="gyPpGe" href="https://support.google.com/websearch/answer/181196?hl=zh-CN" ping="/url?sa=t&amp;source=web&amp;rct=j&amp;url=https://support.google.com/websearch/answer/181196%3Fhl%3Dzh-CN&amp;ved=0ahUKEwjYhv3unOuJAxWzevUHHbs_CKgQwcMDCAY&amp;opi=89978449">无障碍功能帮助</a>','<a jsname="KI37ad" class="gyPpGe" href="https://support.google.com/websearch/answer/181196?hl=zh-CN" ping="/url?sa=t&amp;source=web&amp;rct=j&amp;url=https://support.google.com/websearch/answer/181196%3Fhl%3Dzh-CN&amp;ved=0ahUKEwjYhv3unOuJAxWzevUHHbs_CKgQwcMDCAY&amp;opi=89978449">无障碍功能帮助</a>']
-    link = ["https://www.example.com", "https://www.baidu.com"]
-    language = ["中文", "英语"]
+    theme = ["冬天的旅游"]
+    Keywords = ["墨尔本"]
+    ATag = []
+    link = []
+    language = []
     user = []
     type = "Markdown"
 
