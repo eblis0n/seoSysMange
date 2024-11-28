@@ -38,101 +38,6 @@ class articleManage():
         self.bp.route(self.Myenum.ARTICLE_LIST, methods=['GET'])(self.article_list)
 
 
-    # def article_insert(self):
-    #
-    #     data_request = request.json
-    #     sortID = data_request['sortID']
-    #     commission = data_request['commission']
-    #     type = data_request['type']
-    #     source = data_request['source']
-    #
-    #     if commission == 0 or commission == "0":
-    #         user = [data_request['user']]
-    #     else:
-    #         user = ""
-    #
-    #     if int(data_request['isAI']) == 0:
-    #         promptID = data_request['promptID']
-    #         try:
-    #             theme = data_request['theme']
-    #             theme_l = theme.split("^")
-    #         except:
-    #             theme_l = ""
-    #
-    #         try:
-    #             Keywords = data_request['Keywords']
-    #             Keywords_l = Keywords.split("^")
-    #         except:
-    #             Keywords_l = ""
-    #
-    #         try:
-    #             ATag = data_request['ATag']
-    #             ATag_l = ATag.split("^")
-    #         except:
-    #             ATag_l = ""
-    #         try:
-    #             link = data_request['link']
-    #             link_l = link.split("^")
-    #         except:
-    #             link_l = ""
-    #
-    #         try:
-    #             language = data_request['language']
-    #             language_l = language.split("^")
-    #         except:
-    #             language_l = ""
-    #
-    #             # 获取每个列表的长度
-    #
-    #         valid_lists = [lst for lst in [theme_l, Keywords_l, link_l, ATag_l, language_l, user] if
-    #                        lst !=""]
-    #         max_length = max([len(lst) for lst in valid_lists], default=0)
-    #         # 找出最大长度
-    #         datasDict = {
-    #             "platform": "blogger",
-    #             "max_length": max_length,
-    #             "promptID": promptID,
-    #             "sortID": sortID,
-    #             "source": source,
-    #             "type": type,
-    #             "theme": [],
-    #             "Keywords": [],
-    #             "link": [],
-    #             "ATag": [],
-    #             "language": [],
-    #             "user": [],
-    #         }
-    #         if max_length != 0:
-    #             # 输出结果
-    #             self.usego.sendlog(f'本次批量：{max_length}')
-    #             # 使每个列表达到最大长度
-    #             aligned_lists = [(lst * (max_length // len(lst) + 1))[:max_length] for lst in valid_lists]
-    #             new_theme_l, new_Keywords_l, new_link_l, new_ATag_l, new_language_l, new_user_l = aligned_lists
-    #             datasDict["theme"].extend(new_theme_l)  # 追加而不是替换
-    #             datasDict["Keywords"].extend(new_Keywords_l)
-    #             datasDict["link"].extend(new_link_l)
-    #             datasDict["ATag"].extend(new_ATag_l)
-    #             datasDict["language"].extend(new_language_l)
-    #             datasDict["user"].extend(new_user_l)
-    #
-    #         self.usego.sendlog(f"接收到的参数：{datasDict}")
-    #         results = self.task.run("article", datasDict["platform"], datasDict)
-    #         res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
-    #     else:
-    #         language = data_request['spoken']
-    #         create_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    #         title = data_request['title']
-    #         content = data_request['content']
-    #
-    #         sql_data = self.ssql.article_insert_sql(sortID, source, title, content, language,  type, user, commission, create_at)
-    #         if "sql 语句异常" not in str(sql_data):
-    #             self.usego.sendlog(f'添加成功：{sql_data}')
-    #             res = ResMsg(data=sql_data)
-    #         else:
-    #             self.usego.sendlog(f'添加失败：{sql_data}')
-    #             res = ResMsg(code='B0001', msg=f'添加失败：{sql_data}')
-    #
-    #     return res.to_json()
 
     def article_insert(self):
         data_request = request.json
@@ -142,7 +47,11 @@ class articleManage():
         source = data_request['source']
 
         # 处理 commission 为 0 或 "0" 时，确保 user 为列表
-        user_l = [data_request['user']] if commission == 0 or commission == "0" else []
+        user_l = []
+        if commission == 0 or commission == "0":
+            user_l.append(data_request['user'])
+        else:
+            user = ""
 
         # 如果 isAI == 0，处理相关字段
         if int(data_request['isAI']) == 0:
@@ -192,10 +101,6 @@ class articleManage():
             if max_length != 0:
                 self.usego.sendlog(f'datasDict：{max_length}，{datasDict}')
 
-                # 对每个列表进行填充，使其达到最大长度
-                # aligned_lists = [(lst * (max_length // len(lst) + 1))[:max_length] for lst in variable.values()]
-                # self.usego.sendlog(f'aligned_lists：{aligned_lists}')
-                # new_theme_l, new_Keywords_l, new_link_l, new_ATag_l, new_language_l, new_user_l = aligned_lists
                 # 修改每个字段
                 for key, val in datasDict.items():
                     if isinstance(val, list):  # 确保 val 是列表
@@ -216,7 +121,7 @@ class articleManage():
             title = data_request['title']
             content = data_request['content']
 
-            sql_data = self.ssql.article_insert_sql(sortID, source, title, content, language, type, user, commission,
+            sql_data = self.ssql.article_insert_sql(sortID, source, title, content, language, type, user_l, commission,
                                                     create_at)
             if "sql 语句异常" not in str(sql_data):
                 self.usego.sendlog(f'添加成功：{sql_data}')

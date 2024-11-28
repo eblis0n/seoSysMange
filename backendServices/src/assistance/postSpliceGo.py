@@ -206,10 +206,13 @@ class postSpliceGo:
         """
         from backendServices.src.socialPlatforms.telegraGO.telegraSelenium import telegraSelenium
         telegra = telegraSelenium()
+        # 创建一个包含目标链接的列表
+        to_remove = ["https://telegra.ph", "https://telegra.ph/"]
         with threading.Lock():
-            result = telegra.run(user,title_alt, postingStyle, this_links, alt_text, arts)
+            result = telegra.run(user, title_alt, postingStyle, this_links, alt_text, arts)
             if result:
-                this_res_list.append(result)
+                if result not in to_remove:
+                    this_res_list.append(result)
                 all_links_list_group.remove(this_links)
                 print(f"剩余：{len(all_links_list_group)}")
                 self.del_run_links(this_links)

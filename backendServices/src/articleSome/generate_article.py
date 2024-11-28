@@ -45,10 +45,12 @@ class generateArticle():
             print("第二步 根据 prompt 的初始化")
             promptList = self.disassembly(promptDD, max_length, theme, Keywords, ATag, link, language, user)
             # print("第3步 很关键，生成文章")
-            self.lesGO(source, type, promptID, sortID, promptList, user)
-            time.sleep(5)
+            self.lesGO(source, type, promptID, sortID, promptList,  user)
+
             sql_data = self.basql.pcSettings_update_state_sql(pcname, state=0)
             self.aws_sqs.deleteMSG(queue_url)
+            print("恭喜你，生成文章任务完成")
+            return True
 
         else:
             return False
@@ -74,13 +76,14 @@ class generateArticle():
             print(f"这篇文章由{len(thisArticle)} 段组成")
             Epilogue = ''
             article_title = ''
-
+            language = ''
             for j in range(len(thisArticle)):
+                print(f"thisArticle[j],{thisArticle[j]}")
                 try:
                     language = thisArticle[j]["language"]
                 except:
-                    language = ""
-                    print("没有设置语言")
+                    print("跳过")
+
                 if thisArticle[j]["type"] == "0" or thisArticle[j]["type"] == 0:
                     if source == "openAI":
                         print(f"openAI 很高兴 为你服务")
@@ -107,11 +110,8 @@ class generateArticle():
                 else:
 
                     Epilogue += f'\n\n {thisArticle[j]["promptdata"] }\n\n'
-
+            self.conversionType(api_key, source, article_title, Epilogue, language, type, promptID, sortID,  user)
             print(f"第{i} 篇文章生成完比，剩余{len(promptList) - 1}:{Epilogue}")
-
-            self.conversionType(api_key, source, article_title, Epilogue,language, type, promptID, sortID,  user)
-
         return True
 
     def convert_to_markdown(self, text):
@@ -146,8 +146,8 @@ class generateArticle():
 
         else:
             title_text = Epilogue
-
-        sql_data = self.save_sql(source, promptID, sortID, article_title, title_text,language, type, user)
+        print("language",language)
+        sql_data = self.save_sql(source, promptID, sortID, article_title, title_text, language, type, user)
         if "sql 语句异常" not in str(sql_data):
             print("入库成功")
         else:
@@ -270,6 +270,7 @@ class generateArticle():
                     )
                     new_prompt["type"] = data["type"]
                     new_prompt["promptdata"] = this_prompt
+                    new_prompt["language"] = current_language
                 else:
                     # this_prompt = data["promptdata"]
                     new_prompt = data
@@ -289,13 +290,18 @@ class generateArticle():
         sql_data = self.ssql.ai_prompt_select_sql(promptID)
         if "sql 语句异常" not in str(sql_data):
             resdatas = [item[5] for item in sql_data]
-            # print("resdatas",resdatas)
-            try:
-                resdatas_list = json.loads(resdatas[0])
-                return resdatas_list
-            except json.JSONDecodeError as e:
-                print(f"转换异常：{e}")
+            print("resdatas",resdatas)
+            if resdatas!=[]:
+                try:
+                    resdatas_list = json.loads(resdatas[0])
+                    return resdatas_list
+                except json.JSONDecodeError as e:
+                    print(f"转换异常：{e}")
+                    return None
+            else:
+                print("获取数据失败了")
                 return None
+
         else:
             return None
 
@@ -306,15 +312,16 @@ if __name__ == '__main__':
     queue_url = "/"
     max_length = 1
     source = "openAI"
-    promptID = 2
+    promptID = 1
     sortID = 1
-    theme = ["冬天的旅游"]
-    Keywords = ["墨尔本"]
+    theme = ['冬天的旅游']
+    Keywords = []
     ATag = []
     link = []
-    language = []
+    language = ["法语"]
     user = []
-    type = "Markdown"
+    type = "Html"
+
 
     Art.run(pcname, queue_url, max_length, source, type, promptID, sortID, theme, Keywords, ATag, link, language, user)
 
