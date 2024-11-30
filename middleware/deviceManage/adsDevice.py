@@ -32,10 +32,10 @@ class adsDevice():
 
         whodata = self.chromeStartUp(who, adsServer)
 
-        self.usego.sendlog("{}选手信息如下：{}".format(who, whodata))
+        print("{}选手信息如下：{}".format(who, whodata))
 
         whodata_dict = self.usego.changeDict(whodata)
-        self.usego.sendlog(f"转换结果:{type(whodata_dict)},{whodata_dict}")
+        print(f"转换结果:{type(whodata_dict)},{whodata_dict}")
         try:
             chromedriver = whodata_dict["chromedriver"]
             if chromedriver != '':
@@ -43,13 +43,13 @@ class adsDevice():
                     driver = self.DU.drivers(driverpath=whodata_dict['chromedriver'], debugUP=whodata_dict["debugD"])
                     return driver
                 except Exception as e:
-                    self.usego.sendlog(f"ads接口 返回异常:{e}")
+                    print(f"ads接口 返回异常:{e}")
                     return False
             else:
-                self.usego.sendlog("这个用户{},通过{} 启动chromeStartUp失败".format(who, adsServer))
+                print("这个用户{},通过{} 启动chromeStartUp失败".format(who, adsServer))
                 return False
         except Exception as e:
-            self.usego.sendlog(f"{who}转换结果:{type(whodata_dict)},{whodata_dict},{e}")
+            print(f"{who}转换结果:{type(whodata_dict)},{whodata_dict},{e}")
             return False
 
 
@@ -57,14 +57,14 @@ class adsDevice():
         asdchrome = {}
         response = self.adsAPI(adsServer, "start", userid)
         dict_response = self.usego.changeDict(response)
-        self.usego.sendlog(f"本次请求结果:{dict_response}")
+        print(f"本次请求结果:{dict_response}")
         try:
             asdchrome["chromedriver"] = dict_response['data'].get('webdriver')
             ws = dict_response['data']['ws']
             asdchrome["debugD"] = ws.get('selenium')
             return asdchrome
         except Exception as e:
-            self.usego.sendlog(f"chromeStartUp出现了异常{e}")
+            print(f"chromeStartUp出现了异常{e}")
             return False
 
 
@@ -72,18 +72,18 @@ class adsDevice():
 
     def adsAPI(self, adsServer, mo, userid):
 
-        self.usego.sendlog(f"准备执行：{mo}")
+        print(f"准备执行：{mo}")
         if mo == "start":
             apiUrl = "/api/v1/browser/start?user_id={}".format(userid)
         else:
             apiUrl = "/api/v1/browser/stop?user_id={}".format(userid)
         url = adsServer + apiUrl
         headers = {'Content-Type': 'application/json'}
-        self.usego.sendlog(f"当前访问: {url}")
+        print(f"当前访问: {url}")
         try:
             response = requests.get(url=url, headers=headers).json()
             return response
         except Exception as e:
-            self.usego.sendlog(f"请求ADS 服务器失败: {e}")
+            print(f"请求ADS 服务器失败: {e}")
             return False
 

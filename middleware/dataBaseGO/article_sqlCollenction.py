@@ -79,6 +79,41 @@ class article_sqlGO():
 
     ############################################# article #####################################################
 
+    def article_select_sql(self, limit=None, sortID=None, type=None, source=None, commission=None, isAI=None,user=None):
+        """
+            @Datetime ： 2024/5/7 10:59
+            @Author ：eblis
+            @Motto：查文章
+        """
+        # 构建参数字典，过滤掉 None 和空字符串
+        params = {k: v for k, v in locals().items() if
+                  k in ['commission', 'isAI', 'sortID', 'type', 'source', 'user'] and v not in [None, ""]}
+        print("非 None 的参数名：", list(params.keys()))
+
+        # 构建基础 SQL
+        sql = "SELECT * FROM seo_article"
+        where_clauses = []
+
+        # 构建 WHERE 条件
+        for key, value in params.items():
+            if isinstance(value, str):
+                escaped_value = value.replace("'", "\\'")
+                where_clauses.append(f"`{key}` = '{escaped_value}'")
+            else:
+                where_clauses.append(f"`{key}` = {value}")
+
+        if where_clauses:
+            sql += " WHERE " + " AND ".join(where_clauses)
+
+        # 添加排序和限制
+        sql += " ORDER BY `create_at` ASC"
+        if limit is not None:
+            sql += f" LIMIT {int(limit)}"  # 确保 limit 是整数
+        print("sql", sql)
+
+        sql_data = self.ssql.mysql_select('article', sql)
+        return sql_data
+
 
     def article_list_sql(self):
         # noinspection SqlNoDataSourceInspection
@@ -162,4 +197,47 @@ class article_sqlGO():
         # 执行 SQL 更新查询
         sql_data = self.ssql.mysql_commit('article', sqlgo)
         return sql_data
+
+
+
+    ############################################# post article history #################################################
+
+    def post_article_history_list_sql(self):
+        # noinspection SqlNoDataSourceInspection
+        sqlgo = f"""SELECT /*+ NOCACHE */*  FROM seo_article_post_history ORDER BY create_at DESC;"""
+        # 执行 SQL 查询语句
+        sql_data = self.ssql.mysql_select('article', sqlgo)
+        return sql_data
+
+
+    def post_articlehistory_batch_insert(self, datalist):
+        # datalist 是 list  里有 N 组 元组
+        commitSQL = """
+            INSERT INTO seo_article_post_history (articleID, accountID, platform, url, created_at)
+            VALUES (%s, %s,%s, %s, %s)
+            """
+        # 执行 SQL 查询语句
+        sql_data = self.ssql.mysql_batch_commit('article', commitSQL, datalist)
+        return sql_data
+
+    ############################################# post article_result #################################################
+
+    def post_article_result_list_sql(self):
+        # noinspection SqlNoDataSourceInspection
+        sqlgo = f"""SELECT /*+ NOCACHE */*  FROM seo_article_post_history ORDER BY create_at DESC;"""
+        # 执行 SQL 查询语句
+        sql_data = self.ssql.mysql_select('article', sqlgo)
+        return sql_data
+
+    def post_article_result_batch_insert(self, datalist):
+        # datalist 是 list  里有 N 组 元组
+        commitSQL = """
+            INSERT INTO seo_article (platform, url, created_at)
+            VALUES (%s, %s, %s)
+            """
+        # 执行 SQL 查询语句
+        print("commitSQL",commitSQL)
+        sql_data = self.ssql.mysql_batch_commit('article', commitSQL, datalist)
+        return sql_data
+
 

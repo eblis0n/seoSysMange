@@ -321,7 +321,7 @@ class basis_sqlGO():
         return sql_data
 
 
-    def blogger_info_select_sql(self, group=None):
+    def blogger_info_select_sql(self,group=None):
         """
             @Datetime ： 2024/5/7 10:59
             @Author ：eblis

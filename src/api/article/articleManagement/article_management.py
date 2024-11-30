@@ -151,6 +151,7 @@ class articleManage():
 
 
     def article_list(self):
+
         sql_data = self.ssql.article_list_sql()
         # print("sql_data", sql_data)
 

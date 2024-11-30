@@ -38,21 +38,19 @@ class postSpliceGo:
             @Motto：简单描述用途
         """
 
-
         self.usego.sendlog(
             f"接收到的参数：genre:{genre}, platform:{platform}, stacking_min{stacking_min}, stacking_max{stacking_max},alt_text {alt_text},sort {sort}, postingStyle{postingStyle}, isarts{isarts}")
         sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=1)
         # 第一步根据 platform 选用ads
         if platform == "blogger":
             adsUserList = self.siphon_ads(platform, group, eval(configCall.min_concurrent_user))
-
         elif platform == "note":
             adsUserList = self.siphon_ads(platform, group, eval(configCall.min_concurrent_user))
         elif platform == "telegra":
             adsUserList = self.siphon_ads(platform, eval(configCall.stacking_ads), eval(configCall.min_concurrent_user))
-
         else:
             return False
+
 
         self.usego.sendlog(f"adsUserList 结果：{adsUserList}")
         if adsUserList != []:
@@ -247,6 +245,8 @@ class postSpliceGo:
             return f"生成 {len(new_links_list)} 个新链接，已入库"
         else:
             return None
+
+
     def del_run_links(self, links):
         """
             @Datetime ： 2024/10/28 02:10

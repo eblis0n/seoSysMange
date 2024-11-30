@@ -23,9 +23,7 @@ sys.path.append(bae_idr)
 from middleware.deviceManage.adsDevice import adsDevice
 import middleware.public.configurationCall as configCall
 from middleware.public.commonUse import otherUse
-from middleware.dataBaseGO.mongo_sqlCollenction import mongo_sqlGO
-from middleware.dataBaseGO.basis_sqlCollenction import basis_sqlGO
-from backendServices.src.awsMQ.amazonSQS import AmazonSQS
+
 
 class telegraSelenium:
     def __init__(self):

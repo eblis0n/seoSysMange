@@ -49,22 +49,20 @@ commands:
       - user
 
   - name: postSqlArticle
-    module: backendServices.src.postArticle.post_sql_article
+    module: backendServices.src.articleSome.post_sql_article
     class: postSqlArticle
     method: run
     params:
       - pcname
       - queue_url
-      - max_length
-      - source
-      - type
-      - promptID
+      - platform
+      - group
+      - post_max
       - sortID
-      - theme
-      - Keywords
-      - ATag
-      - link
-      - language
+      - type
+      - source
+      - commission
+      - isAI
       - user
 
 

@@ -214,7 +214,7 @@ class mysqlGO():
         conn = self._connect(mo)
         if conn is None:
             print(f"conn 失败 ")
-            return f"sql 语句异常"
+            return f"sql 语句异常，conn 失败"
         cursor = None
         try:
             cursor = conn.cursor()
