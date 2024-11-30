@@ -116,17 +116,18 @@ class postSqlArticle():
                 for thread in threads:
                     thread.join()
 
-                self.usego.sendlog(f"这波Thread 执行完了：{this_res_list}")
+                print(f"这波Thread 执行完了：{this_res_list}")
 
                 if this_res_list != []:
-                    self.usego.sendlog(f"将数据同步存放数据库")
+                    print(f"将数据同步存放数据库，{this_res_list}，{this_history_list}")
+
                     self.save_datebase(this_res_list, this_history_list)
 
-                self.usego.sendlog(f"总剩余：{len(post_read_list)}")
+                print(f"总剩余：{len(post_read_list)}")
 
                 post_read_list.extend(bad_run_list)
                 bad_run_list.clear()
-                self.usego.sendlog(f"最终剩余：{len(post_read_list)}")
+                print(f"最终剩余：{len(post_read_list)}")
 
                 for link in this_res_list:
                     if link not in all_res:
@@ -137,10 +138,10 @@ class postSqlArticle():
 
             else:
                 if platform in ["blogger", "note"]:
-                    self.usego.sendlog(f"{adsUserList} 都跑过了")
+                    print(f"{adsUserList} 都跑过了")
                     runTure = False
                 else:
-                    self.usego.sendlog(f"初始化一下数据，跑空")
+                    print(f"初始化一下数据，跑空")
                     mm = 0
 
         print("跑完了")
@@ -173,10 +174,10 @@ class postSqlArticle():
                 this_history_list.append(tuple(this_history))
                 this_res_list.append(tuple(this_result))
                 post_read_list.remove(this_post_data)
-                self.usego.sendlog(f"剩余：{len(post_read_list)} 文章没发")
+                print(f"剩余：{len(post_read_list)} 文章没发")
 
             else:
-                self.usego.sendlog(f"执行失败了，{this_post_data} 这些需要回炉再造")
+                print(f"执行失败了，{this_post_data} 这些需要回炉再造")
                 bad_run_list.append(this_post_data)
 
 
@@ -206,9 +207,9 @@ class postSqlArticle():
                 this_history_list.append(tuple(this_history))
                 this_res_list.append(tuple(this_result))
                 post_read_list.remove(this_post_data)
-                self.usego.sendlog(f"剩余：{len(post_read_list)} 文章没发")
+                print(f"剩余：{len(post_read_list)} 文章没发")
             else:
-                self.usego.sendlog(f"执行失败了，{this_post_data} 这些需要回炉再造")
+                print(f"执行失败了，{this_post_data} 这些需要回炉再造")
                 bad_run_list.append(this_post_data)
 
 
@@ -242,10 +243,10 @@ class postSqlArticle():
                 this_history_list.append(tuple(this_history))
                 this_res_list.append(tuple(this_result))
                 post_read_list.remove(this_post_data)
-                self.usego.sendlog(f"剩余：{len(post_read_list)} 文章没发")
+                print(f"剩余：{len(post_read_list)} 文章没发")
 
             else:
-                self.usego.sendlog(f"执行失败了")
+                print(f"执行失败了")
 
 
     def secondaryProcessing(self, platform, post_max, artList, adsUserList):
