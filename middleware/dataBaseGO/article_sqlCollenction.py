@@ -224,7 +224,7 @@ class article_sqlGO():
 
     def post_article_result_list_sql(self):
         # noinspection SqlNoDataSourceInspection
-        sqlgo = f"""SELECT /*+ NOCACHE */*  FROM seo_article_post_history ORDER BY create_at DESC;"""
+        sqlgo = f"""SELECT /*+ NOCACHE */*  FROM seo_result_article_links ORDER BY create_at DESC;"""
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_select('article', sqlgo)
         return sql_data
@@ -232,7 +232,7 @@ class article_sqlGO():
     def post_article_result_batch_insert(self, datalist):
         # datalist 是 list  里有 N 组 元组
         commitSQL = """
-            INSERT INTO seo_article (platform, url, created_at)
+            INSERT INTO seo_result_article_links (platform, url, created_at)
             VALUES (%s, %s, %s)
             """
         # 执行 SQL 查询语句

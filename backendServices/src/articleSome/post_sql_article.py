@@ -116,10 +116,11 @@ class postSqlArticle():
                 for thread in threads:
                     thread.join()
 
-                print(f"这波Thread 执行完了：{this_res_list}")
+                # print(f"这波Thread 执行完了：{this_res_list}")
 
                 if this_res_list != []:
-                    print(f"将数据同步存放数据库，{this_res_list}，{this_history_list}")
+                    print(f"将this_res_list数据同步存放数据库，{this_res_list}")
+                    print(f"将this_history_list数据同步存放数据库，{this_history_list}")
 
                     self.save_datebase(this_res_list, this_history_list)
 
