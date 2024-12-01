@@ -156,7 +156,6 @@ class postSqlArticle():
         """
         from backendServices.src.socialPlatforms.bloggerGO.bloggerSeleniumGO import bloggerSeleniumGO
         blog = bloggerSeleniumGO()
-        this_result = []
         this_history = []
         # 获取当前时间
         now = datetime.now()
@@ -166,12 +165,11 @@ class postSqlArticle():
             result = blog.run(bloggerID, adsUser, this_post_data["title"], this_post_data["content"])
             if result:
                 if "git.html" not in result:
+                    # 保留原有的 this_post_data["id"]
                     this_history.append(this_post_data["id"])
                     this_history.append(user_id)
-                    this_result.append(platform)
-                    this_result.append(result)
-                    this_result.append(created_at)
-                    this_history.extend(this_result)
+                    # 将 this_result 数据写入 this_history，确保顺序不被打乱
+                    this_result = [platform, result, created_at]  # 保证顺序正确
                 this_history_list.append(tuple(this_history))
                 this_res_list.append(tuple(this_result))
                 post_read_list.remove(this_post_data)
@@ -190,7 +188,6 @@ class postSqlArticle():
         """
         from backendServices.src.socialPlatforms.noteGO.notePostText import notePostText
         note = notePostText()
-        this_result = []
         this_history = []
         # 获取当前时间
         now = datetime.now()
@@ -199,11 +196,14 @@ class postSqlArticle():
         with threading.Lock():
             result = note.run(cookie, useragent, proxies, this_post_data["title"], this_post_data["content"])
             if result:
+
+                # 保留原有的 this_post_data["id"]
                 this_history.append(this_post_data["id"])
                 this_history.append(user_id)
-                this_result.append(platform)
-                this_result.append(result)
-                this_result.append(created_at)
+                # 将 this_result 数据写入 this_history，确保顺序不被打乱
+                this_result = [platform, result, created_at]  # 保证顺序正确
+
+                # 这里我们将 this_result 中的元素追加到 this_history 中
                 this_history.extend(this_result)
                 this_history_list.append(tuple(this_history))
                 this_res_list.append(tuple(this_result))
@@ -226,7 +226,6 @@ class postSqlArticle():
         print(f"开始发 {platform}")
         # 创建一个包含目标链接的列表
         to_remove = ["https://telegra.ph", "https://telegra.ph/"]
-        this_result = []
         this_history = []
         # 获取当前时间
         now = datetime.now()
@@ -236,10 +235,14 @@ class postSqlArticle():
             result = telegraGO.run(adsUser, this_post_data["title"], this_post_data["content"])
             if result:
                 if result not in to_remove:
+                    # 保留原有的 this_post_data["id"]
                     this_history.append(this_post_data["id"])
-                    this_result.append(platform)
-                    this_result.append(result)
-                    this_result.append(created_at)
+                    this_history.append("")
+
+                    # 将 this_result 数据写入 this_history，确保顺序不被打乱
+                    this_result = [platform, result, created_at]  # 保证顺序正确
+
+                    # 这里我们将 this_result 中的元素追加到 this_history 中
                     this_history.extend(this_result)
                 this_history_list.append(tuple(this_history))
                 this_res_list.append(tuple(this_result))

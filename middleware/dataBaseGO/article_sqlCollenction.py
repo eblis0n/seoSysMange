@@ -216,6 +216,7 @@ class article_sqlGO():
             INSERT INTO seo_article_post_history (articleID, accountID, platform, url, created_at)
             VALUES (%s, %s,%s, %s, %s)
             """
+        print(f"post_articlehistory_batch_insert:{commitSQL}")
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_batch_commit('article', commitSQL, datalist)
         return sql_data
@@ -236,7 +237,7 @@ class article_sqlGO():
             VALUES (%s, %s, %s)
             """
         # 执行 SQL 查询语句
-        print("commitSQL",commitSQL)
+        print("post_article_result_batch_insert",commitSQL)
         sql_data = self.ssql.mysql_batch_commit('article', commitSQL, datalist)
         return sql_data
 
