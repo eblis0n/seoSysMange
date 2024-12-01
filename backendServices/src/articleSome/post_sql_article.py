@@ -160,7 +160,7 @@ class postSqlArticle():
         # 获取当前时间
         now = datetime.now()
         # 格式化为年月日时分秒
-        created_at = now.strftime("%Y-%m-%d %H:%M:%S")
+        create_at = now.strftime("%Y-%m-%d %H:%M:%S")
         with threading.Lock():
             result = blog.run(bloggerID, adsUser, this_post_data["title"], this_post_data["content"])
             if result:
@@ -169,7 +169,7 @@ class postSqlArticle():
                     this_history.append(this_post_data["id"])
                     this_history.append(user_id)
                     # 将 this_result 数据写入 this_history，确保顺序不被打乱
-                    this_result = [platform, result, created_at]  # 保证顺序正确
+                    this_result = [platform, result, create_at]  # 保证顺序正确
                 this_history_list.append(tuple(this_history))
                 this_res_list.append(tuple(this_result))
                 post_read_list.remove(this_post_data)
@@ -192,7 +192,7 @@ class postSqlArticle():
         # 获取当前时间
         now = datetime.now()
         # 格式化为年月日时分秒
-        created_at = now.strftime("%Y-%m-%d %H:%M:%S")
+        create_at = now.strftime("%Y-%m-%d %H:%M:%S")
         with threading.Lock():
             result = note.run(cookie, useragent, proxies, this_post_data["title"], this_post_data["content"])
             if result:
@@ -201,7 +201,7 @@ class postSqlArticle():
                 this_history.append(this_post_data["id"])
                 this_history.append(user_id)
                 # 将 this_result 数据写入 this_history，确保顺序不被打乱
-                this_result = [platform, result, created_at]  # 保证顺序正确
+                this_result = [platform, result, create_at]  # 保证顺序正确
 
                 # 这里我们将 this_result 中的元素追加到 this_history 中
                 this_history.extend(this_result)
@@ -230,7 +230,7 @@ class postSqlArticle():
         # 获取当前时间
         now = datetime.now()
         # 格式化为年月日时分秒
-        created_at = now.strftime("%Y-%m-%d %H:%M:%S")
+        create_at = now.strftime("%Y-%m-%d %H:%M:%S")
         with threading.Lock():
             result = telegraGO.run(adsUser, this_post_data["title"], this_post_data["content"])
             if result:
@@ -240,7 +240,7 @@ class postSqlArticle():
                     this_history.append("")
 
                     # 将 this_result 数据写入 this_history，确保顺序不被打乱
-                    this_result = [platform, result, created_at]  # 保证顺序正确
+                    this_result = [platform, result, create_at]  # 保证顺序正确
 
                     # 这里我们将 this_result 中的元素追加到 this_history 中
                     this_history.extend(this_result)

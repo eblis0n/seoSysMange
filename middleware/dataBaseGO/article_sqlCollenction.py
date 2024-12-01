@@ -213,10 +213,10 @@ class article_sqlGO():
     def post_articlehistory_batch_insert(self, datalist):
         # datalist 是 list  里有 N 组 元组
         commitSQL = """
-            INSERT INTO seo_article_post_history (articleID, accountID, platform, url, created_at)
+            INSERT INTO seo_article_post_history (`articleID`, `accountID`, `platform`, `url`, `create_at`)
             VALUES (%s, %s,%s, %s, %s)
             """
-        print(f"post_articlehistory_batch_insert:{commitSQL}")
+        # print(f"post_articlehistory_batch_insert:{commitSQL}")
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_batch_commit('article', commitSQL, datalist)
         return sql_data
@@ -233,11 +233,11 @@ class article_sqlGO():
     def post_article_result_batch_insert(self, datalist):
         # datalist 是 list  里有 N 组 元组
         commitSQL = """
-            INSERT INTO seo_result_article_links (platform, url, created_at)
+            INSERT INTO seo_result_article_links (`platform`, `url`, `create_at`)
             VALUES (%s, %s, %s)
             """
         # 执行 SQL 查询语句
-        print("post_article_result_batch_insert",commitSQL)
+        # print("post_article_result_batch_insert",commitSQL)
         sql_data = self.ssql.mysql_batch_commit('article', commitSQL, datalist)
         return sql_data
 
