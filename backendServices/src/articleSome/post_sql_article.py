@@ -20,6 +20,7 @@ import threading
 from middleware.dataBaseGO.article_sqlCollenction import article_sqlGO
 from middleware.dataBaseGO.basis_sqlCollenction import basis_sqlGO
 from middleware.public.commonUse import otherUse
+
 from backendServices.src.awsMQ.amazonSQS import AmazonSQS
 
 import middleware.public.configurationCall as configCall
@@ -31,14 +32,15 @@ class postSqlArticle():
         self.usego = otherUse()
         self.aws_sqs = AmazonSQS()
 
-    def main(self, pcname, queue_url, platform, group, post_max, sortID, type,  source, commission, isAI, user):
+
+    def main(self, pcname, queue_url, platform, group, post_max, sortID, type,  commission, isAI, user,language, isSecondary):
         """
             @Datetime ： 2024/11/18 22:19
             @Author ：eblis
             @Motto：简单描述用途
         """
-        print(
-            f"接收到的参数：platform:{platform}, group:{group}, post_max:{post_max}, sortID:{sortID},type:{type}, source:{source}, commission:{commission}, isAI:{isAI}, user:{user}")
+        self.usego.sendlog(
+            f"接收到的参数：platform:{platform}, group:{group}, post_max:{post_max}, sortID:{sortID},type:{type}, commission:{commission}, isAI:{isAI}, user:{user}, language:{language}")
         sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=1)
         # 第一步根据 platform 选用ads
         if platform == "blogger":
@@ -48,28 +50,52 @@ class postSqlArticle():
         elif platform == "telegra":
             adsUserList = self.siphon_ads(platform, eval(configCall.stacking_ads), eval(configCall.min_concurrent_user))
         else:
-            return False
-        print(f"adsUserList 结果：{len(adsUserList)}")
+            adsUserList = []
+        self.usego.sendlog(f"adsUserList 结果：{len(adsUserList)}")
         if adsUserList != []:
 
             # 第二步：提取符合添加的 文章
-            artList = self.witchArticle(sortID, type, source, commission, isAI, user)
-            print(f"artList 结果：{len(artList)}")
+            artList = self.witchArticle(sortID, type,  commission, isAI, user, language)
+            self.usego.sendlog(f"artList 结果：{len(artList)}")
             if artList != []:
-                # print(f"这波数据有 {len(artList)} 文章， 以及{len(adsUserList)} 账号")
+                # self.usego.sendlog(f"这波数据有 {len(artList)} 文章， 以及{len(adsUserList)} 账号")
                 # 第3步：将已在相同平台相同 账号 发布过的文章 过滤掉
                 post_read_list = self.secondaryProcessing(platform, post_max,  artList, adsUserList)
-                # print(f"post_read_list:{len(post_read_list)},{post_read_list}")
+                self.usego.sendlog(f"post_read_list:{len(post_read_list)}")
+                new_post_read_list = []
+                if int(isSecondary) == 0:
+                    print("二次创作")
+                    from backendServices.src.articleSome.public.aiGO import aiGO
+                    aigo = aiGO()
+                    for i in range(len(post_read_list)):
+                        print(f"post_read_list[i],{post_read_list[i]}")
+                        prompt = f"""需求：1、阅读 分析{post_read_list[i]}，将内容拆分文合理的短句或词组或词语，在不改变原文表达的意思情况下，使用同义词或近义词进行置换；2、原文段落风格保持不变；3、保持原文所使用语言不变"""
+                        content = aigo.run(prompt)
+                        print(f"content,{content}")
+                        if content is not None:
+                            new_post_read_list.append(content)
+                        else:
+                            print("二次创作失败")
+                            new_post_read_list.append(post_read_list[i])
+                else:
+                    new_post_read_list = post_read_list
             #     第4步：开跑：
-                self.run(platform, adsUserList, post_read_list)
-
-
+                all_res = self.run(platform, adsUserList, new_post_read_list)
             else:
-                print(f"没有符合 {sortID}, {type}, {source}, {commission}, {isAI}, {user} 的文章")
-                return False
+                self.usego.sendlog(f"没有符合 {sortID}, {type}, {commission}, {isAI}, {user} 的文章")
+                all_res = None
+
         else:
-            print("没有可用 用户")
-            return False
+            self.usego.sendlog("没有可用 用户")
+            all_res = None
+
+        sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
+        self.aws_sqs.deleteMSG(queue_url)
+        return all_res
+
+
+
+
 
     def run(self, platform, adsUserList, post_read_list):
         """
@@ -77,13 +103,13 @@ class postSqlArticle():
             @Author ：eblis
             @Motto：简单描述用途
         """
-        print(f"platform：{platform},adsUserList：adsUserList{adsUserList}，post_read_list：{adsUserList}")
+        self.usego.sendlog(f"platform：{platform},adsUserList：adsUserList{adsUserList}，post_read_list：{adsUserList}")
         all_res = []
         mun = 0
         mm = 0
         runTure = True
         while len(post_read_list) > 0 and runTure:
-            print(f"第 {mun} 执行开始,剩余{len(post_read_list) - 1} 组数据待处理")
+            self.usego.sendlog(f"第 {mun} 执行开始,剩余{len(post_read_list) - 1} 组数据待处理")
             if len(adsUserList) > mm:
                 this_res_list = []
                 this_history_list = []
@@ -91,14 +117,14 @@ class postSqlArticle():
                 threads = []
 
                 this_group_ads = adsUserList[mm]
-                print(f"这组ads选手分别是{this_group_ads}")
+                self.usego.sendlog(f"这组ads选手分别是{this_group_ads}")
                 this_go = min(len(this_group_ads), len(post_read_list))
-                print(f"需要建立{this_go} 个 线程")
+                self.usego.sendlog(f"需要建立{this_go} 个 线程")
 
                 for i in range(this_go):
                     user = self.usego.changeDict(this_group_ads[i])
                     this_post_data = self.usego.changeDict(post_read_list[i])
-                    print(f"这组 使用的是{user},发布的是{this_post_data } 信息")
+                    self.usego.sendlog(f"这组 使用的是{user},发布的是{this_post_data } 信息")
                     if platform == "blogger":
                         t = threading.Thread(target=self.post_to_blogger, args=(platform, this_res_list, this_history_list, bad_run_list, post_read_list, this_post_data,user["id"],  user["bloggerID"], user["adsID"]))
                     elif platform == "note":
@@ -116,19 +142,19 @@ class postSqlArticle():
                 for thread in threads:
                     thread.join()
 
-                # print(f"这波Thread 执行完了：{this_res_list}")
+                # self.usego.sendlog(f"这波Thread 执行完了：{this_res_list}")
 
                 if this_res_list != []:
-                    print(f"将this_res_list数据同步存放数据库，{this_res_list}")
-                    print(f"将this_history_list数据同步存放数据库，{this_history_list}")
+                    self.usego.sendlog(f"将this_res_list数据同步存放数据库，{this_res_list}")
+                    self.usego.sendlog(f"将this_history_list数据同步存放数据库，{this_history_list}")
 
                     self.save_datebase(this_res_list, this_history_list)
 
-                print(f"总剩余：{len(post_read_list)}")
+                self.usego.sendlog(f"总剩余：{len(post_read_list)}")
 
                 post_read_list.extend(bad_run_list)
                 bad_run_list.clear()
-                print(f"最终剩余：{len(post_read_list)}")
+                self.usego.sendlog(f"最终剩余：{len(post_read_list)}")
 
                 for link in this_res_list:
                     if link not in all_res:
@@ -139,13 +165,14 @@ class postSqlArticle():
 
             else:
                 if platform in ["blogger", "note"]:
-                    print(f"{adsUserList} 都跑过了")
+                    self.usego.sendlog(f"{adsUserList} 都跑过了")
                     runTure = False
                 else:
-                    print(f"初始化一下数据，跑空")
+                    self.usego.sendlog(f"初始化一下数据，跑空")
                     mm = 0
 
-        print("跑完了")
+        self.usego.sendlog("跑完了")
+        return all_res
 
 
     def post_to_blogger(self, platform, this_res_list,  this_history_list, bad_run_list, post_read_list, this_post_data, user_id, bloggerID, adsUser):
@@ -173,10 +200,10 @@ class postSqlArticle():
                 this_history_list.append(tuple(this_history))
                 this_res_list.append(tuple(this_result))
                 post_read_list.remove(this_post_data)
-                print(f"剩余：{len(post_read_list)} 文章没发")
+                self.usego.sendlog(f"剩余：{len(post_read_list)} 文章没发")
 
             else:
-                print(f"执行失败了，{this_post_data} 这些需要回炉再造")
+                self.usego.sendlog(f"执行失败了，{this_post_data} 这些需要回炉再造")
                 bad_run_list.append(this_post_data)
 
 
@@ -208,9 +235,9 @@ class postSqlArticle():
                 this_history_list.append(tuple(this_history))
                 this_res_list.append(tuple(this_result))
                 post_read_list.remove(this_post_data)
-                print(f"剩余：{len(post_read_list)} 文章没发")
+                self.usego.sendlog(f"剩余：{len(post_read_list)} 文章没发")
             else:
-                print(f"执行失败了，{this_post_data} 这些需要回炉再造")
+                self.usego.sendlog(f"执行失败了，{this_post_data} 这些需要回炉再造")
                 bad_run_list.append(this_post_data)
 
 
@@ -223,7 +250,7 @@ class postSqlArticle():
         """
         from backendServices.src.socialPlatforms.telegraGO.telegraSeleniumGO import telegraSeleniumGO
         telegraGO = telegraSeleniumGO()
-        print(f"开始发 {platform}")
+        self.usego.sendlog(f"开始发 {platform}")
         # 创建一个包含目标链接的列表
         to_remove = ["https://telegra.ph", "https://telegra.ph/"]
         this_history = []
@@ -247,10 +274,10 @@ class postSqlArticle():
                 this_history_list.append(tuple(this_history))
                 this_res_list.append(tuple(this_result))
                 post_read_list.remove(this_post_data)
-                print(f"剩余：{len(post_read_list)} 文章没发")
+                self.usego.sendlog(f"剩余：{len(post_read_list)} 文章没发")
 
             else:
-                print(f"执行失败了")
+                self.usego.sendlog(f"执行失败了")
 
 
     def secondaryProcessing(self, platform, post_max, artList, adsUserList):
@@ -266,7 +293,7 @@ class postSqlArticle():
         forReleaseArt = []
 
         # 如果 historyL 为空，则直接为每个用户分配一篇文章
-        print(f"historyL 结果 {historyL}")
+        self.usego.sendlog(f"historyL 结果 {historyL}")
         if platform == "telegra":
             article = artList[:min(post_max, len(artList))]
             forReleaseArt.extend(article)
@@ -274,12 +301,12 @@ class postSqlArticle():
         else:
             if not historyL:
 
-                print(f"有{len(adsUserList)}组，准备分配{len(artList)}")
+                self.usego.sendlog(f"有{len(adsUserList)}组，准备分配{len(artList)}")
                 for adsitem in adsUserList:
-                    print(f"这组 有 {len(adsitem)} 个用户")
+                    self.usego.sendlog(f"这组 有 {len(adsitem)} 个用户")
                     for i, ads_user in enumerate(adsitem):
                         # 如果文章不足，则循环分配文章
-                        print(f"第{i}个用户，总用户：{len(artList)}")
+                        self.usego.sendlog(f"第{i}个用户，总用户：{len(artList)}")
                         article = artList[i % len(artList)]
                         forReleaseArt.append(article)
                 return forReleaseArt
@@ -340,10 +367,10 @@ class postSqlArticle():
         result = self.artsql.post_article_result_batch_insert(datalist)
         time.sleep(5)
         historyResult = self.artsql.post_articlehistory_batch_insert(historylist)
-        print(f"执行结果:{result}, {historyResult}")
+        self.usego.sendlog(f"执行结果:{result}, {historyResult}")
 
     
-    def witchArticle(self, sortID, type, source, commission, isAI, user):
+    def witchArticle(self, sortID, type, commission, isAI, user,language):
         """
             @Datetime ： 2024/11/29 14:40
             @Author ：eblis
@@ -353,10 +380,10 @@ class postSqlArticle():
             user = None
         else:
             user = user[0]
-        sql_data = self.artsql.article_select_sql(sortID=sortID, type=type, source=source, commission=commission, isAI=isAI, user=user)
+        sql_data = self.artsql.article_select_sql(sortID=sortID, type=type, commission=commission, isAI=isAI, user=user, language=language)
         if "sql 语句异常" not in str(sql_data):
             try:
-                resdatas = [{'id': item[0],'title': item[5], 'content': item[6]} for item in sql_data]
+                resdatas = [{'id': item[0], 'title': item[5], 'content': item[6]} for item in sql_data]
 
                 return resdatas
 
@@ -379,7 +406,7 @@ class postSqlArticle():
         unread_files = [f for f in all_files if f not in read]
 
         if not unread_files:
-            print("所有文件已读取完毕,那就重新来")
+            self.usego.sendlog("所有文件已读取完毕,那就重新来")
             read.clear()
             filename = self.usego.randomChoice(all_files)
         else:
@@ -426,7 +453,7 @@ class postSqlArticle():
             else:
                 return []
         elif platform == "telegra":
-            print(f"进来的 group：{group}")
+            self.usego.sendlog(f"进来的 group：{group}")
             return [group[i:i + group_size] for i in range(0, len(group), group_size)]
         else:
             return []
@@ -442,8 +469,8 @@ if __name__ == '__main__':
     post_max = 20
     sortID = 1
     type = "Html"
-    source = "openAI"
     commission = 1
     isAI = 0
     user = ''
-    po.main(pcname, queue_url, platform, group, post_max, sortID, type,  source, commission, isAI, user)
+    isSecondary = 0
+    po.main(pcname, queue_url, platform, group, post_max, sortID, type, commission, isAI, user,isSecondary)

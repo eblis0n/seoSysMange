@@ -34,9 +34,9 @@ class articleManage():
         # 将路由和视图函数绑定到蓝图
         self.bp.route(self.Myenum.ARTICLE_INSERT, methods=['POST'])(self.article_insert)
         self.bp.route(self.Myenum.ARTICLE_DELETE, methods=['POST'])(self.article_delete)
-        # self.bp.route(self.Myenum.ARTICLE_UPDATE, methods=['POST'])(self.article_update)
         self.bp.route(self.Myenum.ARTICLE_LIST, methods=['GET'])(self.article_list)
 
+        self.bp.route(self.Myenum.POST_IN_SQL, methods=['POST'])(self.post_in_sql)
 
 
     def article_insert(self):
@@ -157,7 +157,7 @@ class articleManage():
 
         if "sql 语句异常" not in str(sql_data):
             try:
-                resdatas = [{'id': item[0], 'isAI': item[1], 'promptID': item[2],  'sortID': item[3], 'source': item[4], 'title': item[5], 'content': item[6], 'type': item[7], 'user': item[8], 'commission': item[9], 'language': item[10],'create_at': self.usego.turn_isoformat(item[11]), 'update_at': self.usego.turn_isoformat(item[12])} for item in sql_data]
+                resdatas = [{'id': item[0], 'isAI': item[1], 'promptID': item[2],  'sortID': item[3], 'source': item[4], 'title': item[5], 'content': item[6], 'type': item[7], 'user': item[8], 'commission': item[9], 'language': item[10], 'create_at': self.usego.turn_isoformat(item[11]), 'update_at': self.usego.turn_isoformat(item[12])} for item in sql_data]
 
             except:
                 self.usego.sendlog(f'list没数据：{sql_data}')
@@ -195,25 +195,22 @@ class articleManage():
             "post_max": 0,
             "sortID": data_request['sortID'],
             "type": data_request['type'],
-            "source": data_request['source'],
             "commission": commission,
             "isAI": data_request['isAI'],
-            "user": user
+            "user": user,
+            "language": data_request['spoken'],
+            "isSecondary": data_request['isSecondary']
         }
-        try:
-
-            datasDict["group"] = data_request['group']
-        except:
-            datasDict["post_max"] = int(data_request['post_max'])
-
-        if datasDict["platform"] == "note":
-            watchPC = "blogger"
-        else:
-            watchPC = datasDict["platform"]
+        group = data_request['group']
+        post_max = data_request['post_max']
+        if int(post_max) != "":
+            datasDict["post_max"] = int(post_max)
+        if group == "":
+            datasDict["group"] = "all"
 
 
         self.usego.sendlog(f"接收到的参数：{datasDict}")
-        results = self.task.run("postSqlArticle", watchPC, datasDict)
+        results = self.task.run("postSqlArticle", datasDict["platform"], datasDict)
 
         res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
         return res.to_json()

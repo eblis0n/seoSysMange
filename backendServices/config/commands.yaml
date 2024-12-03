@@ -51,7 +51,7 @@ commands:
   - name: postSqlArticle
     module: backendServices.src.articleSome.post_sql_article
     class: postSqlArticle
-    method: run
+    method: main
     params:
       - pcname
       - queue_url
@@ -60,10 +60,11 @@ commands:
       - post_max
       - sortID
       - type
-      - source
       - commission
       - isAI
       - user
+      - language
+      - isSecondary
 
 
 

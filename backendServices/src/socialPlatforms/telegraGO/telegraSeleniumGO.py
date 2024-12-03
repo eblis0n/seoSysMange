@@ -40,7 +40,7 @@ class telegraSeleniumGO:
             try:
                 driver.get("https://telegra.ph/")
             except Exception as e:
-                print(f"driver.get 出现异常: {e}")
+                self.usego.sendlog(f"driver.get 出现异常: {e}")
                 return None
 
             # 等待页面元素加载
@@ -51,7 +51,7 @@ class telegraSeleniumGO:
                 title_input = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_tl_editor"]/div[1]/h1')))
                 driver.execute_script("arguments[0].textContent = arguments[1];", title_input, title)
             except Exception as e:
-                print(f"标题设置失败: {e}")
+                self.usego.sendlog(f"标题设置失败: {e}")
                 return None
 
             try:
@@ -59,12 +59,12 @@ class telegraSeleniumGO:
                 content_input = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_tl_editor"]/div[1]/p')))
                 driver.execute_script("arguments[0].textContent = '';", content_input)
             except Exception as e:
-                print(f"内容输入框设置失败: {e}")
+                self.usego.sendlog(f"内容输入框设置失败: {e}")
                 return None
 
             # 如果有文章内容，则添加
             # 输入内容
-            print(f"输入内容")
+            self.usego.sendlog(f"输入内容")
             try:
                 driver.execute_script("""
                     var p = document.createElement('p');
@@ -72,7 +72,7 @@ class telegraSeleniumGO:
                     arguments[1].appendChild(p);
                 """, content, content_input)
             except Exception as e:
-                print(f"添加文章内容失败: {e}")
+                self.usego.sendlog(f"添加文章内容失败: {e}")
                 return None
 
 
@@ -81,7 +81,7 @@ class telegraSeleniumGO:
                 publish_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_publish_button"]')))
                 driver.execute_script("arguments[0].click();", publish_button)
             except Exception as e:
-                print(f"点击发布按钮失败: {e}")
+                self.usego.sendlog(f"点击发布按钮失败: {e}")
                 return None
 
             # 随机等待一段时间
@@ -89,7 +89,7 @@ class telegraSeleniumGO:
             return driver.current_url
 
         except Exception as e:
-            print(f"页面操作失败: {e}")
+            self.usego.sendlog(f"页面操作失败: {e}")
             return None
 
         finally:

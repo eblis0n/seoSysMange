@@ -110,6 +110,7 @@ class MyEnum():
     ARTICLE_LIST = "/list/"
     ARTICLE_INSERT = "/add/"
     ARTICLE_DELETE = "/delete/"
+    POST_IN_SQL = "/prefabrication/"
 
     # category
     CATEGORY_LIST = "/list/"

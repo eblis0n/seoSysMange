@@ -79,7 +79,7 @@ class article_sqlGO():
 
     ############################################# article #####################################################
 
-    def article_select_sql(self, limit=None, sortID=None, type=None, source=None, commission=None, isAI=None,user=None):
+    def article_select_sql(self, limit=None, sortID=None, type=None, commission=None, isAI=None,user=None, language=None):
         """
             @Datetime ： 2024/5/7 10:59
             @Author ：eblis
@@ -87,7 +87,7 @@ class article_sqlGO():
         """
         # 构建参数字典，过滤掉 None 和空字符串
         params = {k: v for k, v in locals().items() if
-                  k in ['commission', 'isAI', 'sortID', 'type', 'source', 'user'] and v not in [None, ""]}
+                  k in ['commission', 'isAI', 'sortID', 'type',  'user', 'language'] and v not in [None, ""]}
         print("非 None 的参数名：", list(params.keys()))
 
         # 构建基础 SQL
@@ -130,11 +130,16 @@ class article_sqlGO():
         return sql_data
 
 
-    def ai_article_insert_sql(self, promptID, sortID, source, title, content, language, type, user, commission, create_at):
-        # noinspection SqlNoDataSourceInspection
-        sqlgo = f"""INSERT INTO seo_article (`promptID`,`sortID`, `source`,`title`, `content`, `language`,`type`, `user`, `commission`,  `create_at`) VALUES ('{promptID}', '{sortID}', '{source}','{title}',"{content}",'{language}','{type}','{user}','{commission}', '{create_at}');"""
+    def ai_article_insert_sql(self, isAI, promptID, sortID, source, title, content, language, type, user, commission, create_at):
+        sqlgo = """
+            INSERT INTO seo_article 
+            (`isAI`,`promptID`, `promptID`, `sortID`, `source`, `title`, `content`, `language`, `type`, `user`, `commission`, `create_at`) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+            """
         # 执行 SQL 查询语句
-        sql_data = self.ssql.mysql_commit('article', sqlgo)
+        data = (isAI, promptID, sortID, source, title, content, language, type, user, commission, create_at)
+        sql_data = self.ssql.mysql_commit_tuple('article', sqlgo, data)
+
         return sql_data
 
     def article_delete_sql(self, id):

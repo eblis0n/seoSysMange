@@ -260,16 +260,18 @@ class taskAws():
             response = self.aws_sqs.initialization(f'client_{client["name"]}')
             queue_url = response['QueueUrl']
             self.usego.sendlog(f'{idx}, name:client_{client["name"]}，state:{client["state"]}，队列地址:{queue_url}')
+
             task_data = {
                 "platform": datasDict['platform'],
                 "group": datasDict['group'],
                 "post_max": datasDict['post_max'],
                 "sortID": datasDict['sortID'],
                 "type": datasDict['type'],
-                "source": datasDict['source'],
                 "commission": datasDict['commission'],
                 "isAI": datasDict['isAI'],
-                "user": datasDict['user']
+                "user": datasDict['user'],
+                "language": datasDict['language'],
+                "isSecondary": datasDict['isSecondary']
             }
 
             self.usego.sendlog(f'PostSqlArticle，任务信息:{task_data}')

@@ -2,7 +2,7 @@
 """
 @Datetime ： 2024/11/18 22:16
 @Author ： eblis
-@File ：generate_article.py
+@File ：add_article.py
 @IDE ：PyCharm
 @Motto：ABC(Always Be Coding)
 """
@@ -21,7 +21,9 @@ sys.path.append(bae_idr)
 from middleware.dataBaseGO.article_sqlCollenction import article_sqlGO
 from middleware.dataBaseGO.basis_sqlCollenction import basis_sqlGO
 from middleware.public.commonUse import otherUse
+from backendServices.src.articleSome.public.aiGO import aiGO
 from backendServices.src.awsMQ.amazonSQS import AmazonSQS
+from bs4 import BeautifulSoup
 
 class generateArticle():
     def __init__(self):
@@ -29,6 +31,7 @@ class generateArticle():
         self.basql = basis_sqlGO()
         self.usego = otherUse()
         self.aws_sqs = AmazonSQS()
+        self.aigo = aiGO()
 
     def run(self, pcname, queue_url, max_length, source, type, promptID, sortID,  theme, Keywords, ATag, link, language, user):
         """
@@ -45,12 +48,12 @@ class generateArticle():
             print("第二步 根据 prompt 的初始化")
             promptList = self.disassembly(promptDD, max_length, theme, Keywords, ATag, link, language, user)
             # print("第3步 很关键，生成文章")
-            self.lesGO(source, type, promptID, sortID, promptList,  user)
+            outcome = self.lesGO(source, type, promptID, sortID, promptList,  user)
 
             sql_data = self.basql.pcSettings_update_state_sql(pcname, state=0)
             self.aws_sqs.deleteMSG(queue_url)
-            print("恭喜你，生成文章任务完成")
-            return True
+            # print("恭喜你，生成文章任务完成")
+            return outcome
 
         else:
             return False
@@ -62,13 +65,8 @@ class generateArticle():
             @Author ：eblis
             @Motto：简单描述用途
         """
-        sql_data = self.ssql.ai_open_api_sql("OPEN_API_KEY")
-        if "sql 语句异常" not in str(sql_data):
-            resdatas = [item[0] for item in sql_data]
-            api_key = resdatas[0]
-        else:
-            print("访问数据库失败了，请重试")
-            return False
+
+
 
         for i in range(len(promptList)):
             thisArticle = promptList[i]
@@ -90,15 +88,18 @@ class generateArticle():
 
                         print(f"哟！好样的，需要生成{len(promptList)} 这么多篇文章啊！")
 
-                        generated_text = self.generate_article(thisArticle[j]["promptdata"], api_key)
-                        if article_title == "":
-                            title_prompt = f"需求：1、根据{generated_text} 所使用的语言，给出一端30字符以内的总结； 2、总结末尾不带任何标点符号；"
-                            title_text = self.generate_article(title_prompt, api_key)
-                            article_title = title_text
-                        else:
-                            print(f"当前标题：{article_title} ")
+                        generated_text = self.aigo.run(thisArticle[j]["promptdata"])
+                        if generated_text is not None:
+                            if article_title == "":
+                                title_prompt = f"需求：1、根据{generated_text} 所使用的语言，给出一端30字符以内的总结； 2、总结末尾不带任何标点符号；"
+                                title_text = self.aigo.run(title_prompt)
+                                article_title = title_text
+                            else:
+                                print(f"当前标题：{article_title} ")
 
-                        Epilogue += f"\n\n {generated_text}\n\n"
+                            Epilogue += f"\n\n {generated_text}\n\n"
+                        else:
+                            return False
                     elif source == "OllamaAI":
                         print(f"OllamaAI 还没对接，敬请期待")
 
@@ -110,7 +111,7 @@ class generateArticle():
                 else:
 
                     Epilogue += f'\n\n {thisArticle[j]["promptdata"] }\n\n'
-            self.conversionType(api_key, source, article_title, Epilogue, language, type, promptID, sortID,  user)
+            self.conversionType( source, article_title, Epilogue, language, type, promptID, sortID,  user)
             print(f"第{i} 篇文章生成完比，剩余{len(promptList) - 1}:{Epilogue}")
         return True
 
@@ -127,7 +128,7 @@ class generateArticle():
 
         return markdown_output
     
-    def conversionType(self, api_key, source, article_title, Epilogue, language, type, promptID, sortID,  user):
+    def conversionType(self,  source, article_title, Epilogue, language, type, promptID, sortID,  user):
         """
             @Datetime ： 2024/11/20 14:55
             @Author ：eblis
@@ -138,22 +139,51 @@ class generateArticle():
         downlist = ["Markdown", "markdown", "MARKDOWN"]
         if type in htmllist:
             new_prompt = f"请将 {Epilogue} 转换为完整的 HTML 代码，包括段落排版、超链接处理（在新标签页打开），并使用适当给段落赋予<h2>、<h3>、<h4> 标题 的 HTML 标签结构。"
-            title_text = self.generate_article(new_prompt, api_key)
+            content = self.aigo.run(new_prompt)
+            if content is not None:
+                check_html = self.check_html_tags(content)
+                if check_html:
+                        soup = BeautifulSoup(content, "html.parser")
+                        try:
+                            detail = soup.body.decode_contents()
+                        except:
+                            detail = soup
+
+                else:
+                    print("没有乱七八糟的 标签")
+                    detail = content
+            else:
+                return False
+
+
         elif type in downlist:
             new_Epilogue = self.convert_to_markdown(Epilogue)
             new_prompt = f"请将 {new_Epilogue} 转换为完整的 Markdown 代码，包括段落排版、超链接处理（在新标签页打开），并使用适当段落赋予2级、3级、4级 标题 Markdown 标签结构。"
-            title_text = self.generate_article(new_prompt, api_key)
-
+            detail = self.aigo.run(new_prompt)
+            if detail is None:
+                return False
         else:
-            title_text = Epilogue
-        print("language",language)
-        sql_data = self.save_sql(source, promptID, sortID, article_title, title_text, language, type, user)
+            detail = Epilogue
+        # print("language", language)
+        sql_data = self.save_sql(source, promptID, sortID, article_title, detail, language, type, user)
         if "sql 语句异常" not in str(sql_data):
             print("入库成功")
         else:
             print("入库失败")
-    
 
+    def check_html_tags(self, content):
+        # 遍历每个标签，检查是否存在于内容中
+        # print(f"content,{content}")
+        html_tags = ["<!DOCTYPE html>", "<html>", "<head>", "<body>"]
+
+
+        missing_tags = [tag for tag in html_tags if tag in content]
+        print(f"标签检测结果：{missing_tags}")
+
+        if missing_tags:
+            return True
+        else:
+            return False
 
     def save_sql(self, source, promptID, sortID, title, content,language, type, user):
         """
@@ -163,11 +193,6 @@ class generateArticle():
         """
 
         create_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        # if int(isopenAI) == 0:
-        #     source = "openAI"
-        # else:
-        #     source = "OllamaAI"
-
         if user == []:
             print(f"生成通用文章")
             user = ""
@@ -176,40 +201,8 @@ class generateArticle():
             print(f"要生成专属文章哦")
             user = user[0]
             commission = 0
-        self.ssql.ai_article_insert_sql(promptID, sortID, source, title, content, language, type, user, commission, create_at)
+        self.ssql.ai_article_insert_sql(0, promptID, sortID, source, title, content, language, type, user, commission, create_at)
 
-
-    def generate_article(self, trainingPhrases, api_key, max_retries=5, timeout=60, wait_time=10):
-        retries = 0
-        # print("api_key", api_key)
-        openai.api_key = api_key
-
-        while retries < max_retries:
-            try:
-                print(f'正在使用{trainingPhrases} 进行训练！！')
-                response = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
-                    messages=[
-                        {"role": "user",
-                         "content": trainingPhrases
-                         }
-                    ],
-                    max_tokens=2000,
-                    n=1,
-                    temperature=0.7,
-                    timeout=timeout,
-                )
-                generated_text = response['choices'][0]['message']['content'].strip()
-                print(f" 生成的结果：{generated_text}")
-                # article = self.insert_article(generated_text)
-
-                return generated_text
-
-            except openai.error.RateLimitError:
-                print(f"达到速率限制，等待 {wait_time} 秒后重试")
-                time.sleep(wait_time)
-                retries += 1
-        raise Exception("重试次数达到上限，请求失败")
 
 
     def disassembly(self, promptDD, max_length, theme, Keywords, ATag, link, language, user):
@@ -290,7 +283,7 @@ class generateArticle():
         sql_data = self.ssql.ai_prompt_select_sql(promptID)
         if "sql 语句异常" not in str(sql_data):
             resdatas = [item[5] for item in sql_data]
-            print("resdatas",resdatas)
+            print("resdatas", resdatas)
             if resdatas!=[]:
                 try:
                     resdatas_list = json.loads(resdatas[0])
@@ -318,7 +311,7 @@ if __name__ == '__main__':
     Keywords = []
     ATag = []
     link = []
-    language = ["法语"]
+    language = ["日语"]
     user = []
     type = "Html"
 

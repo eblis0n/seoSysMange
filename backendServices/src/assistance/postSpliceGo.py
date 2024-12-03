@@ -49,7 +49,7 @@ class postSpliceGo:
         elif platform == "telegra":
             adsUserList = self.siphon_ads(platform, eval(configCall.stacking_ads), eval(configCall.min_concurrent_user))
         else:
-            return False
+            adsUserList = []
 
 
         self.usego.sendlog(f"adsUserList 结果：{adsUserList}")
@@ -62,16 +62,12 @@ class postSpliceGo:
                                alt_text)
 
 
-            sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
-            self.aws_sqs.deleteMSG(queue_url)
-            return all_res
-
         else:
+            all_res = None
 
-            sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
-            self.aws_sqs.deleteMSG(queue_url)
-
-            return None
+        sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
+        self.aws_sqs.deleteMSG(queue_url)
+        return all_res
 
     def run(self, isarts, postingStyle, platform, genre, adsUserList, all_links_list_group, title_alt, alt_text):
         """
@@ -150,6 +146,8 @@ class postSpliceGo:
                 else:
                     self.usego.sendlog(f"初始化一下数据，跑空")
                     mm = 0
+        print("跑完了")
+        return all_res
 
 
     def post_to_blogger(self,this_res_list, this_links, all_links_list_group, bad_run_list, bloggerID, adsUser, title_alt, content):
