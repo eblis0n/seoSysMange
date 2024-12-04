@@ -31,6 +31,7 @@ class telegraSeleniumGO:
 
 
     def run(self, adsUser, title, content):
+        self.usego.sendlog(f"接收到的信息 {title},{content}")
         # 生成标题
         driver = None
         try:
@@ -71,11 +72,9 @@ class telegraSeleniumGO:
                 if any(tag in content for tag in html_tab):
                     self.usego.sendlog("检测到特定 HTML 标签，使用 div 包裹插入内容")
                     driver.execute_script("""
-                        var content = arguments[0];
-                        var contentInput = arguments[1];
                         var div = document.createElement('div');
-                        div.innerHTML = content;  // 插入 HTML 内容
-                        contentInput.appendChild(div);
+                        div.textContent = arguments[0];   // 插入 HTML 内容
+                        arguments[1].appendChild(div);
                     """, content, content_input)
                 else:
                     self.usego.sendlog("未检测到 HTML 标签，作为纯文本插入")
