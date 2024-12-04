@@ -130,7 +130,15 @@ class otherUse():
         tree = [menu_dict[item_id] for item_id in children_map[0]]
         return tree
 
-
+    def normalize_text(self, text):
+        replacements = {
+            '‘': "'", '’': "'",  # 替换为普通单引号
+            '“': '"', '”': '"',  # 替换为普通双引号
+            '—': '-',  # 替换为普通连字符
+            '\xa0': ' ',  # 替换为普通空格
+            # 添加其他需要替换的字符
+        }
+        return text.translate(str.maketrans(replacements))
 
     def change_hashed(self, data):
         # 转换字符串为bytes类型，因为bcrypt只能处理bytes

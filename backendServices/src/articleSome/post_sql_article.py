@@ -69,7 +69,9 @@ class postSqlArticle():
                     aigo = aiGO()
                     for i in range(len(post_read_list)):
                         print(f"post_read_list[i],{post_read_list[i]['content']}")
-                        prompt = f"""需求：阅读 {post_read_list[i]['content']} 并按以下要求优化后输出：1. **内容拆分**：将原文内容拆分为合理的短句或词组，以便进行同义词或近义词的替换。2. **同义词替换**：在不改变原文表达的意思情况下，使用同义词或近义词进行替换。3. **保持段落风格**：确保文段的结构和风格与原文一致。"""
+                        content = self.usego.normalize_text(post_read_list[i]['content'])
+                        html_tags = ["<!DOCTYPE html>", "<html>", "<head>", "<body>"]
+                        prompt = f"""需求：阅读 {content} 并按以下要求优化后输出：1. **内容拆分**：将原文内容拆分为合理的短句或词组，以便进行同义词或近义词的替换。2. **同义词替换**：在不改变原文表达的意思情况下，使用同义词或近义词进行替换。3. **保持段落风格**：确保文段的结构和风格与原文一致。4. **保持原文语言**：确保所用语言与原文一致。5. **去除多余Html标签**：如果原文中有{html_tags}这类标签，一律移除"""
                         new_content = aigo.run(prompt)
                         print(f"new_content,{new_content}")
                         if new_content is not None:

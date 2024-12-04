@@ -32,12 +32,12 @@ class aiGO():
         if AIbase is not None:
             if AIbase["url"] != "":
                 try:
-                    print("使用新的openai")
+                    self.usego.sendlog("使用新的openai")
                     openai.api_base = f'{AIbase["url"]}'
                 except Exception as e:
-                    print(f"openai.api_base失败：{e}")
+                    self.usego.sendlog(f"openai.api_base失败：{e}")
             else:
-                print("使用旧的 ")
+                self.usego.sendlog("使用旧的 ")
 
             retries = 0
             # 设置OpenAI API密钥
@@ -45,7 +45,7 @@ class aiGO():
 
             while retries < max_retries:
                 try:
-                    print(f'正在使用{AIbase["model"]}对{trainingPhrases} 进行训练！！')
+                    self.usego.sendlog(f'正在使用{AIbase["model"]} 对 {trainingPhrases} 进行训练！！')
                     response = openai.ChatCompletion.create(
                         model=f'{AIbase["model"]}',
                         messages=[
@@ -59,18 +59,17 @@ class aiGO():
                         timeout=timeout,
                     )
                     generated_text = response['choices'][0]['message']['content'].strip()
-                    print(f" 生成的结果：{generated_text}")
+                    self.usego.sendlog(f" 生成的结果：{generated_text}")
                     # article = self.insert_article(generated_text)
                     return generated_text
 
                 except openai.error.RateLimitError:
-                    print(f"达到速率限制，等待 {wait_time} 秒后重试")
+                    self.usego.sendlog(f"达到速率限制，等待 {wait_time} 秒后重试")
                     time.sleep(wait_time)
                     retries += 1
             # raise Exception("重试次数达到上限，请求失败")
             return None
         else:
-
             return None
 
     def witchOPEN(self):
@@ -83,21 +82,21 @@ class aiGO():
         cached_data = self.cache.read_from_cache(cache_key)
 
         if cached_data:
-            print("从缓存中获取数据", cached_data)
+            self.usego.sendlog(f"从缓存中获取数据{cached_data}")
             return cached_data
 
         sql_data = self.artsql.ai_open_api_sql(f"{cache_key}")
 
         if "sql 语句异常" not in str(sql_data):
             resdatas = [item[0] for item in sql_data]
-            print("数据库查询结果", resdatas)
+            self.usego.sendlog(f"数据库查询结果{resdatas}" )
             if resdatas != []:
                 AIbase = self.usego.changeDict(resdatas[0])
                 self.cache.write_to_cache(cache_key, AIbase)
                 return AIbase
             else:
-                print("数据库没有想要的数据")
+                self.usego.sendlog("数据库没有想要的数据")
                 return None
         else:
-            print("访问数据库失败了，请重试")
+            self.usego.sendlog("访问数据库失败了，请重试")
             return None
