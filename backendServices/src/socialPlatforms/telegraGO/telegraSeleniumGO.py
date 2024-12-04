@@ -65,12 +65,25 @@ class telegraSeleniumGO:
             # 如果有文章内容，则添加
             # 输入内容
             self.usego.sendlog(f"输入内容")
+            html_tab = ["<h2>", "<h3>", "<p>"]
             try:
-                driver.execute_script("""
-                    var p = document.createElement('p');
-                    p.textContent = arguments[0];
-                    arguments[1].appendChild(p);
-                """, content, content_input)
+                # 检查是否包含特定的 HTML 标签
+                if any(tag in content for tag in html_tab):
+                    self.usego.sendlog("检测到特定 HTML 标签，使用 div 包裹插入内容")
+                    driver.execute_script("""
+                        var content = arguments[0];
+                        var contentInput = arguments[1];
+                        var div = document.createElement('div');
+                        div.innerHTML = content;  // 插入 HTML 内容
+                        contentInput.appendChild(div);
+                    """, content, content_input)
+                else:
+                    self.usego.sendlog("未检测到 HTML 标签，作为纯文本插入")
+                    driver.execute_script("""
+                        var p = document.createElement('p');
+                        p.textContent = arguments[0];  // 插入纯文本
+                        arguments[1].appendChild(p);
+                    """, content, content_input)
             except Exception as e:
                 self.usego.sendlog(f"添加文章内容失败: {e}")
                 return None
@@ -96,6 +109,16 @@ class telegraSeleniumGO:
 
             if driver:
                 self.ads.adsAPI(configCall.adsServer, "stop", adsUser)
+                
+    def changeText(self, content):
+        """
+            @Datetime ： 2024/12/4 20:03
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+
+
+    
 
 
 

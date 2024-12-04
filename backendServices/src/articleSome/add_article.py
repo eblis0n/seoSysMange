@@ -141,17 +141,12 @@ class generateArticle():
             new_prompt = f"请将 {Epilogue} 转换为完整的 HTML 代码，包括段落排版、超链接处理（在新标签页打开），并使用适当给段落赋予<h2>、<h3>、<h4> 标题 的 HTML 标签结构。"
             content = self.aigo.run(new_prompt)
             if content is not None:
-                check_html = self.check_html_tags(content)
-                if check_html:
-                        soup = BeautifulSoup(content, "html.parser")
-                        try:
-                            detail = soup.body.decode_contents()
-                        except:
-                            detail = soup
-
-                else:
-                    print("没有乱七八糟的 标签")
-                    detail = content
+                check_html = self.change_html(content)
+                try:
+                    soup = BeautifulSoup(check_html, "html.parser")
+                    detail = soup.body.decode_contents()
+                except:
+                    detail = check_html
             else:
                 return False
 
@@ -171,19 +166,21 @@ class generateArticle():
         else:
             print("入库失败")
 
-    def check_html_tags(self, content):
-        # 遍历每个标签，检查是否存在于内容中
-        # print(f"content,{content}")
-        html_tags = ["<!DOCTYPE html>", "<html>", "<head>", "<body>"]
+    def change_html(self, html_content):
+        """
+            @Datetime ： 2024/12/4 20:23
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        # 要移除的标签列表
+        html_tags = ["<!DOCTYPE html>", "<html>", "</html>", "<head>", "</head>", "<body>", "</body>", "<title>",
+                     "</title>"]
 
+        # 通过正则表达式移除指定标签
+        for tag in html_tags:
+            html_content = re.sub(re.escape(tag), "", html_content, flags=re.IGNORECASE)
 
-        missing_tags = [tag for tag in html_tags if tag in content]
-        print(f"标签检测结果：{missing_tags}")
-
-        if missing_tags:
-            return True
-        else:
-            return False
+        return html_content.strip()
 
     def save_sql(self, source, promptID, sortID, title, content,language, type, user):
         """

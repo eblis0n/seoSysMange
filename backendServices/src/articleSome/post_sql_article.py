@@ -7,6 +7,7 @@
 @Motto：ABC(Always Be Coding)
 """
 import os
+import re
 import sys
 
 base_dr = str(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
@@ -70,12 +71,11 @@ class postSqlArticle():
                     for i in range(len(post_read_list)):
                         print(f"post_read_list[i],{post_read_list[i]['content']}")
                         content = self.usego.normalize_text(post_read_list[i]['content'])
-                        html_tags = ["<!DOCTYPE html>", "<html>", "<head>", "<body>"]
-                        prompt = f"""需求：阅读 {content} 并按以下要求优化后输出：1. **内容拆分**：将原文内容拆分为合理的短句或词组，以便进行同义词或近义词的替换。2. **同义词替换**：在不改变原文表达的意思情况下，使用同义词或近义词进行替换。3. **保持段落风格**：确保文段的结构和风格与原文一致。4. **保持原文语言**：确保所用语言与原文一致。5. **去除多余Html标签**：如果原文中有{html_tags}这类标签，一律移除"""
-                        new_content = aigo.run(prompt)
-                        print(f"new_content,{new_content}")
-                        if new_content is not None:
-                            post_read_list[i]['content'] = new_content
+                        prompt = f"""需求：阅读 {content} 并按以下要求优化后输出：1. **内容拆分**：将原文内容拆分为合理的短句或词组，以便进行同义词或近义词的替换。2. **同义词替换**：在不改变原文表达的意思情况下，使用同义词或近义词进行替换。3. **保持段落风格**：确保文段的结构和风格与原文一致。4. **保持原文语言**：确保所用语言与原文一致。"""
+                        new_content = self.change_html(prompt)
+                        newContent = aigo.run(new_content)
+                        if newContent is not None:
+                            post_read_list[i]['content'] = newContent
                         else:
                             print("二次创作失败，使用原文")
 
@@ -176,6 +176,25 @@ class postSqlArticle():
 
         self.usego.sendlog("跑完了")
         return all_res
+
+
+    def change_html(self, html_content):
+        """
+            @Datetime ： 2024/12/4 20:23
+            @Author ：eblis
+            @Motto：简单描述用途
+        """
+        # 要移除的标签列表
+        html_tags = ["<!DOCTYPE html>", "<html>", "</html>", "<head>", "</head>", "<body>", "</body>", "<title>",
+                     "</title>"]
+
+        # 通过正则表达式移除指定标签
+        for tag in html_tags:
+            html_content = re.sub(re.escape(tag), "", html_content, flags=re.IGNORECASE)
+
+
+        return html_content.strip()
+
 
 
     def post_to_blogger(self, platform, this_res_list,  this_history_list, bad_run_list, post_read_list, this_post_data, user_id, bloggerID, adsUser):
