@@ -31,7 +31,7 @@ class telegraSeleniumGO:
 
 
     def run(self, adsUser, title, content):
-        self.usego.sendlog(f"接收到的信息 {title},{content}")
+        print(f"接收到的数据 {title},content:{content}")
         # 生成标题
         driver = None
         try:
@@ -41,7 +41,7 @@ class telegraSeleniumGO:
             try:
                 driver.get("https://telegra.ph/")
             except Exception as e:
-                self.usego.sendlog(f"driver.get 出现异常: {e}")
+                print(f"driver.get 出现异常: {e}")
                 return None
 
             # 等待页面元素加载
@@ -52,7 +52,7 @@ class telegraSeleniumGO:
                 title_input = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_tl_editor"]/div[1]/h1')))
                 driver.execute_script("arguments[0].textContent = arguments[1];", title_input, title)
             except Exception as e:
-                self.usego.sendlog(f"标题设置失败: {e}")
+                print(f"标题设置失败: {e}")
                 return None
 
             try:
@@ -60,31 +60,20 @@ class telegraSeleniumGO:
                 content_input = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_tl_editor"]/div[1]/p')))
                 driver.execute_script("arguments[0].textContent = '';", content_input)
             except Exception as e:
-                self.usego.sendlog(f"内容输入框设置失败: {e}")
+                print(f"内容输入框设置失败: {e}")
                 return None
 
             # 如果有文章内容，则添加
             # 输入内容
-            self.usego.sendlog(f"输入内容")
-            html_tab = ["<h2>", "<h3>", "<p>"]
+            print(f"输入内容")
             try:
-                # 检查是否包含特定的 HTML 标签
-                if any(tag in content for tag in html_tab):
-                    self.usego.sendlog("检测到特定 HTML 标签，使用 div 包裹插入内容")
-                    driver.execute_script("""
-                        var div = document.createElement('div');
-                        div.textContent = arguments[0];   // 插入 HTML 内容
-                        arguments[1].appendChild(div);
-                    """, content, content_input)
-                else:
-                    self.usego.sendlog("未检测到 HTML 标签，作为纯文本插入")
-                    driver.execute_script("""
-                        var p = document.createElement('p');
-                        p.textContent = arguments[0];  // 插入纯文本
-                        arguments[1].appendChild(p);
-                    """, content, content_input)
+                driver.execute_script("""
+                    var p = document.createElement('p');
+                    p.textContent = arguments[0];
+                    arguments[1].appendChild(p);
+                """, content, content_input)
             except Exception as e:
-                self.usego.sendlog(f"添加文章内容失败: {e}")
+                print(f"添加文章内容失败: {e}")
                 return None
 
 
@@ -93,7 +82,7 @@ class telegraSeleniumGO:
                 publish_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="_publish_button"]')))
                 driver.execute_script("arguments[0].click();", publish_button)
             except Exception as e:
-                self.usego.sendlog(f"点击发布按钮失败: {e}")
+                print(f"点击发布按钮失败: {e}")
                 return None
 
             # 随机等待一段时间
@@ -101,37 +90,25 @@ class telegraSeleniumGO:
             return driver.current_url
 
         except Exception as e:
-            self.usego.sendlog(f"页面操作失败: {e}")
+            print(f"页面操作失败: {e}")
             return None
 
         finally:
-
             if driver:
                 self.ads.adsAPI(configCall.adsServer, "stop", adsUser)
-                
-    def changeText(self, content):
-        """
-            @Datetime ： 2024/12/4 20:03
-            @Author ：eblis
-            @Motto：简单描述用途
-        """
-
-
-    
 
 
 
     
 
 if __name__ == '__main__':
-    pass
-    # start_time = datetime.now()
-    # tele = telegraSelenium()
-    # # 调试，通过配置文件修改
-    # genre = "0"
-    # platform = "telegra"
-    # stacking_min = configCall.stacking_min
-    # stacking_max = configCall.stacking_max
-    # alt_text = configCall.stacking_text
-    #
-    # tele.main(genre, platform, stacking_min, stacking_max, alt_text, "1", "0", "1", "all", 0, 20)
+    tele = telegraSeleniumGO()
+    adsUser = ""
+    title = "你还好吗？"
+    content = """<h2>冬の旅の魅力</h2>
+<p>冬の旅は、雪景色に包まれた神秘的な世界への冒険です。白銀の世界に身を委ね、静寂と清らかな空気に包まれると、心も体もリフレッシュされます。雪の結晶が舞い落ちる幻想的な風景は、まるで夢の中にいるような感覚を与えてくれます。寒さを忘れて、暖かい飲み物を楽しみながら、冬の旅の魅力に魅了されることでしょう。冬の旅に出かけ、新たな冒険を楽しんでみませんか。</p>
+
+<h3>関連リンク</h3>
+<p><a href='https://baidu.com' target='_blank'>https://baidu.com</a></p>
+<p><a href='https://support.google.com/websearch/answer/181196?hl=zh-CN' target='_blank'>无障碍功能帮助</a></p>"""
+    tele.run(adsUser, title, content)
