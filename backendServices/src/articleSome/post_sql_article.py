@@ -62,25 +62,26 @@ class postSqlArticle():
                 # 第3步：将已在相同平台相同 账号 发布过的文章 过滤掉
                 post_read_list = self.secondaryProcessing(platform, post_max,  artList, adsUserList)
                 self.usego.sendlog(f"post_read_list:{len(post_read_list)}")
-                new_post_read_list = []
+                # new_post_read_list = []
                 if int(isSecondary) == 0:
                     print("二次创作")
                     from backendServices.src.articleSome.public.aiGO import aiGO
                     aigo = aiGO()
                     for i in range(len(post_read_list)):
-                        print(f"post_read_list[i],{post_read_list[i]}")
-                        prompt = f"""需求：1、阅读 分析{post_read_list[i]}，将内容拆分文合理的短句或词组或词语，在不改变原文表达的意思情况下，使用同义词或近义词进行置换；2、原文段落风格保持不变；3、保持原文所使用语言不变"""
-                        content = aigo.run(prompt)
-                        print(f"content,{content}")
-                        if content is not None:
-                            new_post_read_list.append(content)
+                        print(f"post_read_list[i],{post_read_list[i]['content']}")
+                        prompt = f"""需求：阅读 {post_read_list[i]['content']} 并按以下要求优化后输出：1. **内容拆分**：将原文内容拆分为合理的短句或词组，以便进行同义词或近义词的替换。2. **同义词替换**：在不改变原文表达的意思情况下，使用同义词或近义词进行替换。3. **保持段落风格**：确保文段的结构和风格与原文一致。"""
+                        new_content = aigo.run(prompt)
+                        print(f"new_content,{new_content}")
+                        if new_content is not None:
+                            post_read_list[i]['content'] = new_content
                         else:
-                            print("二次创作失败")
-                            new_post_read_list.append(post_read_list[i])
+                            print("二次创作失败，使用原文")
+
                 else:
-                    new_post_read_list = post_read_list
+                    print("直接开跑，不浪费时间")
+
             #     第4步：开跑：
-                all_res = self.run(platform, adsUserList, new_post_read_list)
+                all_res = self.run(platform, adsUserList, post_read_list)
             else:
                 self.usego.sendlog(f"没有符合 {sortID}, {type}, {commission}, {isAI}, {user} 的文章")
                 all_res = None
@@ -467,10 +468,12 @@ if __name__ == '__main__':
     platform = "telegra"
     group = "all"
     post_max = 20
-    sortID = 1
+    sortID = 4
     type = "Html"
     commission = 1
     isAI = 0
     user = ''
     isSecondary = 0
-    po.main(pcname, queue_url, platform, group, post_max, sortID, type, commission, isAI, user,isSecondary)
+    language = ""
+
+    po.main(pcname, queue_url, platform, group, post_max, sortID, type, commission, isAI, user, language, isSecondary)
