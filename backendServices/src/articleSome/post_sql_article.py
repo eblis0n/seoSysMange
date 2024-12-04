@@ -219,9 +219,9 @@ class postSqlArticle():
                     this_history.append(user_id)
                     # 将 this_result 数据写入 this_history，确保顺序不被打乱
                     this_result = [platform, result, create_at]  # 保证顺序正确
-                this_history_list.append(tuple(this_history))
-                this_res_list.append(tuple(this_result))
-                post_read_list.remove(this_post_data)
+                    this_history_list.append(tuple(this_history))
+                    this_res_list.append(tuple(this_result))
+                    post_read_list.remove(this_post_data)
                 self.usego.sendlog(f"剩余：{len(post_read_list)} 文章没发")
 
             else:
@@ -488,7 +488,7 @@ if __name__ == '__main__':
     queue_url = "/"
     platform = "telegra"
     group = "all"
-    post_max = 20
+    post_max = 10
     sortID = 4
     type = "Html"
     commission = 1
