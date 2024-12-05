@@ -27,7 +27,7 @@ from bs4 import BeautifulSoup
 
 class generateArticle():
     def __init__(self):
-        self.ssql = article_sqlGO()
+        self.artsql = article_sqlGO()
         self.basql = basis_sqlGO()
         self.usego = otherUse()
         self.aws_sqs = AmazonSQS()

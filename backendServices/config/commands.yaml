@@ -30,7 +30,7 @@ commands:
       - adsIDlist
 
   - name: generate_article
-    module: backendServices.src.articleSome.generate_article
+    module: backendServices.src.articleSome.add_article
     class: generateArticle
     method: run
     params:

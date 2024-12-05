@@ -161,7 +161,7 @@ class operationsManage():
         # content = data_request["script_content"]
         # if isinstance(content, dict):
         #     content = json.dumps(content)
-        created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        create_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         query = {
             "task_id": self.generate_task_id(),
             "host_ip": data_request["host_ip"],
@@ -170,7 +170,7 @@ class operationsManage():
             "task_type": data_request["task_type"],
             "status": "Pending",
             "result": "",
-            "created_at": created_at,
+            "create_at": create_at,
             "completed_at": "",
             "last_update": ""
         }
@@ -210,7 +210,7 @@ class operationsManage():
                             "status": sql_data[i]["status"],
                             "task_type": sql_data[i]["task_type"],
                             "result": sql_data[i]["result"],
-                            "created_at": self.usego.turn_isoformat(sql_data[i]["created_at"]),
+                            "create_at": self.usego.turn_isoformat(sql_data[i]["create_at"]),
                             "completed_at": self.usego.turn_isoformat(sql_data[i]["completed_at"]),
                             "last_update": self.usego.turn_isoformat(sql_data[i]["last_update"])
                         }

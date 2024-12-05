@@ -424,14 +424,14 @@ class bloggerSelenium:
         now = datetime.now()
 
         # 格式化为年月日时分秒
-        created_at = now.strftime("%Y-%m-%d %H:%M:%S")
+        create_at = now.strftime("%Y-%m-%d %H:%M:%S")
         new_links_list = []
         for url in urls:
             this_dat = {
                 "url": f"{url}",
                 "platform": f"{platform}",
                 "genre": f"{genre}",
-                "created_at": created_at
+                "create_at": create_at
             }
             new_links_list.append(this_dat)
         result = self.mossql.splicing_interim_insert_batch("seo_result_301_links", new_links_list)

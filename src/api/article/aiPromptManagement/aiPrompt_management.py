@@ -26,7 +26,7 @@ class aiPromptManage():
         self.bp = Blueprint("aiPrompt", __name__, url_prefix="/prompt")
         self.Myenum = MyEnum()
 
-        self.ssql = article_sqlGO()
+        self.artsql = article_sqlGO()
         self.usego = otherUse()
 
         # 将路由和视图函数绑定到蓝图
@@ -48,7 +48,7 @@ class aiPromptManage():
 
         # print("prompt",prompt)
 
-        sql_data = self.ssql.ai_prompt_insert_sql(salesman, sort, name, pronoun, prompt, create_at)
+        sql_data = self.artsql.ai_prompt_insert_sql(salesman, sort, name, pronoun, prompt, create_at)
 
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'添加成功：{sql_data}')
@@ -66,7 +66,7 @@ class aiPromptManage():
         data_request = request.json
         id = data_request['id']
 
-        sql_data = self.ssql.ai_prompt_delete_sql(id)
+        sql_data = self.artsql.ai_prompt_delete_sql(id)
 
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'成功删除：{id}')
@@ -91,7 +91,7 @@ class aiPromptManage():
 
 
 
-        sql_data = self.ssql.ai_prompt_update_sql(salesman, sort, name, pronoun, prompt, id)
+        sql_data = self.artsql.ai_prompt_update_sql(salesman, sort, name, pronoun, prompt, id)
 
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'更新成功：{sql_data}')
@@ -105,7 +105,7 @@ class aiPromptManage():
         return res.to_json()
 
     def ai_prompt_list(self):
-        sql_data = self.ssql.ai_prompt_list_sql()
+        sql_data = self.artsql.ai_prompt_list_sql()
         # print("sql_data", sql_data)
 
         if "sql 语句异常" not in str(sql_data):

@@ -106,6 +106,22 @@
                 "children": [
 
                 ]
+            },
+            {
+                "path": "articleUpshot",
+                "component": "outcome/articleUpshot/index",
+                "redirect": null,
+                "name": "articleUpshot",
+                "meta": {
+                    "title": "\u6587\u7ae0\u53d1\u5e03\u7ed3\u679c",
+                    "icon": "",
+                    "hidden": false,
+                    "alwaysShow": false,
+                    "keepAlive": true
+                },
+                "children": [
+
+                ]
             }
         ]
     },
@@ -672,22 +688,6 @@
             "keepAlive": false
         },
         "children": [
-            {
-                "path": "https://yescaptcha.atlassian.net/wiki/spaces/YESCAPTCHA/pages/164286",
-                "component": "",
-                "redirect": "",
-                "name": null,
-                "meta": {
-                    "title": "apidocs",
-                    "icon": "link",
-                    "hidden": true,
-                    "alwaysShow": false,
-                    "keepAlive": false
-                },
-                "children": [
-
-                ]
-            },
             {
                 "path": "https://yescaptcha.atlassian.net/wiki/spaces/YESCAPTCHA/pages/164286",
                 "component": "",

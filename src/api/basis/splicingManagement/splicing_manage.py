@@ -66,7 +66,7 @@ class splicingManage():
                         "platform": sql_data[i]["platform"],
                         "genre": sql_data[i]["genre"],
                         "sort": sql_data[i]["sort"],
-                        "created_at": self.usego.turn_isoformat(sql_data[i]["created_at"])
+                        "create_at": self.usego.turn_isoformat(sql_data[i]["create_at"])
                     }
                     resdatas.append(thisdata)
 

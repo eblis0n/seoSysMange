@@ -143,8 +143,13 @@ class article_sqlGO():
         return sql_data
 
     def article_delete_sql(self, id):
-        # noinspection SqlNoDataSourceInspection
-        sqlgo = f"""DELETE FROM seo_article WHERE `id` = '{id}';"""
+        if isinstance(id, list):
+            if len(id) > 1:
+                sqlgo = f"""DELETE FROM seo_article WHERE `id` in {tuple(id)};"""
+            else:
+                sqlgo = f"""DELETE FROM seo_article WHERE `id` = '{id[0]}';"""
+        else:
+            sqlgo = f"""DELETE FROM seo_article WHERE `id` = '{id}';"""
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_commit('article', sqlgo)
         return sql_data
@@ -215,13 +220,13 @@ class article_sqlGO():
         return sql_data
 
 
-    def post_articlehistory_batch_insert(self, datalist):
+    def post_article_history_batch_insert(self, datalist):
         # datalist 是 list  里有 N 组 元组
         commitSQL = """
             INSERT INTO seo_article_post_history (`articleID`, `accountID`, `platform`, `url`, `create_at`)
             VALUES (%s, %s,%s, %s, %s)
             """
-        # print(f"post_articlehistory_batch_insert:{commitSQL}")
+        # print(f"post_article_history_batch_insert:{commitSQL}")
         # 执行 SQL 查询语句
         sql_data = self.ssql.mysql_batch_commit('article', commitSQL, datalist)
         return sql_data

@@ -44,7 +44,7 @@ class spliceGo():
                     "platform": platform,
                     "genre": genre,
                     "sort": sort,
-                    "created_at": formatted_now
+                    "create_at": formatted_now
                 }
                 for url in urllist
             ]
@@ -55,7 +55,7 @@ class spliceGo():
                     "platform": platform,
                     "genre": genre,
                     "sort": sort,
-                    "created_at": formatted_now
+                    "create_at": formatted_now
                 }
                 for zy_link in zyurllist
                 for url in urllist

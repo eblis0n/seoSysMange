@@ -26,7 +26,7 @@ class categoryManage():
         self.bp = Blueprint("category", __name__, url_prefix="/category")
         self.Myenum = MyEnum()
 
-        self.ssql = article_sqlGO()
+        self.artsql = article_sqlGO()
         self.usego = otherUse()
 
         # 将路由和视图函数绑定到蓝图
@@ -42,7 +42,7 @@ class categoryManage():
         level = data_request['level']
         create_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        sql_data = self.ssql.category_insert_sql(name, level, create_at)
+        sql_data = self.artsql.category_insert_sql(name, level, create_at)
 
 
         if "sql 语句异常" not in str(sql_data):
@@ -59,7 +59,7 @@ class categoryManage():
         data_request = request.json
         id = data_request['id']
 
-        sql_data = self.ssql.category_delete_sql(id)
+        sql_data = self.artsql.category_delete_sql(id)
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'成功删除:{id}')
             res = ResMsg(data=sql_data)
@@ -78,7 +78,7 @@ class categoryManage():
         level = data_request('level')
 
 
-        sql_data = self.ssql.category_update_sql(name, level, id)
+        sql_data = self.artsql.category_update_sql(name, level, id)
 
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'更新成功: {sql_data}')
@@ -92,7 +92,7 @@ class categoryManage():
 
     def category_list(self):
 
-        sql_data = self.ssql.category_list_sql()
+        sql_data = self.artsql.category_list_sql()
 
         if "sql 语句异常" not in str(sql_data):
             try:

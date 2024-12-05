@@ -388,7 +388,7 @@ class postSqlArticle():
         """
         result = self.artsql.post_article_result_batch_insert(datalist)
         time.sleep(5)
-        historyResult = self.artsql.post_articlehistory_batch_insert(historylist)
+        historyResult = self.artsql.post_article_history_batch_insert(historylist)
         self.usego.sendlog(f"执行结果:{result}, {historyResult}")
 
     

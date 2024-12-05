@@ -27,7 +27,7 @@ class articleManage():
         self.bp = Blueprint("article", __name__, url_prefix="/article")
         self.Myenum = MyEnum()
 
-        self.ssql = article_sqlGO()
+        self.artsql = article_sqlGO()
         self.usego = otherUse()
         self.task = taskAws()
 
@@ -121,7 +121,7 @@ class articleManage():
             title = data_request['title']
             content = data_request['content']
 
-            sql_data = self.ssql.article_insert_sql(sortID, source, title, content, language, type, user_l, commission,
+            sql_data = self.artsql.article_insert_sql(sortID, source, title, content, language, type, user_l, commission,
                                                     create_at)
             if "sql 语句异常" not in str(sql_data):
                 self.usego.sendlog(f'添加成功：{sql_data}')
@@ -137,7 +137,7 @@ class articleManage():
         data_request = request.json
         id = data_request['id']
 
-        sql_data = self.ssql.article_delete_sql(id)
+        sql_data = self.artsql.article_delete_sql(id)
 
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'成功删除：{id}')
@@ -152,7 +152,7 @@ class articleManage():
 
     def article_list(self):
 
-        sql_data = self.ssql.article_list_sql()
+        sql_data = self.artsql.article_list_sql()
         # print("sql_data", sql_data)
 
         if "sql 语句异常" not in str(sql_data):
