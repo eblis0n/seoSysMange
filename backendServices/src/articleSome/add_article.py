@@ -198,7 +198,7 @@ class generateArticle():
             print(f"要生成专属文章哦")
             user = user[0]
             commission = 0
-        self.ssql.ai_article_insert_sql(0, promptID, sortID, source, title, content, language, type, user, commission, create_at)
+        self.artsql.ai_article_insert_sql(0, promptID, sortID, source, title, content, language, type, user, commission, create_at)
 
 
 
@@ -277,7 +277,7 @@ class generateArticle():
             @Motto：简单描述用途
         """
         print(f"提取promptID 得到具体prompt")
-        sql_data = self.ssql.ai_prompt_select_sql(promptID)
+        sql_data = self.artsql.ai_prompt_select_sql(promptID)
         if "sql 语句异常" not in str(sql_data):
             resdatas = [item[5] for item in sql_data]
             print("resdatas", resdatas)
