@@ -133,7 +133,7 @@ class article_sqlGO():
     def ai_article_insert_sql(self, isAI, promptID, sortID, source, title, content, language, type, user, commission, create_at):
         sqlgo = """
             INSERT INTO seo_article 
-            (`isAI`,`promptID`, `promptID`, `sortID`, `source`, `title`, `content`, `language`, `type`, `user`, `commission`, `create_at`) 
+            (`isAI`, `promptID`, `sortID`, `source`, `title`, `content`, `language`, `type`, `user`, `commission`, `create_at`) 
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
             """
         # 执行 SQL 查询语句
