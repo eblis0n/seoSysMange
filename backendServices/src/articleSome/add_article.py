@@ -41,18 +41,18 @@ class generateArticle():
         """
 
         # 第一步:根据promptID 拿到具体prompt信息
-        print(f"来活啦～{pcname}, {queue_url}, {max_length}, {source}, {type}, {promptID}, {sortID},  {theme}, {Keywords}, {ATag}, {link}, {language}, {user}")
+        self.usego.sendlog(f"来活啦～{pcname}, {queue_url}, {max_length}, {source}, {type}, {promptID}, {sortID},  {theme}, {Keywords}, {ATag}, {link}, {language}, {user}")
 
         promptDD = self.witch_prompt(promptID)
         if promptDD is not None and len(promptDD) > 0:
-            print("第二步 根据 prompt 的初始化")
+            self.usego.sendlog("第二步 根据 prompt 的初始化")
             promptList = self.disassembly(promptDD, max_length, theme, Keywords, ATag, link, language, user)
-            # print("第3步 很关键，生成文章")
+            # self.usego.sendlog("第3步 很关键，生成文章")
             outcome = self.lesGO(source, type, promptID, sortID, promptList,  user)
 
             sql_data = self.basql.pcSettings_update_state_sql(pcname, state=0)
             self.aws_sqs.deleteMSG(queue_url)
-            # print("恭喜你，生成文章任务完成")
+            # self.usego.sendlog("恭喜你，生成文章任务完成")
             return outcome
 
         else:
@@ -70,23 +70,23 @@ class generateArticle():
 
         for i in range(len(promptList)):
             thisArticle = promptList[i]
-            print(f"开始{i} prompt 组 生成文章")
-            print(f"这篇文章由{len(thisArticle)} 段组成")
+            self.usego.sendlog(f"开始{i} prompt 组 生成文章")
+            self.usego.sendlog(f"这篇文章由{len(thisArticle)} 段组成")
             Epilogue = ''
             article_title = ''
             language = ''
             for j in range(len(thisArticle)):
-                print(f"thisArticle[j],{thisArticle[j]}")
+                self.usego.sendlog(f"thisArticle[j],{thisArticle[j]}")
                 try:
                     language = thisArticle[j]["language"]
                 except:
-                    print("跳过")
+                    self.usego.sendlog("跳过")
 
                 if thisArticle[j]["type"] == "0" or thisArticle[j]["type"] == 0:
                     if source == "openAI":
-                        print(f"openAI 很高兴 为你服务")
+                        self.usego.sendlog(f"openAI 很高兴 为你服务")
 
-                        print(f"哟！好样的，需要生成{len(promptList)} 这么多篇文章啊！")
+                        self.usego.sendlog(f"哟！好样的，需要生成{len(promptList)} 这么多篇文章啊！")
 
                         generated_text = self.aigo.run(thisArticle[j]["promptdata"])
                         if generated_text is not None:
@@ -95,24 +95,24 @@ class generateArticle():
                                 title_text = self.aigo.run(title_prompt)
                                 article_title = title_text
                             else:
-                                print(f"当前标题：{article_title} ")
+                                self.usego.sendlog(f"当前标题：{article_title} ")
 
                             Epilogue += f"\n\n {generated_text}\n\n"
                         else:
                             return False
                     elif source == "OllamaAI":
-                        print(f"OllamaAI 还没对接，敬请期待")
+                        self.usego.sendlog(f"OllamaAI 还没对接，敬请期待")
 
                         return False
                     else:
-                        print(f"来了老弟")
-                        print("还没对接")
+                        self.usego.sendlog(f"来了老弟")
+                        self.usego.sendlog("还没对接")
                         return False
                 else:
 
                     Epilogue += f'\n\n {thisArticle[j]["promptdata"] }\n\n'
             self.conversionType( source, article_title, Epilogue, language, type, promptID, sortID,  user)
-            print(f"第{i} 篇文章生成完比，剩余{len(promptList) - 1}:{Epilogue}")
+            self.usego.sendlog(f"第{i} 篇文章生成完比，剩余{len(promptList) - 1}:{Epilogue}")
         return True
 
     def convert_to_markdown(self, text):
@@ -134,7 +134,7 @@ class generateArticle():
             @Author ：eblis
             @Motto：简单描述用途
         """
-        print(f"根据 {type}  优化内容")
+        self.usego.sendlog(f"根据 {type}  优化内容")
         htmllist = ["HTML", "Html", "html"]
         downlist = ["Markdown", "markdown", "MARKDOWN"]
         if type in htmllist:
@@ -159,12 +159,12 @@ class generateArticle():
                 return False
         else:
             detail = Epilogue
-        # print("language", language)
+        # self.usego.sendlog("language", language)
         sql_data = self.save_sql(source, promptID, sortID, article_title, detail, language, type, user)
         if "sql 语句异常" not in str(sql_data):
-            print("入库成功")
+            self.usego.sendlog("入库成功")
         else:
-            print("入库失败")
+            self.usego.sendlog("入库失败")
 
     def change_html(self, html_content):
         """
@@ -191,11 +191,11 @@ class generateArticle():
 
         create_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if user == []:
-            print(f"生成通用文章")
+            self.usego.sendlog(f"生成通用文章")
             user = ""
             commission = 1
         else:
-            print(f"要生成专属文章哦")
+            self.usego.sendlog(f"要生成专属文章哦")
             user = user[0]
             commission = 0
         self.artsql.ai_article_insert_sql(0, promptID, sortID, source, title, content, language, type, user, commission, create_at)
@@ -276,20 +276,21 @@ class generateArticle():
             @Author ：eblis
             @Motto：简单描述用途
         """
-        print(f"提取promptID 得到具体prompt")
+        self.usego.sendlog(f"提取promptID 得到具体prompt")
         sql_data = self.artsql.ai_prompt_select_sql(promptID)
         if "sql 语句异常" not in str(sql_data):
             resdatas = [item[5] for item in sql_data]
-            print("resdatas", resdatas)
+
+            self.usego.sendlog(f"提取到的resdatas:{resdatas}")
             if resdatas!=[]:
                 try:
                     resdatas_list = json.loads(resdatas[0])
                     return resdatas_list
                 except json.JSONDecodeError as e:
-                    print(f"转换异常：{e}")
+                    self.usego.sendlog(f"转换异常：{e}")
                     return None
             else:
-                print("获取数据失败了")
+                self.usego.sendlog("获取数据失败了")
                 return None
 
         else:

@@ -45,10 +45,11 @@ class aiPromptManage():
         pronoun = data_request['pronoun']
         prompt = data_request['prompt']
         create_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # print(f"prompt:{prompt}")
+        new_prompt = prompt.strip()
+        # print("new_prompt",new_prompt)
 
-        # print("prompt",prompt)
-
-        sql_data = self.artsql.ai_prompt_insert_sql(salesman, sort, name, pronoun, prompt, create_at)
+        sql_data = self.artsql.ai_prompt_insert_sql(salesman, sort, name, pronoun, new_prompt, create_at)
 
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'添加成功：{sql_data}')
@@ -88,10 +89,11 @@ class aiPromptManage():
         name = data_request['name']
         pronoun = data_request['pronoun']
         prompt = data_request['prompt']
+        new_prompt = prompt.strip()
 
 
 
-        sql_data = self.artsql.ai_prompt_update_sql(salesman, sort, name, pronoun, prompt, id)
+        sql_data = self.artsql.ai_prompt_update_sql(salesman, sort, name, pronoun, new_prompt, id)
 
         if "sql 语句异常" not in str(sql_data):
             self.usego.sendlog(f'更新成功：{sql_data}')
