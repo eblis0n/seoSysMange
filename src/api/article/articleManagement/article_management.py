@@ -57,7 +57,7 @@ class articleManage():
         if int(data_request['isAI']) == 0:
             self.usego.sendlog(f'要发 AI 文章哦，')
             promptID = data_request['promptID']
-            self.usego.sendlog(f'promptID:{promptID}')
+            # self.usego.sendlog(f'promptID:{promptID}')
 
             # 处理主题字段，确保为空时返回空列表
             theme = data_request.get('theme', "")

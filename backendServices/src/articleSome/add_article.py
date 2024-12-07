@@ -111,7 +111,7 @@ class generateArticle():
                 else:
 
                     Epilogue += f'\n\n {thisArticle[j]["promptdata"] }\n\n'
-            self.conversionType( source, article_title, Epilogue, language, type, promptID, sortID,  user)
+            self.conversionType(source, article_title, Epilogue, language, type, promptID, sortID,  user)
             self.usego.sendlog(f"第{i} 篇文章生成完比，剩余{len(promptList) - 1}:{Epilogue}")
         return True
 
@@ -128,7 +128,7 @@ class generateArticle():
 
         return markdown_output
     
-    def conversionType(self,  source, article_title, Epilogue, language, type, promptID, sortID,  user):
+    def conversionType(self,  source, article_title, Epilogue, language, type, promptID, sortID, user):
         """
             @Datetime ： 2024/11/20 14:55
             @Author ：eblis
@@ -159,12 +159,8 @@ class generateArticle():
                 return False
         else:
             detail = Epilogue
-        # self.usego.sendlog("language", language)
-        sql_data = self.save_sql(source, promptID, sortID, article_title, detail, language, type, user)
-        if "sql 语句异常" not in str(sql_data):
-            self.usego.sendlog("入库成功")
-        else:
-            self.usego.sendlog("入库失败")
+
+        self.save_sql(source, promptID, sortID, article_title, detail, language, type, user)
 
     def change_html(self, html_content):
         """
@@ -182,13 +178,14 @@ class generateArticle():
 
         return html_content.strip()
 
-    def save_sql(self, source, promptID, sortID, title, content,language, type, user):
+    def save_sql(self, source, promptID, sortID, title, content, language, type, user):
         """
             @Datetime ： 2024/11/19 22:14
             @Author ：eblis
             @Motto：简单描述用途
         """
 
+        self.usego.sendlog(f"接收到的参数：{source}, {promptID}, {sortID}, {title}, {content}, {language}, {type}, {user}")
         create_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if user == []:
             self.usego.sendlog(f"生成通用文章")
@@ -198,8 +195,13 @@ class generateArticle():
             self.usego.sendlog(f"要生成专属文章哦")
             user = user[0]
             commission = 0
-        self.artsql.ai_article_insert_sql(0, promptID, sortID, source, title, content, language, type, user, commission, create_at)
-
+        sql_data = self.artsql.ai_article_insert_sql(0, promptID, sortID, source, title, content, language, type, user, commission, create_at)
+        if "sql 语句异常" not in str(sql_data):
+            self.usego.sendlog("入库成功")
+            return True
+        else:
+            self.usego.sendlog("入库失败")
+            return False
 
 
     def disassembly(self, promptDD, max_length, theme, Keywords, ATag, link, language, user):

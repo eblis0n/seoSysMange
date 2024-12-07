@@ -151,23 +151,9 @@ class article_sqlGO():
         else:
             sqlgo = f"""DELETE FROM seo_article WHERE `id` = '{id}';"""
         # 执行 SQL 查询语句
+        # print("sqlgo",sqlgo)
         sql_data = self.ssql.mysql_commit('article', sqlgo)
         return sql_data
-
-    # def article_update_sql(self, promptID, sortID, source, title, content, user, commission, id):
-    #     """
-    #         更新 PC 设置的状态、名称和地址
-    #     """
-    #
-    #     sqlgo = f"""
-    #                     UPDATE seo_ai_prompt
-    #                     SET `promptID` = '{promptID}', `sortID` = '{sortID}', `source` = '{source}', `title` = '{title}', `content` = '{content}', `user` = '{user}', `commission` = '{commission}'
-    #                     WHERE `id` = {id};
-    #                 """
-    #     # 执行 SQL 更新查询
-    #     sql_data = self.ssql.mysql_commit('article', sqlgo)
-    #     return sql_data
-    #
 
 
 
@@ -249,6 +235,19 @@ class article_sqlGO():
         # 执行 SQL 查询语句
         # print("post_article_result_batch_insert",commitSQL)
         sql_data = self.ssql.mysql_batch_commit('article', commitSQL, datalist)
+        return sql_data
+
+    def post_article_result_delete(self, id):
+        if isinstance(id, list):
+            if len(id) > 1:
+                sqlgo = f"""DELETE FROM seo_result_article_links WHERE `id` in {tuple(id)};"""
+            else:
+                sqlgo = f"""DELETE FROM seo_result_article_links WHERE `id` = '{id[0]}';"""
+        else:
+            sqlgo = f"""DELETE FROM seo_result_article_links WHERE `id` = '{id}';"""
+        # 执行 SQL 查询语句
+        print("sqlgo", sqlgo)
+        sql_data = self.ssql.mysql_commit('article', sqlgo)
         return sql_data
 
 

@@ -159,7 +159,7 @@ class outcomeManage():
         if platform and urldatas:
             if platform == "article":
 
-                sql_data = self.artsql.article_delete_sql(url_list)
+                sql_data = self.artsql.post_article_result_delete(url_list)
                 if "sql 语句异常" not in str(sql_data):
                     self.usego.sendlog(f'成功删除：{url_list}')
                     res = ResMsg(data=sql_data)
