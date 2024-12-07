@@ -184,16 +184,23 @@ class postSqlArticle():
             @Author ：eblis
             @Motto：简单描述用途
         """
-        # 要移除的标签列表
-        html_tags = ["<!DOCTYPE html>", "<html>", "</html>", "<head>", "</head>", "<body>", "</body>", "<title>",
-                     "</title>"]
+        html_tags_map = {
+            "<!DOCTYPE html>": "",
+            "<html>": "",
+            "</html>": "",
+            "<head>": "",
+            "</head>": "",
+            "<body>": "",
+            "</body>": "",
+            "<title>": "",
+            "</title>": ""
+        }
 
-        # 通过正则表达式移除指定标签
-        for tag in html_tags:
-            html_content = re.sub(re.escape(tag), "", html_content, flags=re.IGNORECASE)
+        # 遍历键值对并替换内容
+        for tag, replacement in html_tags_map.items():
+            html_content = re.sub(re.escape(tag), replacement, html_content, flags=re.IGNORECASE)
 
-
-        return html_content.strip()
+        return html_content.strip
 
 
 

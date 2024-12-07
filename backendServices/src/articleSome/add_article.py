@@ -141,7 +141,7 @@ class generateArticle():
             new_prompt = f"请将 {Epilogue} 转换为完整的 HTML 代码，包括段落排版、超链接处理（在新标签页打开），并使用适当给段落赋予<h2>、<h3>、<h4> 标题 的 HTML 标签结构。"
             content = self.aigo.run(new_prompt)
             if content is not None:
-                check_html = self.change_html(content)
+                check_html = self.extract_body_content(content)
                 try:
                     soup = BeautifulSoup(check_html, "html.parser")
                     detail = soup.body.decode_contents()
@@ -162,21 +162,22 @@ class generateArticle():
 
         self.save_sql(source, promptID, sortID, article_title, detail, language, type, user)
 
-    def change_html(self, html_content):
+    def extract_body_content(self, html_content):
         """
-            @Datetime ： 2024/12/4 20:23
-            @Author ：eblis
-            @Motto：简单描述用途
+        @Datetime ： 2024/12/4 20:23
+        @Author ：eblis
+        @Motto：提取 HTML 中 <body> 标签内的内容。
         """
-        # 要移除的标签列表
-        html_tags = ["<!DOCTYPE html>", "<html>", "</html>", "<head>", "</head>", "<body>", "</body>", "<title>",
-                     "</title>"]
+        # 使用正则表达式提取 <body> 标签中的内容
+        match = re.search(r"<body.*?>(.*?)</body>", html_content, flags=re.IGNORECASE | re.DOTALL)
 
-        # 通过正则表达式移除指定标签
-        for tag in html_tags:
-            html_content = re.sub(re.escape(tag), "", html_content, flags=re.IGNORECASE)
-
-        return html_content.strip()
+        if match:
+            # 提取 <body> 标签内的内容
+            body_content = match.group(1)
+            return body_content.strip()
+        else:
+            # 如果没有 <body> 标签，返回空字符串
+            return html_content
 
     def save_sql(self, source, promptID, sortID, title, content, language, type, user):
         """
