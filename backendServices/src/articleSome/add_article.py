@@ -41,18 +41,18 @@ class generateArticle():
         """
 
         # 第一步:根据promptID 拿到具体prompt信息
-        self.usego.sendlog(f"来活啦～{pcname}, {queue_url}, {max_length}, {source}, {type}, {promptID}, {sortID},  {theme}, {Keywords}, {ATag}, {link}, {language}, {user}")
+        print(f"来活啦～{pcname}, {queue_url}, {max_length}, {source}, {type}, {promptID}, {sortID},  {theme}, {Keywords}, {ATag}, {link}, {language}, {user}")
 
         promptDD = self.witch_prompt(promptID)
         if promptDD is not None and len(promptDD) > 0:
-            self.usego.sendlog("第二步 根据 prompt 的初始化")
+            print("第二步 根据 prompt 的初始化")
             promptList = self.disassembly(promptDD, max_length, theme, Keywords, ATag, link, language, user)
-            # self.usego.sendlog("第3步 很关键，生成文章")
+            print("第3步 很关键，生成文章")
             outcome = self.lesGO(source, type, promptID, sortID, promptList,  user)
 
             sql_data = self.basql.pcSettings_update_state_sql(pcname, state=0)
             self.aws_sqs.deleteMSG(queue_url)
-            # self.usego.sendlog("恭喜你，生成文章任务完成")
+            # print("恭喜你，生成文章任务完成")
             return outcome
 
         else:
@@ -65,55 +65,67 @@ class generateArticle():
             @Author ：eblis
             @Motto：简单描述用途
         """
-
-
-
         for i in range(len(promptList)):
             thisArticle = promptList[i]
-            self.usego.sendlog(f"开始{i} prompt 组 生成文章")
-            self.usego.sendlog(f"这篇文章由{len(thisArticle)} 段组成")
+            print(f"开始{i} prompt 组 生成文章")
+            print(f"这篇文章由{len(thisArticle)} 段组成")
             Epilogue = ''
             article_title = ''
             language = ''
+
             for j in range(len(thisArticle)):
-                self.usego.sendlog(f"thisArticle[j],{thisArticle[j]}")
+                print(f"这组Article：{thisArticle[j]}")
+                link = thisArticle[j]['link']
                 try:
                     language = thisArticle[j]["language"]
                 except:
-                    self.usego.sendlog("跳过")
+                    print(f'thisArticle[j]["language"]： 为{thisArticle[j]["language"]} 跳过')
 
-                if thisArticle[j]["type"] == "0" or thisArticle[j]["type"] == 0:
+                if int(thisArticle[j]["type"]) == 0:
                     if source == "openAI":
-                        self.usego.sendlog(f"openAI 很高兴 为你服务")
+                        print(f"openAI 很高兴 为你服务")
 
-                        self.usego.sendlog(f"哟！好样的，需要生成{len(promptList)} 这么多篇文章啊！")
+                        print(f"哟！好样的，需要生成{len(promptList)} 这么多篇文章啊！")
 
                         generated_text = self.aigo.run(thisArticle[j]["promptdata"])
                         if generated_text is not None:
                             if article_title == "":
-                                title_prompt = f"需求：1、根据{generated_text} 所使用的语言，给出一端30字符以内的总结； 2、总结末尾不带任何标点符号；"
+                                title_prompt = f"Requirements: 1. Based on the language used by {generated_text}, give a summary within 30 characters at one end; 2. Without any punctuation marks;"
                                 title_text = self.aigo.run(title_prompt)
                                 article_title = title_text
                             else:
-                                self.usego.sendlog(f"当前标题：{article_title} ")
+                                print(f"当前标题：{article_title} ")
+                            new_generated_text = self.replace_url_with_regex(generated_text, link)
 
-                            Epilogue += f"\n\n {generated_text}\n\n"
+                            Epilogue += f"\n{new_generated_text}\n"
                         else:
-                            return False
+                            print("AI跪了。需要重试")
+                            continue
                     elif source == "OllamaAI":
-                        self.usego.sendlog(f"OllamaAI 还没对接，敬请期待")
+                        print(f"OllamaAI 还没对接，敬请期待")
 
                         return False
                     else:
-                        self.usego.sendlog(f"来了老弟")
-                        self.usego.sendlog("还没对接")
+                        print(f"来了老弟")
+                        print("还没对接")
                         return False
                 else:
+                    Epilogue += f'\n {thisArticle[j]["promptdata"] }\n'
 
-                    Epilogue += f'\n\n {thisArticle[j]["promptdata"] }\n\n'
             self.conversionType(source, article_title, Epilogue, language, type, promptID, sortID,  user)
-            self.usego.sendlog(f"第{i} 篇文章生成完比，剩余{len(promptList) - 1}:{Epilogue}")
+            print(f"第{i} 篇文章生成完比，剩余{len(promptList) - 1}")
         return True
+
+    def replace_url_with_regex(self, text, replacement_url):
+        """
+        使用正则表达式替换文本中包含特定域名的 URL。
+
+        :param text: 原始文本
+        :param replacement_url: 替换后的 URL
+        :return: 替换后的文本
+        """
+        pattern = r"https://www\.example\.com(\S*)"
+        return re.sub(pattern, replacement_url, text)
 
     def convert_to_markdown(self, text):
         # 替换裸链接为 Markdown 格式
@@ -128,17 +140,17 @@ class generateArticle():
 
         return markdown_output
     
-    def conversionType(self,  source, article_title, Epilogue, language, type, promptID, sortID, user):
+    def conversionType(self, source, article_title, Epilogue, language, type, promptID, sortID, user):
         """
             @Datetime ： 2024/11/20 14:55
             @Author ：eblis
-            @Motto：简单描述用途
+            @Motto：将生成的内容 修改为指定模式
         """
-        self.usego.sendlog(f"根据 {type}  优化内容")
+        print(f"根据 {type}  优化{Epilogue} 内容")
         htmllist = ["HTML", "Html", "html"]
         downlist = ["Markdown", "markdown", "MARKDOWN"]
         if type in htmllist:
-            new_prompt = f"请将 {Epilogue} 转换为完整的 HTML 代码，包括段落排版、超链接处理（在新标签页打开），并使用适当给段落赋予<h2>、<h3>、<h4> 标题 的 HTML 标签结构。"
+            new_prompt = f"Requirements: 1. Convert {Epilogue} into complete HTML code, including paragraph formatting and hyperlink processing; 2. Use an HTML tag structure that appropriately assigns <h2>, <h3>, and <h4> titles to paragraphs; 3. Only typesetting is based on HTML characteristics, and the full text is not optimized."
             content = self.aigo.run(new_prompt)
             if content is not None:
                 check_html = self.extract_body_content(content)
@@ -148,16 +160,15 @@ class generateArticle():
                 except:
                     detail = check_html
             else:
-                return False
-
-
+                detail = Epilogue
         elif type in downlist:
             new_Epilogue = self.convert_to_markdown(Epilogue)
-            new_prompt = f"请将 {new_Epilogue} 转换为完整的 Markdown 代码，包括段落排版、超链接处理（在新标签页打开），并使用适当段落赋予2级、3级、4级 标题 Markdown 标签结构。"
+            new_prompt = f"Requirements: 1. Convert {new_Epilogue} to complete Markdown format, including paragraph formatting and hyperlink processing. 2. Use appropriate paragraphs to give level 2, level 3, and level 4 titles. 3. Do not optimize the full text content."
             detail = self.aigo.run(new_prompt)
             if detail is None:
-                return False
+                detail = Epilogue
         else:
+            print(f"不认识这个{type},保留原文格式")
             detail = Epilogue
 
         self.save_sql(source, promptID, sortID, article_title, detail, language, type, user)
@@ -186,22 +197,22 @@ class generateArticle():
             @Motto：简单描述用途
         """
 
-        self.usego.sendlog(f"接收到的参数：{source}, {promptID}, {sortID}, {title}, {content}, {language}, {type}, {user}")
+        # print(f"接收到的参数：{source}, {promptID}, {sortID}, {title}, {content}, {language}, {type}, {user}")
         create_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if user == []:
-            self.usego.sendlog(f"生成通用文章")
+            print(f"生成通用文章")
             user = ""
             commission = 1
         else:
-            self.usego.sendlog(f"要生成专属文章哦")
+            print(f"要生成专属文章哦")
             user = user[0]
             commission = 0
         sql_data = self.artsql.ai_article_insert_sql(0, promptID, sortID, source, title, content, language, type, user, commission, create_at)
         if "sql 语句异常" not in str(sql_data):
-            self.usego.sendlog("入库成功")
+            print("入库成功")
             return True
         else:
-            self.usego.sendlog("入库失败")
+            print("入库失败")
             return False
 
 
@@ -262,6 +273,8 @@ class generateArticle():
                         .replace('{user}', current_user)
                     )
                     new_prompt["type"] = data["type"]
+                    new_prompt["link"] = current_link
+                    new_prompt["ATag"] = current_ATag
                     new_prompt["promptdata"] = this_prompt
                     new_prompt["language"] = current_language
                 else:
@@ -279,21 +292,21 @@ class generateArticle():
             @Author ：eblis
             @Motto：简单描述用途
         """
-        self.usego.sendlog(f"提取promptID 得到具体prompt")
+        print(f"提取promptID 得到具体prompt")
         sql_data = self.artsql.ai_prompt_select_sql(promptID)
         if "sql 语句异常" not in str(sql_data):
             resdatas = [item[5] for item in sql_data]
 
-            self.usego.sendlog(f"提取到的resdatas:{resdatas}")
+            print(f"提取到的resdatas:{resdatas}")
             if resdatas!=[]:
                 try:
                     resdatas_list = json.loads(resdatas[0])
                     return resdatas_list
                 except json.JSONDecodeError as e:
-                    self.usego.sendlog(f"转换异常：{e}")
+                    print(f"转换异常：{e}")
                     return None
             else:
-                self.usego.sendlog("获取数据失败了")
+                print("获取数据失败了")
                 return None
 
         else:
@@ -306,15 +319,15 @@ if __name__ == '__main__':
     queue_url = "/"
     max_length = 1
     source = "openAI"
-    promptID = 1
-    sortID = 1
-    theme = ['冬天的旅游']
+    promptID = 4
+    sortID = 5
+    theme = ['大化け期待！2024年の東証スタンダードで注目のテンバガー候補銘柄']
     Keywords = []
     ATag = []
-    link = []
-    language = ["日语"]
+    link = ["https://note.com/easy_racoon9308/n/n0228a186ba82"]
+    language = ["jp"]
     user = []
-    type = "Html"
+    type = "Markdown"
 
 
     Art.run(pcname, queue_url, max_length, source, type, promptID, sortID, theme, Keywords, ATag, link, language, user)
