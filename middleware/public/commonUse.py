@@ -136,9 +136,18 @@ class otherUse():
             '“': '"', '”': '"',  # 替换为普通双引号
             '—': '-',  # 替换为普通连字符
             '\xa0': ' ',  # 替换为普通空格
+            '\u30fb': "'",
+
             # 添加其他需要替换的字符
         }
-        return text.translate(str.maketrans(replacements))
+        # 先移除 GBK 不支持的字符
+        cleaned_text = text.encode("gbk", errors="ignore").decode("gbk", errors="ignore")
+
+        # 执行替换
+        for old, new in replacements.items():
+            cleaned_text = cleaned_text.replace(old, new)
+
+        return cleaned_text
 
     def change_hashed(self, data):
         # 转换字符串为bytes类型，因为bcrypt只能处理bytes

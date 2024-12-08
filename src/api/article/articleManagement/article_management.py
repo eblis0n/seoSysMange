@@ -201,13 +201,17 @@ class articleManage():
             "language": data_request['spoken'],
             "isSecondary": data_request['isSecondary']
         }
-        group = data_request['group']
-        post_max = data_request['post_max']
-        if int(post_max) != "":
-            datasDict["post_max"] = int(post_max)
-        if group == "":
-            datasDict["group"] = "all"
-
+        if datasDict["platform"] == "telegra":
+            try:
+                datasDict["post_max"] = int(data_request['post_max'])
+            except:
+                datasDict["post_max"] = 0
+        else:
+            group = data_request['group']
+            if group == "":
+                datasDict["group"] = "all"
+            else:
+                datasDict["group"] = group
 
         self.usego.sendlog(f"接收到的参数：{datasDict}")
         results = self.task.run("postSqlArticle", datasDict["platform"], datasDict)
