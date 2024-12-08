@@ -71,13 +71,14 @@ class postSqlArticle():
                     for i in range(len(post_read_list)):
                         print(f"post_read_list[i],{post_read_list[i]['content']}")
                         content = self.usego.normalize_text(post_read_list[i]['content'])
-                        prompt = f"""需求：阅读 {content} 并按以下要求优化后输出：1. **内容拆分**：将原文内容拆分为合理的短句或词组，以便进行同义词或近义词的替换。2. **同义词替换**：在不改变原文表达的意思情况下，使用同义词或近义词进行替换。3. **保持段落风格**：确保文段的结构和风格与原文一致。4. **保持原文语言**：确保所用语言与原文一致。"""
-                        new_content = self.change_html(prompt)
-                        newContent = aigo.run(new_content)
-                        if newContent is not None:
-                            post_read_list[i]['content'] = newContent
+                        prompt = f"""Requirements: Read the full text of {content} completely and optimize according to the following requirements: 1. **Content splitting**: Split the original content into reasonable short sentences or phrases; 2. **Synonymous short sentences or phrase replacement** : Replace with synonyms or synonyms without changing the meaning of the original text. 3. **Maintain paragraph style**: Make sure the structure and style of the paragraph are consistent with the original text. 4. **Keep original language**: Use original language"""
+                        newContent = aigo.run(prompt)
+                        new_content = self.change_html(newContent)
+                        if new_content:
+                            post_read_list[i]['content'] = new_content
                         else:
                             print("二次创作失败，使用原文")
+                            post_read_list[i]['content'] = content
 
                 else:
                     print("直接开跑，不浪费时间")
