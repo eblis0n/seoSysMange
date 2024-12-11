@@ -323,7 +323,7 @@ class postSqlArticle():
         forReleaseArt = []
 
         # 如果 historyL 为空，则直接为每个用户分配一篇文章
-        self.usego.sendlog(f"historyL 结果 {historyL}")
+        # self.usego.sendlog(f"historyL 结果 {historyL}")
         if platform == "telegra":
             article = artList[:min(post_max, len(artList))]
             forReleaseArt.extend(article)
