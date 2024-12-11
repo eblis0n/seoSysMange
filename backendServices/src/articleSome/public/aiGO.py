@@ -26,7 +26,7 @@ class aiGO():
         self.usego = otherUse()
         self.cache = customCache()
 
-    def run(self, trainingPhrases, max_retries=5, timeout=60, wait_time=10):
+    def run(self, prompt, max_retries=5, timeout=60, wait_time=10):
 
         AIbase = self.witchOPEN()
         if AIbase is not None:
@@ -45,12 +45,12 @@ class aiGO():
 
             while retries < max_retries:
                 try:
-                    print(f'正在使用{AIbase["model"]} 对 {trainingPhrases} 进行训练！！')
+                    print(f'正在使用{AIbase["model"]} 对 {prompt} 进行训练！！')
                     response = openai.ChatCompletion.create(
                         model=f'{AIbase["model"]}',
                         messages=[
                             {"role": "user",
-                             "content": trainingPhrases
+                             "content": prompt
                              }
                         ],
                         max_tokens=2000,
@@ -61,7 +61,12 @@ class aiGO():
                     generated_text = response['choices'][0]['message']['content'].strip()
                     print(f" 生成的结果：{generated_text}")
                     # article = self.insert_article(generated_text)
-                    return generated_text
+                    if "I'm sorry" in generated_text:
+                        print("生成失败，使用原文")
+                        return None
+                    else:
+
+                        return generated_text
 
                 except openai.error.RateLimitError:
                     print(f"达到速率限制，等待 {wait_time} 秒后重试")

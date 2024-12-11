@@ -69,9 +69,9 @@ class postSqlArticle():
                     from backendServices.src.articleSome.public.aiGO import aiGO
                     aigo = aiGO()
                     for i in range(len(post_read_list)):
-                        print(f"post_read_list[i],{post_read_list[i]['content']}")
+                        # print(f"post_read_list[i],{post_read_list[i]['content']}")
                         content = self.usego.normalize_text(post_read_list[i]['content'])
-                        prompt = f"""Requirements: Read the full text of {content} completely and optimize according to the following requirements: 1. **Content splitting**: Split the original content into reasonable short sentences or phrases; 2. **Synonymous short sentences or phrase replacement** : Replace with synonyms or synonyms without changing the meaning of the original text. 3. **Maintain paragraph style**: Make sure the structure and style of the paragraph are consistent with the original text. 4. **Keep original language**: Use original language"""
+                        prompt = f"""Read the full text of {content} and optimize it according to the following requirements: 1. Split the original content into reasonable short sentences or phrases; 2. Replace it with synonyms or near synonyms without changing the meaning of the original text. 3. Ensure that the paragraph structure and style are consistent with the original text. 4. Keep using the original language. 5. Print the reorganized and optimized content directly."""
                         newContent = aigo.run(prompt)
                         new_content = self.change_html(newContent)
                         if new_content:
@@ -149,8 +149,8 @@ class postSqlArticle():
                 # self.usego.sendlog(f"这波Thread 执行完了：{this_res_list}")
 
                 if this_res_list != []:
-                    self.usego.sendlog(f"将this_res_list数据同步存放数据库，{this_res_list}")
-                    self.usego.sendlog(f"将this_history_list数据同步存放数据库，{this_history_list}")
+                    # self.usego.sendlog(f"将this_res_list数据同步存放数据库，{this_res_list}")
+                    # self.usego.sendlog(f"将this_history_list数据同步存放数据库，{this_history_list}")
 
                     self.save_datebase(this_res_list, this_history_list)
 
@@ -201,7 +201,7 @@ class postSqlArticle():
         for tag, replacement in html_tags_map.items():
             html_content = re.sub(re.escape(tag), replacement, html_content, flags=re.IGNORECASE)
 
-        return html_content.strip
+        return html_content.strip()
 
 
 
