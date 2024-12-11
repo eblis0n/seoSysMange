@@ -87,6 +87,11 @@ log_folder_path = conf.get("logs", "log_folder_path")
 log_folder_name = conf.get("logs", "log_folder_name")
 log_level = conf.get("logs", "log_level")
 
+###################################### prompt ######################################
+
+pseudoOriginal = conf.get("prompt", "pseudoOriginal")
+addConvertHtml = conf.get("prompt", "addConvertHtml")
+addConvertMarkdowm = conf.get("prompt", "addConvertMarkdowm")
 
 ###################################### Client ######################################
 

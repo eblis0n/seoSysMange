@@ -71,7 +71,7 @@ class postSqlArticle():
                     for i in range(len(post_read_list)):
                         # print(f"post_read_list[i],{post_read_list[i]['content']}")
                         content = self.usego.normalize_text(post_read_list[i]['content'])
-                        prompt = f"""Read the full text of {content} and complete the following requirements: 1. Split the original content into reasonable short sentences or phrases while maintaining the original document format or markup language; 2. Replace the original content with synonyms or near-synonyms in paragraphs without changing the original meaning; 3. Ensure that the paragraph structure is consistent with the original text; 4. Do not change the language used in the original text; 5. Directly print the reorganized and optimized content."""
+                        prompt = f"""{configCall.pseudoOriginal}"""
                         newContent = aigo.run(prompt)
                         new_content = self.change_html(newContent)
                         if new_content:

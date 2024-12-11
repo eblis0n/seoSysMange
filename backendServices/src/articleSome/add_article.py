@@ -21,8 +21,10 @@ sys.path.append(bae_idr)
 from middleware.dataBaseGO.article_sqlCollenction import article_sqlGO
 from middleware.dataBaseGO.basis_sqlCollenction import basis_sqlGO
 from middleware.public.commonUse import otherUse
+import middleware.public.configurationCall as configCall
 from backendServices.src.articleSome.public.aiGO import aiGO
 from backendServices.src.awsMQ.amazonSQS import AmazonSQS
+
 from bs4 import BeautifulSoup
 
 class generateArticle():
@@ -150,7 +152,7 @@ class generateArticle():
         htmllist = ["HTML", "Html", "html"]
         downlist = ["Markdown", "markdown", "MARKDOWN"]
         if type in htmllist:
-            new_prompt = f"Requirements: 1. Convert {Epilogue} into complete HTML code, including paragraph formatting and hyperlink processing; 2. Use an HTML tag structure that appropriately assigns <h2>, <h3>, and <h4> titles to paragraphs; 3. Only typesetting is based on HTML characteristics, and the full text is not optimized."
+            new_prompt = f"""{configCall.addConvertHtml}"""
             content = self.aigo.run(new_prompt)
             if content is not None:
                 check_html = self.extract_body_content(content)
@@ -162,8 +164,8 @@ class generateArticle():
             else:
                 detail = Epilogue
         elif type in downlist:
-            new_Epilogue = self.convert_to_markdown(Epilogue)
-            new_prompt = f"Requirements: 1. Convert {new_Epilogue} to complete Markdown format, including paragraph formatting and hyperlink processing. 2. Use appropriate paragraphs to give level 2, level 3, and level 4 titles. 3. Do not optimize the full text content."
+            # new_Epilogue = self.convert_to_markdown(Epilogue)
+            new_prompt = f"""{configCall.addConvertMarkdowm}"""
             detail = self.aigo.run(new_prompt)
             if detail is None:
                 detail = Epilogue
