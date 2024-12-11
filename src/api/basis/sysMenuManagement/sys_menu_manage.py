@@ -20,7 +20,7 @@ from middleware.public.returnMsg import ResMsg
 from flask import Blueprint
 from src.api.urlSet import MyEnum
 from middleware.dataBaseGO.basis_sqlCollenction import basis_sqlGO
-from middleware.public.commonUse import otherUse
+from middleware.public.commonUse import otherUse, customCache
 from middleware.jwtGO.py_jwt import get_verify_token
 import middleware.public.configurationCall as configCall
 
@@ -31,6 +31,7 @@ class menuDeploy():
         self.ssql = basis_sqlGO()
         self.Myenum = MyEnum()
         self.usego = otherUse()
+        self.cache = customCache()
 
         # 将路由和视图函数绑定到蓝图
 
@@ -58,29 +59,35 @@ class menuDeploy():
             else:
                 self.usego.sendlog(f'router_code：{router_code}')
                 time.sleep(5)
-                sql_data = self.ssql.menu_router_list(router_code, 4)
-                # print("sql_data",sql_data)
-                if "sql 语句异常" not in str(sql_data):
-                    try:
-                        resdatas = [{'id': item[0], 'name': item[1], 'parent_id': item[2], 'route_name': item[3],
-                                     'route_path': item[4], 'component': item[5], 'icon': item[6], 'sort': item[7], 'visible': item[8], 'redirect': item[9], 'type': item[10], 'always_show': item[11], 'keep_alive': item[12], 'params': item[13]} for item in sql_data]
+                mun_tree = self.cache.read_from_cache("menu_tree")
+                if mun_tree:
+                    self.usego.sendlog(f'有，有效的缓存数据，不用查数据库')
+                    res = ResMsg(data=mun_tree)
+                else:
+                    sql_data = self.ssql.menu_router_list(router_code, 4)
+                    # print("sql_data",sql_data)
+                    if "sql 语句异常" not in str(sql_data):
+                        try:
+                            resdatas = [{'id': item[0], 'name': item[1], 'parent_id': item[2], 'route_name': item[3],
+                                         'route_path': item[4], 'component': item[5], 'icon': item[6], 'sort': item[7], 'visible': item[8], 'redirect': item[9], 'type': item[10], 'always_show': item[11], 'keep_alive': item[12], 'params': item[13]} for item in sql_data]
+                        except:
+                            self.usego.sendlog(f'最新的请求不到，用默认的')
+                            default_tree_data = self.sys_menu_routes_default()
+                            res = ResMsg(data=default_tree_data)
 
-                    except:
+                        else:
+                            # print("resdatas",resdatas)
+                            tree_data = self.usego.build_tree(resdatas)
+                            self.cache.write_to_cache("menu_tree", tree_data)
+
+
+                            self.usego.sendlog(f'用户菜单结果：{tree_data}')
+                            res = ResMsg(data=tree_data)
+                        return res.to_json()
+                    else:
                         self.usego.sendlog(f'最新的请求不到，用默认的')
                         default_tree_data = self.sys_menu_routes_default()
                         res = ResMsg(data=default_tree_data)
-
-                    else:
-                        # print("resdatas",resdatas)
-                        tree_data = self.usego.build_tree(resdatas)
-
-                        self.usego.sendlog(f'用户菜单结果：{tree_data}')
-                        res = ResMsg(data=tree_data)
-                    return res.to_json()
-                else:
-                    self.usego.sendlog(f'最新的请求不到，用默认的')
-                    default_tree_data = self.sys_menu_routes_default()
-                    res = ResMsg(data=default_tree_data)
 
             return res.to_json()
 

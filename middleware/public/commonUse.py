@@ -60,7 +60,7 @@ class verifyGO():
             return None
 
 class customCache():
-    def __init__(self, maxsize=2, ttl=1800):
+    def __init__(self, maxsize=50, ttl=1 * 60 * 60):
         self.cache = TTLCache(maxsize=maxsize, ttl=ttl)
 
     def write_to_cache(self, key, value):
