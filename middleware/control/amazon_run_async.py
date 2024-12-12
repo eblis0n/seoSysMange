@@ -55,12 +55,11 @@ class AmazonRunAsync:
         """处理消息逻辑"""
         try:
             command = next((cmd for cmd in commands if cmd['name'] == message.get('command')), None)
-            self.usego.sendlog(f"得到的message: {message}")
-            self.usego.sendlog(f"得到的command: {command}")
+
             if command:
                 # self.usego.sendlog(f"得到的: {type({command['script']})},{command['script']}")
                 message['script']['receipt_handle'] = f"{receipt_handle}"
-                self.usego.sendlog(f"开始执行命令: {command}")
+                self.usego.sendlog(f"开始执行命令: {message}")
                 new_message = message.get("script")
                 result = self.execute_command(command, new_message)
 

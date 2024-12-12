@@ -73,13 +73,12 @@ class postSqlArticle():
                         content = self.usego.normalize_text(post_read_list[i]['content'])
                         prompt = f"""{configCall.pseudoOriginal}"""
                         newContent = aigo.run(prompt)
-                        new_content = self.change_html(newContent)
-                        if new_content:
+                        if newContent is not None:
+                            new_content = self.change_html(newContent)
                             post_read_list[i]['content'] = new_content
                         else:
                             print("二次创作失败，使用原文")
                             post_read_list[i]['content'] = content
-
                 else:
                     print("直接开跑，不浪费时间")
 

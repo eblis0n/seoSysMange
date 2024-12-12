@@ -65,7 +65,6 @@ class aiGO():
                         print("生成失败，使用原文")
                         return None
                     else:
-
                         return generated_text
 
                 except openai.error.RateLimitError:
