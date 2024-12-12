@@ -334,18 +334,28 @@ class postSqlArticle():
         # 如果 historyL 为空，则直接为每个用户分配一篇文章
         # self.usego.sendlog(f"historyL 结果 {historyL}")
         if platform == "telegra":
-            article = artList[:min(post_max, len(artList))]
+            # 计算需要发布的篇数
+            needed_articles = post_max
+            available_articles = len(artList)
+
+            # 如果文章数量不足，则重复文章直到达到 post_max
+            if available_articles < needed_articles:
+                # 使用 itertools.cycle 循环填充文章列表
+                import itertools
+                article = list(itertools.islice(itertools.cycle(artList), needed_articles))
+            else:
+                # 如果文章数量足够，则直接取前 post_max 篇
+                article = artList[:needed_articles]
             forReleaseArt.extend(article)
             return forReleaseArt
         else:
             if not historyL:
-
                 self.usego.sendlog(f"有{len(adsUserList)}组，准备分配{len(artList)}")
                 for adsitem in adsUserList:
                     self.usego.sendlog(f"这组 有 {len(adsitem)} 个用户")
                     for i, ads_user in enumerate(adsitem):
                         # 如果文章不足，则循环分配文章
-                        self.usego.sendlog(f"第{i}个用户，总用户：{len(artList)}")
+                        self.usego.sendlog(f"第{i}个用户，总文章数量：{len(artList)}")
                         article = artList[i % len(artList)]
                         forReleaseArt.append(article)
                 return forReleaseArt
