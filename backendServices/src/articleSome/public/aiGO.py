@@ -61,7 +61,7 @@ class aiGO():
                     generated_text = response['choices'][0]['message']['content'].strip()
                     print(f" 生成的结果：{generated_text}")
                     # article = self.insert_article(generated_text)
-                    if "I'm sorry" in generated_text:
+                    if "I am sorry" in generated_text:
                         print("生成失败，使用原文")
                         return None
                     else:
