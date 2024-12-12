@@ -27,7 +27,7 @@ class getCookie():
         self.aws_sqs = AmazonSQS()
 
 
-    def run(self, pcname, queue_url, adsIDlist):
+    def run(self, pcname, queue_url, adsIDlist,receipt_handle):
         """
             @Datetime ： 2024/8/27 13:33
             @Author ：eblis
@@ -99,7 +99,7 @@ class getCookie():
 
         # 处理完成所有批次后的操作：更新状态和删除队列消息
         self.ssql.pcSettings_update_state_sql(pcname, state=0)
-        self.aws_sqs.deleteMSG(queue_url)
+        self.aws_sqs.deleteMSG(queue_url,receipt_handle)
         return True
 
 

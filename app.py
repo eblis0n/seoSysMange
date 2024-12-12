@@ -14,8 +14,8 @@ import threading
 import middleware.public.configurationCall as configCall
 from middleware.public.commonUse import otherUse
 from middleware.public.logs import log_config
-from middleware.control.amazonRun import amazonRun
-
+# from middleware.control.amazonRun import amazonRun
+from middleware.control.amazon_run_async import AmazonRunAsync
 # API 蓝图导入
 from src.api.basis.amazonManagement.amazon_management import amazonManage
 from src.api.basis.bloggerManagement.blogger_management import bloggerManage
@@ -126,8 +126,8 @@ def _register_blueprints(app):
 def _configure_amazon_sqs():
     """配置 Amazon SQS 客户端"""
     if configCall.isClient == '0':
-        ama = amazonRun()
-        threading.Thread(target=ama.run_sqs_client, daemon=True).start()
+        ama = AmazonRunAsync()
+        threading.Thread(target=ama.run, daemon=True).start()
         print("SQS client mode started.")
 
 app = create_app()

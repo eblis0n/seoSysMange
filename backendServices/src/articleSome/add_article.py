@@ -9,10 +9,8 @@
 import json
 import os
 import sys
-import time
 from datetime import datetime
 import re
-import openai
 
 base_dr = str(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 bae_idr = base_dr.replace('\\', '/')
@@ -35,7 +33,7 @@ class generateArticle():
         self.aws_sqs = AmazonSQS()
         self.aigo = aiGO()
 
-    def run(self, pcname, queue_url, max_length, source, type, promptID, sortID,  theme, Keywords, ATag, link, language, user):
+    def run(self, pcname, queue_url, max_length, source, type, promptID, sortID,  theme, Keywords, ATag, link, language, user, receipt_handle):
         """
             @Datetime ： 2024/11/18 22:19
             @Author ：eblis
@@ -53,7 +51,7 @@ class generateArticle():
             outcome = self.lesGO(source, type, promptID, sortID, promptList,  user)
 
             sql_data = self.basql.pcSettings_update_state_sql(pcname, state=0)
-            self.aws_sqs.deleteMSG(queue_url)
+            self.aws_sqs.deleteMSG(queue_url, receipt_handle)
             # print("恭喜你，生成文章任务完成")
             return outcome
 

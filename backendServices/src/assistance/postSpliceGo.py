@@ -31,7 +31,7 @@ class postSpliceGo:
         self.aws_sqs = AmazonSQS()
 
     def main(self, pcname, queue_url, genre, platform, stacking_min, stacking_max, title_alt, alt_text, sort, isarts,
-             postingStyle, group, start, end):
+             postingStyle, group, start, end,receipt_handle):
         """
             @Datetime ： 2024/10/26 00:09
             @Author ：eblis
@@ -60,13 +60,11 @@ class postSpliceGo:
         # 第 3 步： 进一步 处理
             all_res = self.run(isarts, postingStyle, platform, genre, adsUserList, all_links_list_group, title_alt,
                                alt_text)
-
-
         else:
             all_res = None
 
         sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
-        self.aws_sqs.deleteMSG(queue_url)
+        self.aws_sqs.deleteMSG(queue_url, receipt_handle)
         return all_res
 
     def run(self, isarts, postingStyle, platform, genre, adsUserList, all_links_list_group, title_alt, alt_text):
@@ -200,7 +198,7 @@ class postSpliceGo:
             @Author ：eblis
             @Motto：简单描述用途
         """
-        from backendServices.src.socialPlatforms.telegraGO.telegraSelenium import telegraSelenium
+        from backendServices.src.history.telegraSelenium import telegraSelenium
         telegra = telegraSelenium()
         # 创建一个包含目标链接的列表
         to_remove = ["https://telegra.ph", "https://telegra.ph/"]

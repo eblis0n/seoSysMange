@@ -1,11 +1,12 @@
-'''
-version: 1.0.0
-Author: Eblis
-Date: 2024-10-26 16:39:34
-LastEditTime: 2024-11-08 16:26:48
-'''
-import os
-import sys
+# -*- coding: utf-8 -*-
+"""
+@Datetime ： 2024/11/18 22:16
+@Author ： eblis
+@File ：add_article.py
+@IDE ：PyCharm
+@Motto：ABC(Always Be Coding)
+"""
+
 import yaml
 import importlib
 import time
@@ -67,6 +68,7 @@ class amazonRun:
                     command = next((cmd for cmd in commands if cmd['name'] == message.get('command')), None)
 
                     if command:
+                        command["script"]["receipt_handle"] = receipt_handle
                         try:
                             self.usego.sendlog(f"开始执行命令: {command}")
                             new_message = message.get("script")

@@ -68,6 +68,7 @@ class AmazonSQS:
         except ClientError as e:
             return self._handle_error("Failed to create queue", e)
 
+
     def sendMSG(self, queue_url, msg_group, scriptname, task_data):
         """发送消息到队列"""
         message_body = {
@@ -83,6 +84,7 @@ class AmazonSQS:
             )
         except ClientError as e:
             return self._handle_error("Failed to send message", e)
+
 
     def takeMSG(self, queue_url):
         """接收消息"""
@@ -103,32 +105,42 @@ class AmazonSQS:
         except Exception as e:
             return self._handle_error("Failed to receive message", e)
 
+
     def deleteMSG(self, queue_url, receipt_handle=None):
         """删除指定消息或一条消息（如果未提供 receipt_handle）"""
         try:
-            # 删除指定消息
             if receipt_handle:
                 self.usego.sendlog(f"Deleting specified message with ReceiptHandle: {receipt_handle}")
                 self.sqs.delete_message(
                     QueueUrl=queue_url,
                     ReceiptHandle=receipt_handle
                 )
-            # 删除一条消息（如果未提供 receipt_handle）
             else:
-                self.usego.sendlog(f"Deleting one message from the queue")
+                self.usego.sendlog("Deleting one message from the queue")
                 messages = self.sqs.receive_message(
                     QueueUrl=queue_url,
-                    MaxNumberOfMessages=1
+                    MaxNumberOfMessages=1,
+                    VisibilityTimeout=300  # 设置可见性超时
                 ).get("Messages", [])
 
                 if messages:
+                    receipt_handle = messages[0]["ReceiptHandle"]
                     self.sqs.delete_message(
                         QueueUrl=queue_url,
-                        ReceiptHandle=messages[0]["ReceiptHandle"]
+                        ReceiptHandle=receipt_handle
                     )
+                    self.usego.sendlog(f"Message deleted with ReceiptHandle: {receipt_handle}")
+                else:
+                    self.usego.sendlog("No messages to delete.")
             return True
         except Exception as e:
+            self.usego.sendlog(f"Failed to delete message: {str(e)}")
             return self._handle_error("Failed to delete message", e, False)
+
+
+
+
+
 
     def has_messages(self, queue_url):
         """检查队列是否有消息"""

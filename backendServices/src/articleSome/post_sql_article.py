@@ -34,7 +34,7 @@ class postSqlArticle():
         self.aws_sqs = AmazonSQS()
 
 
-    def main(self, pcname, queue_url, platform, group, post_max, sortID, type,  commission, isAI, user,language, isSecondary):
+    def main(self, pcname, queue_url, platform, group, post_max, sortID, type,  commission, isAI, user,language, isSecondary,receipt_handle):
         """
             @Datetime ： 2024/11/18 22:19
             @Author ：eblis
@@ -94,7 +94,7 @@ class postSqlArticle():
             all_res = None
 
         sql_data = self.ssql.pcSettings_update_state_sql(pcname, state=0)
-        self.aws_sqs.deleteMSG(queue_url)
+        self.aws_sqs.deleteMSG(queue_url, receipt_handle)
         return all_res
 
 

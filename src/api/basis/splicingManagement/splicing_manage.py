@@ -170,10 +170,6 @@ class splicingManage():
         results = {}
         for platform in platforms:
             results[f"{platform}_total"] = get_platform_data(platform)
-        #
-        # datas = [results]
-
-
 
         # 输出日志
         self.usego.sendlog(f"查询结果：{results}")
