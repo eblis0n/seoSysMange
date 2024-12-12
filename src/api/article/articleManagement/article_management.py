@@ -111,7 +111,7 @@ class articleManage():
                     else:  # 非列表字段
                         continue
 
-            self.usego.sendlog(f"接收到的参数：{datasDict}")
+            self.usego.sendlog(f"接收到的参数，准备生成文章：{datasDict}")
             results = self.task.run("article", datasDict["platform"], datasDict)
             res = ResMsg(data=results) if results else ResMsg(code='B0001', msg='No results received')
         else:

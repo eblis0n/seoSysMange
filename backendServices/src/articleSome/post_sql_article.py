@@ -69,9 +69,18 @@ class postSqlArticle():
                     from backendServices.src.articleSome.public.aiGO import aiGO
                     aigo = aiGO()
                     for i in range(len(post_read_list)):
-                        # print(f"post_read_list[i],{post_read_list[i]['content']}")
+                        print(f"post_read_list[i],{post_read_list[i]}")
+                        title_prompt = f"""{configCall.titlePrompt}""".replace('{generated_text}', post_read_list[i]['title'])
+                        print(f"title_prompt:{title_prompt}")
+                        newtitle = aigo.run(title_prompt)
+                        if newtitle is not None:
+                            post_read_list[i]['title'] = newtitle
+                        else:
+                            self.usego.sendlog("二次创作失败，使用原来的")
+
                         content = self.usego.normalize_text(post_read_list[i]['content'])
-                        prompt = f"""{configCall.pseudoOriginal}"""
+                        prompt = f"""{configCall.pseudoOriginal}""".replace("{content}", content)
+                        print(f"content prompt:{prompt}")
                         newContent = aigo.run(prompt)
 
                         if newContent is not None:

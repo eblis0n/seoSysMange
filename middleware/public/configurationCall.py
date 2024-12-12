@@ -89,6 +89,7 @@ log_level = conf.get("logs", "log_level")
 
 ###################################### prompt ######################################
 
+titlePrompt = conf.get("prompt", "titlePrompt")
 pseudoOriginal = conf.get("prompt", "pseudoOriginal")
 addConvertHtml = conf.get("prompt", "addConvertHtml")
 addConvertMarkdowm = conf.get("prompt", "addConvertMarkdowm")

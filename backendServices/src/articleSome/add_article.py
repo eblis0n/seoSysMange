@@ -48,7 +48,7 @@ class generateArticle():
             print("第二步 根据 prompt 的初始化")
             promptList = self.disassembly(promptDD, max_length, theme, Keywords, ATag, link, language, user)
             print("第3步 很关键，生成文章")
-            outcome = self.lesGO(source, type, promptID, sortID, promptList,  user)
+            outcome = self.lesGO(source, type, promptID, sortID, promptList, user)
 
             sql_data = self.basql.pcSettings_update_state_sql(pcname, state=0)
             self.aws_sqs.deleteMSG(queue_url, receipt_handle)
@@ -90,7 +90,8 @@ class generateArticle():
                         generated_text = self.aigo.run(thisArticle[j]["promptdata"])
                         if generated_text is not None:
                             if article_title == "":
-                                title_prompt = f"Requirements: 1. Based on the language used by {generated_text}, give a summary within 30 characters at one end; 2. Without any punctuation marks;"
+                                # title_prompt = f"Requirements: 1. Based on the language used by {generated_text}, give a summary within 30 characters at one end; 2. Without any punctuation marks;"
+                                title_prompt = f"""{configCall.titlePrompt}""".replace('{generated_text}', generated_text)
                                 title_text = self.aigo.run(title_prompt)
                                 article_title = title_text
                             else:
@@ -150,7 +151,7 @@ class generateArticle():
         htmllist = ["HTML", "Html", "html"]
         downlist = ["Markdown", "markdown", "MARKDOWN"]
         if type in htmllist:
-            new_prompt = f"""{configCall.addConvertHtml}"""
+            new_prompt = f"""{configCall.addConvertHtml}""".replace('{Epilogue}',Epilogue)
             content = self.aigo.run(new_prompt)
             if content is not None:
                 check_html = self.extract_body_content(content)
@@ -163,7 +164,7 @@ class generateArticle():
                 detail = Epilogue
         elif type in downlist:
             # new_Epilogue = self.convert_to_markdown(Epilogue)
-            new_prompt = f"""{configCall.addConvertMarkdowm}"""
+            new_prompt = f"""{configCall.addConvertMarkdowm}""".replace('{Epilogue}', Epilogue)
             detail = self.aigo.run(new_prompt)
             if detail is None:
                 detail = Epilogue
