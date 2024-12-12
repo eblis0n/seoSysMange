@@ -84,7 +84,8 @@ class AmazonRunAsync:
         self.usego.sendlog(f"使用队列: {queue_url}")
 
         while True:
-
+            self.usego.sendlog("未收到新消息，等待 30 秒")
+            time.sleep(30)
             try:
                 message_result = self.aws_sqs.takeMSG(queue_url)
 
@@ -100,8 +101,9 @@ class AmazonRunAsync:
                     # 异步处理消息
                     self.executor.submit(self.process_message, message, receipt_handle, commands)
                 else:
-                    self.usego.sendlog("未收到新消息，等待 30 秒")
-                    time.sleep(30)
+                    self.usego.sendlog("没有可执行的消息～")
+
+
             except Exception as e:
                 self.usego.sendlog(f"消息处理循环出错: {e}")
 
