@@ -57,7 +57,8 @@ class AmazonRunAsync:
             command = next((cmd for cmd in commands if cmd['name'] == message.get('command')), None)
 
             if command:
-                command["script"]["receipt_handle"] = receipt_handle
+                self.usego.sendlog(f"得到的: {type({command['script']})},{command['script']}")
+                message['script']['receipt_handle'] = f"{receipt_handle}"
                 self.usego.sendlog(f"开始执行命令: {command}")
                 new_message = message.get("script")
                 result = self.execute_command(command, new_message)
@@ -83,8 +84,7 @@ class AmazonRunAsync:
         self.usego.sendlog(f"使用队列: {queue_url}")
 
         while True:
-            # self.usego.sendlog("避免异常，等待 30 秒再说...")
-            # time.sleep(30)
+
             try:
                 message_result = self.aws_sqs.takeMSG(queue_url)
 
