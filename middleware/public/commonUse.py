@@ -130,6 +130,7 @@ class otherUse():
         tree = [menu_dict[item_id] for item_id in children_map[0]]
         return tree
 
+
     def normalize_text(self, text):
         replacements = {
             '‘': "'", '’': "'",  # 替换为普通单引号

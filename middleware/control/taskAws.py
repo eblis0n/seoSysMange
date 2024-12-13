@@ -237,7 +237,7 @@ class taskAws():
 
             }
             self.usego.sendlog(f' get article，任务信息:{task_data}')
-            response = self.aws_sqs.sendMSG(queue_url, f'run_generate_article_group',f'generate_article',task_data)
+            response = self.aws_sqs.sendMSG(queue_url, f'run_generate_article_group', f'generate_article', task_data)
             result[f"{client}"] = response
             results.append(result)
             self.usego.sendlog(f' run_{datasDict["platform"]}_selenium，任务发送结果:{response}')

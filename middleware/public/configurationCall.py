@@ -87,6 +87,10 @@ log_folder_path = conf.get("logs", "log_folder_path")
 log_folder_name = conf.get("logs", "log_folder_name")
 log_level = conf.get("logs", "log_level")
 
+###################################### pexels ######################################
+
+pexelsKEY = conf.get("pexels", "pexelsKEY")
+
 ###################################### prompt ######################################
 
 titlePrompt = conf.get("prompt", "titlePrompt")

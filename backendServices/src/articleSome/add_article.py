@@ -18,6 +18,7 @@ sys.path.append(bae_idr)
 
 from middleware.dataBaseGO.article_sqlCollenction import article_sqlGO
 from middleware.dataBaseGO.basis_sqlCollenction import basis_sqlGO
+from middleware.thirdPartyAPIs.pexels_API import pexelsAPI
 from middleware.public.commonUse import otherUse
 import middleware.public.configurationCall as configCall
 from backendServices.src.articleSome.public.aiGO import aiGO
@@ -240,6 +241,12 @@ class generateArticle():
             try:
                 # 检查 Atab 是否有该索引，如果没有，赋值为空字符串
                 current_ATag = ATag[i] if i < len(ATag) else ""
+                if current_ATag == "webpic":
+                    pex = pexelsAPI()
+
+                    # 调用 pexelsGO 函数获取图片链接
+                    result = pex.pexelsGO(configCall.pexelsKEY, "金融")
+                    current_ATag = result if result else ""
             except:
                 current_ATag = ""
 
