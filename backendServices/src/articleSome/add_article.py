@@ -91,8 +91,7 @@ class generateArticle():
                         generated_text = self.aigo.run(thisArticle[j]["promptdata"])
                         if generated_text is not None:
                             if article_title == "":
-                                # title_prompt = f"Requirements: 1. Based on the language used by {generated_text}, give a summary within 30 characters at one end; 2. Without any punctuation marks;"
-                                title_prompt = f"""{configCall.titlePrompt}""".replace('{generated_text}', generated_text)
+                                title_prompt = configCall.titlePrompt.replace('{generated_text}', generated_text)
                                 title_text = self.aigo.run(title_prompt)
                                 article_title = title_text
                             else:
@@ -152,7 +151,7 @@ class generateArticle():
         htmllist = ["HTML", "Html", "html"]
         downlist = ["Markdown", "markdown", "MARKDOWN"]
         if type in htmllist:
-            new_prompt = f"""{configCall.addConvertHtml}""".replace('{Epilogue}',Epilogue)
+            new_prompt =configCall.addConvertHtml.replace('{Epilogue}',Epilogue)
             content = self.aigo.run(new_prompt)
             if content is not None:
                 check_html = self.extract_body_content(content)
@@ -165,7 +164,7 @@ class generateArticle():
                 detail = Epilogue
         elif type in downlist:
             # new_Epilogue = self.convert_to_markdown(Epilogue)
-            new_prompt = f"""{configCall.addConvertMarkdowm}""".replace('{Epilogue}', Epilogue)
+            new_prompt = configCall.addConvertMarkdowm.replace('{Epilogue}', Epilogue)
             detail = self.aigo.run(new_prompt)
             if detail is None:
                 detail = Epilogue
@@ -243,7 +242,6 @@ class generateArticle():
                 current_ATag = ATag[i] if i < len(ATag) else ""
                 if current_ATag == "webpic":
                     pex = pexelsAPI()
-
                     # 调用 pexelsGO 函数获取图片链接
                     result = pex.pexelsGO(configCall.pexelsKEY, "金融")
                     current_ATag = result if result else ""

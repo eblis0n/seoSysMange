@@ -79,8 +79,9 @@ class postSqlArticle():
                             self.usego.sendlog("二次创作失败，使用原来的")
 
                         content = self.usego.normalize_text(post_read_list[i]['content'])
-                        prompt = f"""{configCall.pseudoOriginal}""".replace("{content}", content)
-                        print(f"content prompt:{prompt}")
+                        print(f"原文内容：{content}")
+                        prompt = configCall.pseudoOriginal.replace("{content}", content)
+                        # print(f"content prompt:{prompt}")
                         newContent = aigo.run(prompt)
 
                         if newContent is not None:

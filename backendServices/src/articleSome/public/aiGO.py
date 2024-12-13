@@ -59,7 +59,7 @@ class aiGO():
                         timeout=timeout,
                     )
                     generated_text = response['choices'][0]['message']['content'].strip()
-                    print(f" 生成的结果：{generated_text}")
+                    print(f" ai执行结果：{generated_text}")
                     # article = self.insert_article(generated_text)
                     if "I am sorry" in generated_text:
                         print("生成失败，使用原文")
