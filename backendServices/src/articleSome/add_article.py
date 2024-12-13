@@ -72,7 +72,7 @@ class generateArticle():
             print(f"这篇文章由{len(thisArticle)} 段组成")
             Epilogue = ''
             article_title = ''
-            language = ''
+            language = 'en'
 
             for j in range(len(thisArticle)):
                 print(f"这组Article：{thisArticle[j]}")
@@ -80,7 +80,7 @@ class generateArticle():
                 try:
                     language = thisArticle[j]["language"]
                 except:
-                    print(f'thisArticle[j]["language"]： 为{thisArticle[j]["language"]} 跳过')
+                    print(f'language 字段设置为空')
 
                 if int(thisArticle[j]["type"]) == 0:
                     if source == "openAI":
@@ -322,23 +322,24 @@ class generateArticle():
 
 
 if __name__ == '__main__':
-    Art = generateArticle()
-    pcname = "this_mac_1_not"
-    queue_url = "/"
-    max_length = 1
-    source = "openAI"
-    promptID = 4
-    sortID = 5
-    theme = ['大化け期待！2024年の東証スタンダードで注目のテンバガー候補銘柄']
-    Keywords = []
-    ATag = []
-    link = ["https://note.com/easy_racoon9308/n/n0228a186ba82"]
-    language = ["jp"]
-    user = []
-    type = "Markdown"
-
-
-    Art.run(pcname, queue_url, max_length, source, type, promptID, sortID, theme, Keywords, ATag, link, language, user)
+    pass
+    # Art = generateArticle()
+    # pcname = "this_mac_1_not"
+    # queue_url = "/"
+    # max_length = 1
+    # source = "openAI"
+    # promptID = 4
+    # sortID = 5
+    # theme = ['大化け期待！2024年の東証スタンダードで注目のテンバガー候補銘柄']
+    # Keywords = []
+    # ATag = []
+    # link = ["https://note.com/easy_racoon9308/n/n0228a186ba82"]
+    # language = ["jp"]
+    # user = []
+    # type = "Markdown"
+    #
+    #
+    # Art.run(pcname, queue_url, max_length, source, type, promptID, sortID, theme, Keywords, ATag, link, language, user)
 
 
 
