@@ -73,6 +73,12 @@ class MyEnum():
     BLOGGER_INFO_UPDATE = "/update/"
     BLOGGER_INFO_DELETE = "/delete/"
 
+    # twitter
+    TWITTER_INFO_LIST = "/list/"
+    TWITTER_INFO_INSERT = "/add/"
+    TWITTER_INFO_UPDATE = "/update/"
+    TWITTER_INFO_DELETE = "/delete/"
+
     # note
     NOTE_INFO_LIST = "/list/"
     NOTE_INFO_INSERT = "/add/"

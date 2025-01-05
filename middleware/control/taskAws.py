@@ -101,11 +101,11 @@ class taskAws():
             @Motto：简单描述用途
         """
         end = 200000
+
         if idx == 0:
             start = 0
-            # end = 200000
         else:
-            start = end
+            start = end * idx
             end = 200000 * (idx + 1)
 
         return start, end

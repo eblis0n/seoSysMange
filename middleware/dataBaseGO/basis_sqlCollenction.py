@@ -280,6 +280,72 @@ class basis_sqlGO():
         return sql_data
 
 
+    ############################################# twitter #####################################################
+
+
+    def twitter_info_list_sql(self):
+        # noinspection SqlNoDataSourceInspection
+        sqlgo = f"""SELECT /*+ NOCACHE */*  FROM seo_twitter_info ORDER BY `create_at` DESC;"""
+        # 执行 SQL 查询语句
+        sql_data = self.ssql.mysql_select('basis', sqlgo)
+        return sql_data
+
+
+    def twitter_info_insert_sql(self, group, adsNumber, adsID, proxy, twuser, twpassword, email, emailPwd, auth_token, cookie, create_at):
+        # noinspection SqlNoDataSourceInspection
+        sqlgo = f"""INSERT INTO seo_twitter_info (`group`,`adsNumber`,`adsID`, `proxy`, `twuser`,`twpassword`,`email`,`emailPwd`,`auth_token`,`cookie`, `create_at`) VALUES ('{group}','{adsNumber}','{adsID}','{proxy}','{twuser}','{twpassword}','{email}','{emailPwd}','{auth_token}','{cookie}','{create_at}');"""
+        # 执行 SQL 查询语句
+        sql_data = self.ssql.mysql_commit('basis', sqlgo)
+        return sql_data
+
+
+    def twitter_info_delete_sql(self, id):
+        # noinspection SqlNoDataSourceInspection
+        sqlgo = f"""DELETE FROM seo_twitter_info WHERE `id` = '{id}';"""
+        # 执行 SQL 查询语句
+        sql_data = self.ssql.mysql_commit('basis', sqlgo)
+        return sql_data
+
+    def twitter_info_update_sql(self, group, adsNumber, adsID, proxy, twuser, twpassword, email, emailPwd, auth_token, cookie, id):
+        """
+            更新 PC 设置的状态、名称和地址
+        """
+
+        sqlgo = f"""
+                        UPDATE seo_twitter_info 
+                        SET `group` = '{group}', `adsNumber` = '{adsNumber}', `adsID` = '{adsID}', `proxy` = '{proxy}', `twuser` = '{twuser}', `twpassword` = '{twpassword}', `email` = '{email}', `emailPwd` = '{emailPwd}', `auth_token` = '{auth_token}', `cookie` = '{cookie}'
+                        WHERE `id` = '{id}';
+                    """
+        # 执行 SQL 更新查询
+        sql_data = self.ssql.mysql_commit('basis', sqlgo)
+        return sql_data
+
+
+    def twitter_info_select_sql(self,group=None):
+        """
+            @Datetime ： 2024/5/7 10:59
+            @Author ：eblis
+            @Motto：查询 PC 设置
+        """
+        # print("pcSettings_select, locals():", locals())
+
+        # 构建参数字典，过滤掉 None 和空字符串
+        params = {k: v for k, v in locals().items() if k in ['group'] and v not in [None, ""]}
+        print("非 None 的参数名：", list(params.keys()))
+
+        # 根据参数构建 SQL 查询
+        if params:
+            conditions = [f"`{k}` = '{v}'" for k, v in params.items()]
+            sqlgo = f"SELECT /*+ NOCACHE */ * FROM seo_twitter_info WHERE {' AND '.join(conditions)} ORDER BY `create_at` DESC;"
+        else:
+            sqlgo = "SELECT /*+ NOCACHE */ * FROM seo_twitter_info ORDER BY `create_at` DESC;"
+
+        # print("生成的 SQL 查询:", sqlgo)
+
+        # 执行查询
+        sql_data = self.ssql.mysql_select('basis', sqlgo)
+        return sql_data
+
     ############################################# blogger #####################################################
 
 

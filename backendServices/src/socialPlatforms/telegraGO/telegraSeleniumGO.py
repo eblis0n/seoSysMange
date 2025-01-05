@@ -117,43 +117,61 @@ class telegraSeleniumGO:
         Returns:
             str: The JavaScript script string.
         """
-        # Parse content and generate JavaScript code to create elements
-        def html_to_js(content):
+
+        def parse_html_to_js(content, parent="arguments[0]"):
             js_lines = []
 
-            # Regular expression to capture all tags with content
-            tag_pattern = re.compile(r'<(\w+)(.*?)>(.*?)<\/\1>', re.DOTALL)
+            # Regular expression to match opening tag, attributes, and inner content
+            tag_pattern = re.compile(r'<(\w+)([^>]*)>(.*?)<\/\1>', re.DOTALL)
+
+            # Match individual tags and their content
             tags = tag_pattern.findall(content)
 
             for tag, attrs, inner_html in tags:
-                # Handle <p> tag separately to create <a> links
-                if tag == 'p':
-                    links = re.findall(r'<a href=[\'"]([^\'"]+)[\'"]', inner_html)
-                    if links:  # If there are <a> tags inside <p>
-                        # Generate <p> with <a> tags inside
-                        for link in links:
-                            js_lines.append(f"var p = document.createElement('p');")
-                            js_lines.append(f"var a = document.createElement('a');")
-                            js_lines.append(f"a.href = '{link}';")
-                            js_lines.append(f"a.textContent = '{link}';")
-                            js_lines.append(f"p.appendChild(a);")
-                            js_lines.append(f"arguments[0].appendChild(p);")  # Append to parent element
-                    else:
-                        # If no <a> tags, directly set p.textContent
-                        js_lines.append(f"var p = document.createElement('p');")
-                        js_lines.append(f"p.textContent = `{inner_html.strip()}`;")
-                        js_lines.append(f"arguments[0].appendChild(p);")  # Append to parent element
-                else:
-                    # Handle other tags like <h2>, <h3>, etc.
-                    inner_text = re.sub(r'<.*?>', '', inner_html.strip())  # Strip inner tags
+                if tag == 'img':
+                    # Handle <img> tags
+                    src_match = re.search(r'src=[\'"]([^\'"]+)[\'"]', attrs)
+                    if src_match:
+                        img_src = src_match.group(1)
+                        js_lines.append(f"var img = document.createElement('img');")
+                        js_lines.append(f"img.src = '{img_src}';")
+                        js_lines.append(f"{parent}.appendChild(img);")
+                elif tag == 'a':
+                    # Handle <a> tags with potential nested content
+                    href_match = re.search(r'href=[\'"]([^\'"]+)[\'"]', attrs)
+                    if href_match:
+                        href = href_match.group(1)
+                        js_lines.append(f"var a = document.createElement('a');")
+                        js_lines.append(f"a.href = '{href}';")
+                        # Process nested HTML inside <a> (e.g., <img>)
+                        nested_js = parse_html_to_js(inner_html, parent="a")
+                        js_lines.extend(nested_js if nested_js else [])
+                        js_lines.append(f"{parent}.appendChild(a);")
+                elif tag in ['p', 'h2', 'h3', 'h4']:
+                    # Handle common tags like <p>, <h2>, etc.
                     js_lines.append(f"var {tag} = document.createElement('{tag}');")
-                    js_lines.append(f"{tag}.textContent = `{inner_text}`;")
-                    js_lines.append(f"arguments[0].appendChild({tag});")  # Append to parent element
+                    nested_js = parse_html_to_js(inner_html, parent=tag)  # Process nested content
+                    if nested_js:
+                        js_lines.extend(nested_js)
+                    else:
+                        # Escape special characters for text content
+                        js_lines.append(f"{tag}.textContent = `{escape(inner_html.strip())}`;")
+                    js_lines.append(f"{parent}.appendChild({tag});")
+                else:
+                    # Generic fallback for other tags
+                    js_lines.append(f"var {tag} = document.createElement('{tag}');")
+                    nested_js = parse_html_to_js(inner_html, parent=tag)
+                    if nested_js:
+                        js_lines.extend(nested_js)
+                    else:
+                        js_lines.append(f"{tag}.textContent = `{escape(inner_html.strip())}`;")
+                    js_lines.append(f"{parent}.appendChild({tag});")
 
-            return '\n'.join(js_lines)
+            return js_lines
 
-        js_script = html_to_js(content)
-        return js_script
+        # Start parsing and join lines
+        js_lines = parse_html_to_js(content)
+        return '\n'.join(js_lines)
 
 
 

@@ -198,7 +198,7 @@ class postSpliceGo:
             @Author ：eblis
             @Motto：简单描述用途
         """
-        from backendServices.src.history.telegraSelenium import telegraSelenium
+        from backendServices.src.socialPlatforms.telegraGO.telegraSelenium import telegraSelenium
         telegra = telegraSelenium()
         # 创建一个包含目标链接的列表
         to_remove = ["https://telegra.ph", "https://telegra.ph/"]

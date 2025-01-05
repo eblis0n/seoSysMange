@@ -19,6 +19,7 @@ from middleware.control.amazon_run_async import AmazonRunAsync
 # API 蓝图导入
 from src.api.basis.amazonManagement.amazon_management import amazonManage
 from src.api.basis.bloggerManagement.blogger_management import bloggerManage
+from src.api.basis.twitterManagement.twitter_management import twitterManage
 from src.api.basis.operationsManagement.operations_manage import operationsManage
 
 from src.api.basis.outcomeManagement.outcome_manage import outcomeManage
@@ -110,6 +111,7 @@ def _register_blueprints(app):
         amazonManage().bp,
         outcomeManage().bp,
         bloggerManage().bp,
+        twitterManage().bp,
         operationsManage().bp,
         scriptTemplateManage().bp,
         noteInfoManage().bp,
