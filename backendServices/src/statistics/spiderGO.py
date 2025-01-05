@@ -31,13 +31,14 @@ import requests
 base_dr = str(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 bae_idr = base_dr.replace('\\', '/')
 sys.path.append(bae_idr)
-from publicFunctions.commonUse import commonUse
-import publicFunctions.configuration as config
+
+from middleware.public.commonUse import otherUse
+import middleware.public.configurationCall as configCall
 
 
 class spidergo():
     def __init__(self):
-        self.comm = commonUse()
+        self.comm = otherUse()
         # self.jiao_sql = jiao_sqlCollectionGO()
 
     def run_keywords(self, keywords, domain):
@@ -47,7 +48,7 @@ class spidergo():
             @Motto：简单描述用途
         """
         current_at = datetime.now().strftime("%Y%m%d")
-        folder_path = config.google_file
+        folder_path = configCall.google_file
 
         domain_path = self.domain_log(domain, folder_path, current_at)
 
@@ -62,7 +63,7 @@ class spidergo():
         """
         print(f"{domain}准备查蜘蛛")
         current_at = datetime.now().strftime("%Y%m%d")
-        folder_path = config.google_file
+        folder_path = configCall.google_file
 
         if self.check_file(current_at, folder_path):
             print("存在包含当前日期的文件。")
